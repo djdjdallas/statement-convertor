@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
 const AuthContext = createContext({})
 
@@ -17,18 +16,34 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [supabase, setSupabase] = useState(null)
+  const [error, setError] = useState(null)
 
   // Initialize Supabase client safely on client-side only
   useEffect(() => {
-    try {
-      console.log('Initializing Supabase client...')
-      const client = createClient()
-      console.log('Supabase client created:', !!client)
-      setSupabase(client)
-    } catch (error) {
-      console.error('Failed to initialize Supabase client:', error)
-      setLoading(false)
+    const initSupabase = async () => {
+      try {
+        console.log('Initializing Supabase client...')
+        
+        // Dynamic import to avoid SSR issues
+        const { createClient } = await import('@/lib/supabase/client')
+        const client = createClient()
+        
+        if (!client) {
+          console.log('Supabase client creation returned null (likely server-side)')
+          setLoading(false)
+          return
+        }
+        
+        console.log('Supabase client created:', !!client)
+        setSupabase(client)
+      } catch (error) {
+        console.error('Failed to initialize Supabase client:', error)
+        setError(error.message)
+        setLoading(false)
+      }
     }
+
+    initSupabase()
   }, [])
 
   useEffect(() => {
@@ -103,11 +118,34 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
+    error,
     signUp,
     signIn,
     signOut,
     resetPassword,
     updatePassword
+  }
+
+  // Show error state if Supabase failed to initialize
+  if (error && !loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full bg-white shadow-md rounded-lg p-6">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-red-600 mb-4">Configuration Error</h2>
+            <p className="text-gray-600 mb-4">
+              Unable to initialize the application. Please check your environment configuration.
+            </p>
+            <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+              {error}
+            </div>
+            <p className="text-xs text-gray-500 mt-4">
+              Make sure your .env.local file contains valid Supabase credentials.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

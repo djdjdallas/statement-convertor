@@ -81,10 +81,15 @@ export async function POST(request) {
     const exportData = transactions.map(transaction => ({
       Date: transaction.date,
       Description: transaction.description,
+      'Normalized Merchant': transaction.normalized_merchant || transaction.description,
       Category: transaction.category,
+      Subcategory: transaction.subcategory || '',
       Amount: transaction.amount,
       Balance: transaction.balance || '',
-      Type: transaction.transaction_type
+      Type: transaction.transaction_type,
+      'Confidence %': transaction.confidence || '',
+      'AI Reasoning': transaction.ai_reasoning || '',
+      'Anomaly Detected': transaction.anomaly_data ? 'Yes' : 'No'
     }))
 
     let fileBuffer
@@ -94,7 +99,7 @@ export async function POST(request) {
     if (format === 'csv') {
       // Generate CSV
       const parser = new Parser({
-        fields: ['Date', 'Description', 'Category', 'Amount', 'Balance', 'Type']
+        fields: ['Date', 'Description', 'Normalized Merchant', 'Category', 'Subcategory', 'Amount', 'Balance', 'Type', 'Confidence %', 'AI Reasoning', 'Anomaly Detected']
       })
       const csvContent = parser.parse(exportData)
       fileBuffer = Buffer.from(csvContent, 'utf8')
@@ -108,10 +113,15 @@ export async function POST(request) {
       const colWidths = [
         { width: 12 }, // Date
         { width: 40 }, // Description
+        { width: 30 }, // Normalized Merchant
         { width: 15 }, // Category
+        { width: 15 }, // Subcategory
         { width: 12 }, // Amount
         { width: 12 }, // Balance
-        { width: 10 }  // Type
+        { width: 10 }, // Type
+        { width: 12 }, // Confidence %
+        { width: 40 }, // AI Reasoning
+        { width: 15 }  // Anomaly Detected
       ]
       ws['!cols'] = colWidths
 
@@ -120,11 +130,19 @@ export async function POST(request) {
       XLSX.utils.book_append_sheet(wb, ws, 'Transactions')
       
       // Add summary sheet
+      const highConfidenceCount = transactions.filter(t => t.confidence >= 90).length
+      const anomaliesDetected = transactions.filter(t => t.anomaly_data).length
+      const avgConfidence = transactions.filter(t => t.confidence).reduce((sum, t) => sum + t.confidence, 0) / transactions.filter(t => t.confidence).length || 0
+      
       const summaryData = [
         { Metric: 'Total Transactions', Value: transactions.length },
         { Metric: 'Total Credits', Value: transactions.filter(t => t.transaction_type === 'credit').reduce((sum, t) => sum + (t.amount || 0), 0) },
         { Metric: 'Total Debits', Value: Math.abs(transactions.filter(t => t.transaction_type === 'debit').reduce((sum, t) => sum + (t.amount || 0), 0)) },
-        { Metric: 'Net Amount', Value: transactions.reduce((sum, t) => sum + (t.amount || 0), 0) }
+        { Metric: 'Net Amount', Value: transactions.reduce((sum, t) => sum + (t.amount || 0), 0) },
+        { Metric: 'AI Processed', Value: transactions.filter(t => t.confidence).length },
+        { Metric: 'High Confidence (90%+)', Value: highConfidenceCount },
+        { Metric: 'Average Confidence %', Value: avgConfidence.toFixed(1) },
+        { Metric: 'Anomalies Detected', Value: anomaliesDetected }
       ]
       
       const summaryWs = XLSX.utils.json_to_sheet(summaryData)
