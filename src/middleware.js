@@ -32,15 +32,18 @@ export async function middleware(request) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protect dashboard routes
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    return NextResponse.redirect(new URL('/auth/signin', request.url))
-  }
+  // Temporarily disable redirects to fix loop - handled by client-side auth
+  // TODO: Re-enable and fix after authentication is working
+  
+  // // Protect dashboard routes
+  // if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
+  //   return NextResponse.redirect(new URL('/auth/signin', request.url))
+  // }
 
-  // Redirect authenticated users away from auth pages
-  if (request.nextUrl.pathname.startsWith('/auth') && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+  // // Redirect authenticated users away from auth pages
+  // if (request.nextUrl.pathname.startsWith('/auth') && user) {
+  //   return NextResponse.redirect(new URL('/dashboard', request.url))
+  // }
 
   return supabaseResponse
 }

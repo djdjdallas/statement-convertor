@@ -81,7 +81,7 @@ Examples:
 Merchant names to normalize:
 ${JSON.stringify(uniqueMerchants, null, 2)}
 
-Return a JSON object mapping original names to normalized names:
+CRITICAL: Return ONLY valid JSON with no explanations or formatting. Just the raw JSON object mapping original names to normalized names:
 {
   "original_name": "normalized_name"
 }`
@@ -93,7 +93,7 @@ Return a JSON object mapping original names to normalized names:
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const normalizedMap = JSON.parse(response.content[0].text)
+      const normalizedMap = this.extractJSON(response.content[0].text)
       return normalizedMap
     } catch (error) {
       console.error('Claude merchant normalization error:', error)
@@ -132,7 +132,8 @@ For each anomaly found, provide:
   "recommendation": "suggested action"
 }
 
-Return a JSON array of anomalies found, or empty array if none.`
+CRITICAL: Return ONLY valid JSON array with no explanations or formatting. Just the raw JSON:
+[anomalies] or [] if none found.`
 
       const response = await this.anthropic.messages.create({
         model: this.model,
@@ -141,7 +142,7 @@ Return a JSON array of anomalies found, or empty array if none.`
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const anomalies = JSON.parse(response.content[0].text)
+      const anomalies = this.extractJSON(response.content[0].text)
       return Array.isArray(anomalies) ? anomalies : []
     } catch (error) {
       console.error('Claude anomaly detection error:', error)
@@ -204,24 +205,65 @@ Return a JSON object with:
   }
 
   /**
+   * Extract JSON from Claude response, handling markdown code blocks and other formatting
+   */
+  extractJSON(text) {
+    try {
+      // Remove markdown code blocks if present
+      let cleanText = text.replace(/```json\s*/g, '').replace(/```\s*$/g, '')
+      
+      // Find JSON content (objects or arrays)
+      const objectMatch = cleanText.match(/\{[\s\S]*\}/)
+      const arrayMatch = cleanText.match(/\[[\s\S]*\]/)
+      
+      if (objectMatch && arrayMatch) {
+        // Choose the longer match (likely the complete JSON)
+        cleanText = objectMatch[0].length > arrayMatch[0].length ? objectMatch[0] : arrayMatch[0]
+      } else if (objectMatch) {
+        cleanText = objectMatch[0]
+      } else if (arrayMatch) {
+        cleanText = arrayMatch[0]
+      }
+      
+      // Remove any leading/trailing non-JSON text
+      cleanText = cleanText.trim()
+      
+      return JSON.parse(cleanText)
+    } catch (error) {
+      console.error('JSON extraction error:', error)
+      console.error('Raw text:', text.substring(0, 500))
+      throw error
+    }
+  }
+
+  /**
    * Enhanced PDF text analysis for better transaction extraction
    */
   async enhancePDFExtraction(pdfText, bankType = 'unknown') {
     try {
-      const prompt = `You are a bank statement parsing expert. Analyze this PDF text and extract transaction data with high accuracy.
+      const prompt = `You are a financial document parsing expert. Analyze this PDF text and extract ALL transaction data with high accuracy. This document may contain multiple formats:
+
+1. Bank statement format: Date, Description, Amount, Balance
+2. Ledger format: Date, Description, Credits, Debits, Running Profit, Balance
 
 Bank type: ${bankType}
 PDF Text:
-${pdfText.slice(0, 8000)}
+${pdfText.slice(0, 12000)}
 
-Extract:
-1. All transactions with dates, descriptions, amounts, and balances
-2. Account information (account number, holder name, balances)
-3. Statement period
-4. Any fees or charges
-5. Categorize each transaction
+Extract ALL transactions from ALL pages and formats including:
+1. Bank statement transactions (deposits, withdrawals, fees, etc.)
+2. Ledger transactions (credits, debits, sales, purchases, labor, supplies)
+3. Account information (account number, holder name, balances)
+4. Statement period
+5. Categorize each transaction appropriately
 
-Return structured JSON:
+IMPORTANT: For the amount field:
+- Debits/withdrawals/expenses should be NEGATIVE numbers (e.g., -45.67)
+- Credits/deposits/income should be POSITIVE numbers (e.g., 100.00)
+- For ledger entries: Credits = positive amounts, Debits = negative amounts
+- Look for indicators in the description to determine if it's a debit or credit
+
+CRITICAL: Return ONLY valid JSON with no explanations, comments, or additional text. Do not include markdown formatting or code blocks. Just the raw JSON:
 {
   "accountInfo": {
     "accountNumber": "****1234",
@@ -241,6 +283,14 @@ Return structured JSON:
       "balance": 1000.00,
       "category": "Groceries",
       "type": "debit"
+    },
+    {
+      "date": "2024-01-20",
+      "description": "DIRECT DEPOSIT - PAYROLL",
+      "amount": 2500.00,
+      "balance": 3500.00,
+      "category": "Income",
+      "type": "credit"
     }
   ],
   "summary": {
@@ -257,7 +307,7 @@ Return structured JSON:
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const extractedData = JSON.parse(response.content[0].text)
+      const extractedData = this.extractJSON(response.content[0].text)
       return extractedData
     } catch (error) {
       console.error('Claude PDF extraction error:', error)

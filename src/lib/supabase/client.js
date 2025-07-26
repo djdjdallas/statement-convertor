@@ -1,9 +1,11 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
+let supabaseClient = null
+
 export function createClient() {
-  // Check if we're in the browser
-  if (typeof window === 'undefined') {
-    return null
+  // Return existing client if already created
+  if (supabaseClient) {
+    return supabaseClient
   }
   
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -14,21 +16,24 @@ export function createClient() {
       hasUrl: !!url, 
       hasKey: !!key 
     })
-    throw new Error('Missing Supabase environment variables. Please check your .env.local file.')
+    // Return null instead of throwing during initialization
+    return null
   }
   
   console.log('Creating Supabase client with URL:', url.substring(0, 30) + '...')
   
   try {
-    return createSupabaseClient(url, key, {
+    supabaseClient = createSupabaseClient(url, key, {
       auth: {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true
       }
     })
+    
+    return supabaseClient
   } catch (error) {
     console.error('Failed to create Supabase client:', error)
-    throw error
+    return null
   }
 }

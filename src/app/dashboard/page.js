@@ -43,18 +43,27 @@ export default function DashboardPage() {
     totalExports: 0
   })
   const [loading, setLoading] = useState(true)
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading: authLoading } = useAuth()
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
+    console.log('Dashboard useEffect - user:', user, 'authLoading:', authLoading)
+    
+    if (authLoading) {
+      console.log('Still loading authentication state...')
+      return
+    }
+
     if (!user) {
-      router.push('/auth/signin')
+      console.log('No user found, redirecting to signin...')
+      router.replace('/auth/signin')
       return
     }
     
+    console.log('User authenticated, fetching dashboard data...')
     fetchDashboardData()
-  }, [user, router])
+  }, [user, authLoading, router])
 
   const fetchDashboardData = async () => {
     try {
@@ -195,15 +204,29 @@ export default function DashboardPage() {
   const monthlyLimit = tierInfo?.limits.monthlyConversions
   const canProcess = monthlyLimit === -1 || stats.thisMonth < monthlyLimit
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading authentication...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (!user) {
+    // This should not render because of the useEffect redirect, but keeping as fallback
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-gray-600 mb-4">Please sign in to access your dashboard</p>
-            <Link href="/auth/signin">
-              <Button>Sign In</Button>
-            </Link>
+            <p className="text-gray-600 mb-4">Redirecting to sign in...</p>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
           </CardContent>
         </Card>
       </div>

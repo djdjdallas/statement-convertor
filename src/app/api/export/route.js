@@ -84,7 +84,10 @@ export async function POST(request) {
       'Normalized Merchant': transaction.normalized_merchant || transaction.description,
       Category: transaction.category,
       Subcategory: transaction.subcategory || '',
-      Amount: transaction.amount,
+      // Apply negative sign for debits/withdrawals
+      Amount: transaction.transaction_type === 'debit' ? 
+        (transaction.amount > 0 ? -transaction.amount : transaction.amount) : 
+        transaction.amount,
       Balance: transaction.balance || '',
       Type: transaction.transaction_type,
       'Confidence %': transaction.confidence || '',
@@ -136,9 +139,12 @@ export async function POST(request) {
       
       const summaryData = [
         { Metric: 'Total Transactions', Value: transactions.length },
-        { Metric: 'Total Credits', Value: transactions.filter(t => t.transaction_type === 'credit').reduce((sum, t) => sum + (t.amount || 0), 0) },
-        { Metric: 'Total Debits', Value: Math.abs(transactions.filter(t => t.transaction_type === 'debit').reduce((sum, t) => sum + (t.amount || 0), 0)) },
-        { Metric: 'Net Amount', Value: transactions.reduce((sum, t) => sum + (t.amount || 0), 0) },
+        { Metric: 'Total Credits', Value: transactions.filter(t => t.transaction_type === 'credit').reduce((sum, t) => sum + Math.abs(t.amount || 0), 0) },
+        { Metric: 'Total Debits', Value: -transactions.filter(t => t.transaction_type === 'debit').reduce((sum, t) => sum + Math.abs(t.amount || 0), 0) },
+        { Metric: 'Net Amount', Value: transactions.reduce((sum, t) => {
+          const amount = t.amount || 0
+          return sum + (t.transaction_type === 'debit' ? -Math.abs(amount) : Math.abs(amount))
+        }, 0) },
         { Metric: 'AI Processed', Value: transactions.filter(t => t.confidence).length },
         { Metric: 'High Confidence (90%+)', Value: highConfidenceCount },
         { Metric: 'Average Confidence %', Value: avgConfidence.toFixed(1) },

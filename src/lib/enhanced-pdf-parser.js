@@ -1,9 +1,22 @@
-// Use pdfjs-dist for reliable PDF text extraction
-import * as pdfjsLib from 'pdfjs-dist'
+// Use pdf-parse for reliable PDF text extraction (Node.js compatible)
 import { claudeAI } from './ai/claude-service.js'
 
-// Configure worker - disable worker for server-side usage
-pdfjsLib.GlobalWorkerOptions.workerSrc = null
+// Lazy load pdf-parse to avoid initialization issues
+let pdfParse;
+
+async function getPdfParser() {
+  if (!pdfParse) {
+    try {
+      // Import the core functionality without triggering debug code
+      const pdfParseModule = await import('pdf-parse/lib/pdf-parse.js');
+      pdfParse = pdfParseModule.default || pdfParseModule;
+    } catch (error) {
+      console.error('Failed to load pdf-parse:', error);
+      throw new Error('PDF parsing library not available');
+    }
+  }
+  return pdfParse;
+}
 
 /**
  * Enhanced Bank statement PDF parser with AI integration
@@ -58,23 +71,16 @@ export class EnhancedBankStatementParser {
     try {
       console.log('Starting enhanced PDF parsing, buffer size:', pdfBuffer.length)
       
-      // Load PDF document
-      const loadingTask = pdfjsLib.getDocument({ data: pdfBuffer })
-      const pdfDoc = await loadingTask.promise
+      // Get the PDF parser
+      const pdfParser = await getPdfParser()
       
-      let fullText = ''
-      const numPages = pdfDoc.numPages
+      // Parse PDF and extract text
+      const pdfData = await pdfParser(pdfBuffer)
+      const text = pdfData.text
+      const numPages = pdfData.numpages || 1
       
-      // Extract text from all pages
-      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-        const page = await pdfDoc.getPage(pageNum)
-        const textContent = await page.getTextContent()
-        const pageText = textContent.items.map(item => item.str).join(' ')
-        fullText += pageText + '\n'
-      }
-      
-      const text = fullText
       console.log('Extracted text length:', text.length)
+      console.log('Number of pages:', numPages)
       
       // Detect bank type using traditional method
       const bankType = this.detectBankType(text)
@@ -347,6 +353,8 @@ export class EnhancedBankStatementParser {
     const transactions = []
     const lines = text.split('\n')
     
+    console.log('Alternative extraction: processing', lines.length, 'lines')
+    
     // Look for lines that might contain transaction data
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim()
@@ -358,37 +366,102 @@ export class EnhancedBankStatementParser {
       const dateMatch = line.match(/(\d{1,2}\/\d{1,2}\/?\d{0,4})/g)
       if (!dateMatch) continue
       
-      // Look for amount patterns
-      const amountMatch = line.match(/([-]?\$?[\d,]+\.?\d{0,2})/g)
-      if (!amountMatch || amountMatch.length < 1) continue
+      // Try to extract transaction data from the line
+      const extracted = this.extractTransactionFromLine(line, dateMatch[0])
+      if (extracted) {
+        transactions.push(extracted)
+        console.log('Extracted transaction:', extracted.date, extracted.description, extracted.amount)
+      }
+    }
+    
+    console.log('Alternative extraction found', transactions.length, 'transactions')
+    return transactions
+  }
+
+  /**
+   * Extract transaction data from a single line with multiple format support
+   */
+  extractTransactionFromLine(line, dateStr) {
+    const date = this.parseDate(dateStr)
+    if (!date) return null
+
+    // Try different formats
+    
+    // Format 1: Bank statement format
+    // "1/5/18 Check #123 ABC Insurance  112.89 887.11"
+    const bankMatch = line.match(/(\d{1,2}\/\d{1,2}\/?\d{0,4})\s+(.+?)\s+([-]?\$?[\d,]+\.?\d{0,2})\s*([-]?\$?[\d,]+\.?\d{0,2})?/)
+    if (bankMatch) {
+      const [, , description, amountStr, balanceStr] = bankMatch
+      const amount = this.parseAmount(amountStr)
+      const balance = balanceStr ? this.parseAmount(balanceStr) : null
       
-      // Extract transaction components
-      const date = this.parseDate(dateMatch[0])
-      if (!date) continue
-      
-      // Find description (text between date and first amount)
-      const dateIndex = line.indexOf(dateMatch[0])
-      const firstAmountIndex = line.indexOf(amountMatch[0])
-      
-      if (dateIndex >= firstAmountIndex) continue
-      
-      const description = line.substring(dateIndex + dateMatch[0].length, firstAmountIndex).trim()
-      const amount = this.parseAmount(amountMatch[0])
-      const balance = amountMatch.length > 1 ? this.parseAmount(amountMatch[amountMatch.length - 1]) : null
-      
-      if (amount !== null && description) {
-        transactions.push({
+      if (amount !== null && description.trim()) {
+        return {
           date,
           description: this.cleanDescription(description),
           amount,
           balance,
           type: this.determineTransactionType(description, amount),
           category: this.categorizeTransaction(description)
-        })
+        }
       }
     }
-    
-    return transactions
+
+    // Format 2: Ledger format with Credits/Debits columns
+    // "3/1/18 Supplies - Seed Purchase  200.00 -200.00 1,800.00"
+    const ledgerMatch = line.match(/(\d{1,2}\/\d{1,2}\/?\d{0,4})\s+(.+?)\s+([\d,]+\.?\d{0,2})?\s*([\d,]+\.?\d{0,2})?\s*([-+]?[\d,]+\.?\d{0,2})?\s*([\d,]+\.?\d{0,2})?/)
+    if (ledgerMatch) {
+      const [, , description, credit, debit, runningProfit, balance] = ledgerMatch
+      
+      // Determine amount - use debit if present, otherwise credit
+      let amount = 0
+      let type = 'unknown'
+      
+      if (debit && parseFloat(debit.replace(/,/g, '')) > 0) {
+        amount = -this.parseAmount(debit) // Debits are negative
+        type = 'debit'
+      } else if (credit && parseFloat(credit.replace(/,/g, '')) > 0) {
+        amount = this.parseAmount(credit) // Credits are positive
+        type = 'credit'
+      }
+      
+      if (amount !== 0 && description && description.trim() !== '') {
+        return {
+          date,
+          description: this.cleanDescription(description),
+          amount,
+          balance: balance ? this.parseAmount(balance) : null,
+          type,
+          category: this.categorizeTransaction(description)
+        }
+      }
+    }
+
+    // Format 3: Simple format - just find amounts
+    const amountMatches = line.match(/([-]?\$?[\d,]+\.?\d{0,2})/g)
+    if (amountMatches && amountMatches.length >= 1) {
+      const dateIndex = line.indexOf(dateStr)
+      const firstAmountIndex = line.indexOf(amountMatches[0])
+      
+      if (dateIndex < firstAmountIndex) {
+        const description = line.substring(dateIndex + dateStr.length, firstAmountIndex).trim()
+        const amount = this.parseAmount(amountMatches[0])
+        const balance = amountMatches.length > 1 ? this.parseAmount(amountMatches[amountMatches.length - 1]) : null
+        
+        if (amount !== null && description) {
+          return {
+            date,
+            description: this.cleanDescription(description),
+            amount,
+            balance,
+            type: this.determineTransactionType(description, amount),
+            category: this.categorizeTransaction(description)
+          }
+        }
+      }
+    }
+
+    return null
   }
 
   /**
@@ -461,21 +534,41 @@ export class EnhancedBankStatementParser {
    * Determine transaction type (debit/credit)
    */
   determineTransactionType(description, amount) {
-    if (amount > 0) {
-      return 'credit'
-    } else if (amount < 0) {
+    // If amount is already negative, it's a debit
+    if (amount < 0) {
       return 'debit'
     }
     
     // Check description for clues
     const lowerDesc = description.toLowerCase()
-    if (lowerDesc.includes('deposit') || lowerDesc.includes('credit')) {
-      return 'credit'
-    } else if (lowerDesc.includes('withdrawal') || lowerDesc.includes('debit') || lowerDesc.includes('fee')) {
+    
+    // Common debit/expense indicators
+    const debitKeywords = [
+      'withdrawal', 'debit', 'fee', 'charge', 'purchase', 'payment',
+      'bill', 'mortgage', 'rent', 'utilities', 'insurance', 'subscription',
+      'transfer out', 'atm', 'pos', 'check', 'direct debit', 'autopay',
+      'labor', 'supplies', 'materials', 'expense', 'cost'
+    ]
+    
+    // Common credit/income indicators  
+    const creditKeywords = [
+      'deposit', 'credit', 'refund', 'rebate', 'interest earned',
+      'direct deposit', 'payroll', 'salary', 'income', 'transfer in',
+      'cash back', 'reward', 'dividend', 'sale of', 'revenue'
+    ]
+    
+    // Check for debit keywords
+    if (debitKeywords.some(keyword => lowerDesc.includes(keyword))) {
       return 'debit'
     }
     
-    return 'unknown'
+    // Check for credit keywords
+    if (creditKeywords.some(keyword => lowerDesc.includes(keyword))) {
+      return 'credit'
+    }
+    
+    // If no clear indication and amount is positive, assume debit (most transactions are expenses)
+    return amount > 0 ? 'debit' : 'unknown'
   }
 
   /**

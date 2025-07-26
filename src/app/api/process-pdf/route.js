@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { bankStatementParser } from '@/lib/pdf-parser'
+import { enhancedBankStatementParser } from '@/lib/enhanced-pdf-parser'
 import { checkUsageLimit, getTierLimits } from '@/lib/subscription-tiers'
 
 export async function POST(request) {
@@ -97,8 +97,8 @@ export async function POST(request) {
       const arrayBuffer = await fileData.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
 
-      // Parse PDF and extract transactions
-      const parseResult = await bankStatementParser.parsePDF(buffer)
+      // Parse PDF and extract transactions with AI enhancement
+      const parseResult = await enhancedBankStatementParser.parsePDF(buffer)
 
       if (!parseResult.success) {
         throw new Error(parseResult.error)
@@ -106,7 +106,7 @@ export async function POST(request) {
 
       const { data: extractedData } = parseResult
 
-      // Save extracted transactions to database
+      // Save extracted transactions to database with AI-enhanced fields
       const transactionsToInsert = extractedData.transactions.map(transaction => ({
         file_id: fileId,
         date: transaction.date,
@@ -114,7 +114,13 @@ export async function POST(request) {
         amount: transaction.amount,
         balance: transaction.balance,
         transaction_type: transaction.type,
-        category: transaction.category
+        category: transaction.category,
+        subcategory: transaction.subcategory,
+        confidence: transaction.confidence,
+        normalized_merchant: transaction.normalizedMerchant,
+        ai_reasoning: transaction.aiReasoning,
+        anomaly_data: transaction.anomaly ? JSON.stringify(transaction.anomaly) : null,
+        original_category: transaction.originalCategory
       }))
 
       if (transactionsToInsert.length > 0) {
@@ -128,13 +134,27 @@ export async function POST(request) {
         }
       }
 
+      // Save AI insights if available
+      if (extractedData.aiInsights) {
+        await supabase
+          .from('ai_insights')
+          .insert({
+            file_id: fileId,
+            user_id: user.id,
+            insights_data: extractedData.aiInsights,
+            generated_at: new Date().toISOString()
+          })
+      }
+
       // Update file record with completion status and metadata
       await supabase
         .from('files')
         .update({
           processing_status: 'completed',
           processed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          ai_enhanced: extractedData.metadata?.aiEnhanced || false,
+          extraction_method: extractedData.metadata?.extractionMethod || 'Traditional'
         })
         .eq('id', fileId)
 
@@ -161,7 +181,8 @@ export async function POST(request) {
           accountInfo: extractedData.accountInfo,
           statementPeriod: extractedData.statementPeriod,
           preview: extractedData.transactions.slice(0, 5), // First 5 transactions for preview
-          metadata: extractedData.metadata
+          metadata: extractedData.metadata,
+          aiInsights: extractedData.aiInsights
         }
       })
 
