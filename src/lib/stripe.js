@@ -1,9 +1,19 @@
 import Stripe from 'stripe'
 
-// Server-side Stripe instance
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16'
-})
+// Server-side Stripe instance - lazy initialization to avoid build errors
+let stripeInstance = null
+
+function getStripe() {
+  if (!stripeInstance && process.env.STRIPE_SECRET_KEY) {
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16'
+    })
+  }
+  return stripeInstance
+}
+
+// Export the getStripe function for internal use
+export { getStripe }
 
 // Price IDs for subscription tiers - these would come from your Stripe dashboard
 export const STRIPE_PRICES = {
@@ -22,6 +32,10 @@ export async function createCheckoutSession({
   cancelUrl
 }) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -57,6 +71,10 @@ export async function createCheckoutSession({
  */
 export async function createPortalSession(customerId, returnUrl) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: returnUrl,
@@ -74,6 +92,10 @@ export async function createPortalSession(customerId, returnUrl) {
  */
 export async function getOrCreateCustomer(userId, email, name = null) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     // First, try to find existing customer by email
     const existingCustomers = await stripe.customers.list({
       email: email,
@@ -114,6 +136,10 @@ export async function getOrCreateCustomer(userId, email, name = null) {
  */
 export async function getSubscription(customerId) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: 'active',
@@ -136,6 +162,10 @@ export async function getSubscription(customerId) {
  */
 export async function cancelSubscription(subscriptionId) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const subscription = await stripe.subscriptions.update(subscriptionId, {
       cancel_at_period_end: true
     })
@@ -152,6 +182,10 @@ export async function cancelSubscription(subscriptionId) {
  */
 export async function reactivateSubscription(subscriptionId) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const subscription = await stripe.subscriptions.update(subscriptionId, {
       cancel_at_period_end: false
     })
@@ -168,6 +202,10 @@ export async function reactivateSubscription(subscriptionId) {
  */
 export async function getPrice(priceId) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const price = await stripe.prices.retrieve(priceId, {
       expand: ['product']
     })
@@ -184,6 +222,10 @@ export async function getPrice(priceId) {
  */
 export async function handleSubscriptionCreated(subscription) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const customer = await stripe.customers.retrieve(subscription.customer)
     const userId = customer.metadata.userId || subscription.metadata.userId
 
@@ -221,6 +263,10 @@ export async function handleSubscriptionCreated(subscription) {
  */
 export async function handleSubscriptionUpdated(subscription) {
   try {
+    const stripe = getStripe()
+    if (!stripe) {
+      throw new Error('Stripe is not configured')
+    }
     const customer = await stripe.customers.retrieve(subscription.customer)
     const userId = customer.metadata.userId || subscription.metadata.userId
 

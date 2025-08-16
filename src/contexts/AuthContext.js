@@ -111,6 +111,83 @@ export const AuthProvider = ({ children }) => {
     return { data, error }
   }
 
+  const signInWithGoogle = async () => {
+    const supabase = createClient()
+    if (!supabase) return { data: null, error: new Error('Supabase not initialized') }
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: 'email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      }
+    })
+    return { data, error }
+  }
+
+  const linkGoogleAccount = async () => {
+    const supabase = createClient()
+    if (!supabase) return { data: null, error: new Error('Supabase not initialized') }
+    
+    // For linking, we need to ensure the user is already authenticated
+    if (!user) {
+      return { data: null, error: new Error('User must be authenticated to link Google account') }
+    }
+    
+    const { data, error } = await supabase.auth.linkIdentity({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?link=true`,
+        scopes: 'email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      }
+    })
+    return { data, error }
+  }
+
+  const unlinkGoogleAccount = async () => {
+    const supabase = createClient()
+    if (!supabase) return { data: null, error: new Error('Supabase not initialized') }
+    
+    // Get the user's identities
+    const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser()
+    if (userError) return { data: null, error: userError }
+    
+    // Find Google identity
+    const googleIdentity = currentUser?.identities?.find(identity => identity.provider === 'google')
+    if (!googleIdentity) {
+      return { data: null, error: new Error('No Google account linked') }
+    }
+    
+    const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+    return { data, error }
+  }
+
+  const getGoogleTokens = async () => {
+    const supabase = createClient()
+    if (!supabase) return { data: null, error: new Error('Supabase not initialized') }
+    
+    if (!user) {
+      return { data: null, error: new Error('User not authenticated') }
+    }
+    
+    // Get tokens from our google_tokens table
+    const { data, error } = await supabase
+      .from('google_tokens')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+    
+    return { data, error }
+  }
+
   const value = {
     user,
     loading,
@@ -119,7 +196,11 @@ export const AuthProvider = ({ children }) => {
     signIn,
     signOut,
     resetPassword,
-    updatePassword
+    updatePassword,
+    signInWithGoogle,
+    linkGoogleAccount,
+    unlinkGoogleAccount,
+    getGoogleTokens
   }
 
   // Show error state if Supabase failed to initialize

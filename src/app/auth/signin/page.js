@@ -13,6 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Separator } from '@/components/ui/separator'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
+import GoogleSignInButton from '@/components/GoogleSignInButton'
+import SocialAuthDivider from '@/components/SocialAuthDivider'
 
 const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -78,8 +80,12 @@ export default function SignInPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <GoogleSignInButton mode="signin" className="mb-4" />
+            
+            <SocialAuthDivider />
+            
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
                 {error && (
                   <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
                     {error}

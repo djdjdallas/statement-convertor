@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { stripe, handleSubscriptionCreated, handleSubscriptionUpdated } from '@/lib/stripe'
+import { getStripe, handleSubscriptionCreated, handleSubscriptionUpdated } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request) {
@@ -17,6 +17,10 @@ export async function POST(request) {
 
     let event
     try {
+      const stripe = getStripe()
+      if (!stripe) {
+        throw new Error('Stripe is not configured')
+      }
       event = stripe.webhooks.constructEvent(
         body,
         signature,
@@ -104,6 +108,11 @@ export async function POST(request) {
         console.log('Subscription deleted:', subscription.id)
 
         // Downgrade user to free tier
+        const stripe = getStripe()
+        if (!stripe) {
+          console.error('Stripe is not configured')
+          break
+        }
         const customer = await stripe.customers.retrieve(subscription.customer)
         const userId = customer.metadata.userId
 
@@ -130,6 +139,11 @@ export async function POST(request) {
           console.log('Payment succeeded for subscription:', invoice.subscription)
           
           // Log successful payment
+          const stripe = getStripe()
+          if (!stripe) {
+            console.error('Stripe is not configured')
+            break
+          }
           const customer = await stripe.customers.retrieve(invoice.customer)
           const userId = customer.metadata.userId
 
@@ -148,6 +162,11 @@ export async function POST(request) {
           console.log('Payment failed for subscription:', invoice.subscription)
           
           // Handle failed payment - you might want to send an email or update status
+          const stripe = getStripe()
+          if (!stripe) {
+            console.error('Stripe is not configured')
+            break
+          }
           const customer = await stripe.customers.retrieve(invoice.customer)
           const userId = customer.metadata.userId
 
