@@ -1,7 +1,7 @@
-# StatementConverter - AI Enhancement Documentation
+# Statement Desk - AI Enhancement Documentation
 
 ## Project Overview
-StatementConverter is a Next.js SaaS application that converts PDF bank statements to Excel/CSV formats, enhanced with advanced AI capabilities powered by Claude AI.
+Statement Desk is a Next.js SaaS application that converts PDF bank statements to Excel/CSV formats, enhanced with advanced AI capabilities powered by Claude AI.
 
 ## AI Enhancement Implementation Status
 

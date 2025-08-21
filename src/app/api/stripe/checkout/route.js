@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createCheckoutSession, getOrCreateCustomer, STRIPE_PRICES } from '@/lib/stripe'
+import { createCheckoutSession, getOrCreateCustomer } from '@/lib/stripe'
+import { getPriceId } from '@/lib/subscription-tiers'
 
 export async function POST(request) {
   try {
@@ -16,11 +17,21 @@ export async function POST(request) {
       )
     }
 
-    const { tier } = await request.json()
+    const { tier, billingPeriod = 'monthly' } = await request.json()
     
-    if (!tier || !['basic', 'premium'].includes(tier)) {
+    // Validate tier - now includes professional, business, not basic/premium
+    const validTiers = ['professional', 'business', 'basic', 'premium'] // Include legacy names
+    if (!tier || !validTiers.includes(tier)) {
       return NextResponse.json(
         { error: 'Invalid subscription tier' },
+        { status: 400 }
+      )
+    }
+
+    // Validate billing period
+    if (!['monthly', 'yearly'].includes(billingPeriod)) {
+      return NextResponse.json(
+        { error: 'Invalid billing period' },
         { status: 400 }
       )
     }
@@ -55,17 +66,28 @@ export async function POST(request) {
         stripe_customer_id: customer.id
       })
 
-    // Create checkout session
-    const priceId = STRIPE_PRICES[tier]
+    // Get the appropriate price ID based on tier and billing period
+    const priceId = getPriceId(tier, billingPeriod)
+    
+    if (!priceId) {
+      return NextResponse.json(
+        { error: 'Invalid price configuration' },
+        { status: 400 }
+      )
+    }
+
+    // Create checkout session with trial period
     const { session, error: sessionError } = await createCheckoutSession({
       userId: user.id,
       userEmail: user.email,
       priceId,
       successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`
+      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      trialPeriodDays: 14 // 14-day free trial
     })
 
     if (sessionError) {
+      console.error('Checkout session error:', sessionError)
       return NextResponse.json(
         { error: 'Failed to create checkout session' },
         { status: 500 }

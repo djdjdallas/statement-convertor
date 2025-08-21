@@ -1,0 +1,273 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { enhancedBankStatementParser } from '@/lib/enhanced-pdf-parser'
+import { checkUsageLimit, getTierLimits } from '@/lib/subscription-tiers'
+
+export async function POST(request) {
+  try {
+    console.log('PDF processing API called')
+    const supabase = await createClient()
+    
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.log('Authentication error:', authError)
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+    
+    console.log('User authenticated:', user.id)
+
+    // Get request data
+    const { fileId } = await request.json()
+    
+    if (!fileId) {
+      return NextResponse.json(
+        { error: 'File ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Get user profile and check subscription limits
+    const { data: userProfile } = await supabase
+      .from('user_profiles')
+      .select('subscription_tier, subscription_plan')
+      .eq('id', user.id)
+      .single()
+
+    // Use subscription_plan (new naming) or fall back to subscription_tier (old naming)
+    const userTier = userProfile?.subscription_plan || userProfile?.subscription_tier || 'free'
+
+    // Get usage from the efficient conversion_usage table using the stored function
+    const { data: usageData, error: usageError } = await supabase
+      .rpc('get_user_monthly_usage', { p_user_id: user.id })
+      .single()
+
+    const currentUsage = usageData?.conversions_count || 0
+    
+    // Check usage limits
+    if (!checkUsageLimit(userTier, currentUsage)) {
+      const limits = getTierLimits(userTier)
+      return NextResponse.json(
+        { 
+          error: 'Monthly processing limit exceeded',
+          details: {
+            current: currentUsage,
+            limit: limits.monthlyConversions,
+            tier: userTier,
+            message: `You've used ${currentUsage} out of ${limits.monthlyConversions} conversions this month. Please upgrade your plan for more conversions.`
+          }
+        },
+        { status: 429 }
+      )
+    }
+
+    // Get file record from database
+    const { data: fileRecord, error: fileError } = await supabase
+      .from('files')
+      .select('*')
+      .eq('id', fileId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (fileError || !fileRecord) {
+      return NextResponse.json(
+        { error: 'File not found' },
+        { status: 404 }
+      )
+    }
+
+    // Check file size limits
+    const limits = getTierLimits(userTier)
+    if (fileRecord.file_size > limits.maxFileSize) {
+      return NextResponse.json(
+        { 
+          error: 'File size exceeds your plan limit',
+          details: {
+            fileSize: fileRecord.file_size,
+            limit: limits.maxFileSize,
+            tier: userTier
+          }
+        },
+        { status: 413 }
+      )
+    }
+
+    // Update file status to processing
+    await supabase
+      .from('files')
+      .update({ 
+        processing_status: 'processing',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', fileId)
+
+    try {
+      // Download file from Supabase Storage
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from('statement-files')
+        .download(fileRecord.file_path)
+
+      if (downloadError) {
+        throw new Error(`Failed to download file: ${downloadError.message}`)
+      }
+
+      // Convert file to buffer
+      const arrayBuffer = await fileData.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+
+      // Parse PDF and extract transactions with AI enhancement
+      const parseResult = await enhancedBankStatementParser.parsePDF(buffer)
+
+      if (!parseResult.success) {
+        throw new Error(parseResult.error)
+      }
+
+      const { data: extractedData } = parseResult
+
+      // Save extracted transactions to database with AI-enhanced fields
+      const transactionsToInsert = extractedData.transactions.map(transaction => ({
+        file_id: fileId,
+        date: transaction.date,
+        description: transaction.description,
+        amount: transaction.amount,
+        balance: transaction.balance,
+        transaction_type: transaction.type,
+        category: transaction.category,
+        subcategory: transaction.subcategory,
+        confidence: transaction.confidence,
+        normalized_merchant: transaction.normalizedMerchant,
+        ai_reasoning: transaction.aiReasoning,
+        anomaly_data: transaction.anomaly ? JSON.stringify(transaction.anomaly) : null,
+        original_category: transaction.originalCategory
+      }))
+
+      if (transactionsToInsert.length > 0) {
+        const { error: insertError } = await supabase
+          .from('transactions')
+          .insert(transactionsToInsert)
+
+        if (insertError) {
+          console.error('Error inserting transactions:', insertError)
+          throw new Error('Failed to save transaction data')
+        }
+      }
+
+      // Save AI insights if available
+      if (extractedData.aiInsights) {
+        await supabase
+          .from('ai_insights')
+          .insert({
+            file_id: fileId,
+            user_id: user.id,
+            insights_data: extractedData.aiInsights,
+            generated_at: new Date().toISOString()
+          })
+      }
+
+      // Update file record with completion status and metadata
+      await supabase
+        .from('files')
+        .update({
+          processing_status: 'completed',
+          processed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          ai_enhanced: extractedData.metadata?.aiEnhanced || false,
+          extraction_method: extractedData.metadata?.extractionMethod || 'Traditional'
+        })
+        .eq('id', fileId)
+
+      // Increment usage counter efficiently using the stored function
+      const { error: incrementError } = await supabase
+        .rpc('increment_user_usage', {
+          p_user_id: user.id,
+          p_usage_type: 'conversion',
+          p_amount: 1
+        })
+
+      if (incrementError) {
+        console.error('Failed to increment usage:', incrementError)
+        // Don't fail the request if usage tracking fails
+      }
+
+      // Also log to usage_tracking for detailed audit trail
+      await supabase.from('usage_tracking').insert({
+        user_id: user.id,
+        action: 'pdf_process',
+        details: {
+          file_id: fileId,
+          filename: fileRecord.original_filename,
+          transaction_count: extractedData.transactions.length,
+          bank_type: extractedData.bankType,
+          processing_time: Date.now()
+        }
+      })
+
+      // Get updated usage for response
+      const { data: updatedUsage } = await supabase
+        .rpc('get_user_monthly_usage', { p_user_id: user.id })
+        .single()
+
+      // Return success response with extracted data
+      return NextResponse.json({
+        success: true,
+        data: {
+          fileId,
+          transactionCount: extractedData.transactions.length,
+          bankType: extractedData.bankType,
+          accountInfo: extractedData.accountInfo,
+          statementPeriod: extractedData.statementPeriod,
+          preview: extractedData.transactions.slice(0, 5), // First 5 transactions for preview
+          metadata: extractedData.metadata,
+          aiInsights: extractedData.aiInsights
+        },
+        usage: {
+          current: updatedUsage?.conversions_count || currentUsage + 1,
+          limit: limits.monthlyConversions,
+          remaining: Math.max(0, limits.monthlyConversions - (updatedUsage?.conversions_count || currentUsage + 1))
+        }
+      })
+
+    } catch (processingError) {
+      console.error('PDF processing error:', processingError)
+      
+      // Update file status to failed
+      await supabase
+        .from('files')
+        .update({
+          processing_status: 'failed',
+          error_message: processingError.message,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', fileId)
+
+      return NextResponse.json(
+        { error: processingError.message || 'Failed to process PDF' },
+        { status: 500 }
+      )
+    }
+
+  } catch (error) {
+    console.error('API error:', error)
+    console.error('Error stack:', error.stack)
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+// Handle preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
+}

@@ -260,7 +260,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                  StatementConverter
+                  Statement Desk
                 </span>
                 <div className="text-xs text-gray-500 -mt-1">AI-Powered Analytics</div>
               </div>

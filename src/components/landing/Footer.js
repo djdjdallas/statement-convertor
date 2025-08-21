@@ -32,7 +32,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-blue-500" />
-              <span className="ml-2 text-xl font-bold text-white">StatementConverter</span>
+              <span className="ml-2 text-xl font-bold text-white">Statement Desk</span>
             </div>
             <p className="mt-4 text-gray-400 text-sm">
               Convert PDF bank statements to Excel and CSV with AI-powered accuracy and bank-level security.
@@ -104,7 +104,7 @@ export default function Footer() {
               ))}
             </div>
             <p className="mt-8 text-sm text-gray-400 md:order-1 md:mt-0">
-              &copy; 2024 StatementConverter. All rights reserved.
+              &copy; 2024 Statement Desk. All rights reserved.
             </p>
           </div>
         </div>

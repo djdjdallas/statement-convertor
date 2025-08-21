@@ -14,14 +14,14 @@ const getStripe = () => {
 /**
  * Redirect to Stripe checkout
  */
-export async function redirectToCheckout(tier) {
+export async function redirectToCheckout(tier, billingPeriod = 'monthly') {
   try {
     const response = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ tier })
+      body: JSON.stringify({ tier, billingPeriod })
     })
 
     const data = await response.json()

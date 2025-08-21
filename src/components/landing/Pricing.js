@@ -17,13 +17,20 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Pricing() {
   const [loading, setLoading] = useState({});
+  const [billingPeriod, setBillingPeriod] = useState("monthly");
   const { user } = useAuth();
 
-  const tiers = Object.entries(SUBSCRIPTION_TIERS).map(([key, tier]) => ({
-    id: key,
-    ...tier,
-    popular: key === "basic",
-  }));
+  const tiers = Object.entries(SUBSCRIPTION_TIERS)
+    .filter(([key]) => key !== 'enterprise') // Enterprise shown separately
+    .map(([key, tier]) => ({
+      id: key,
+      ...tier,
+      popular: key === "professional",
+      displayPrice: tier.price === 'Custom' ? 'Custom' : 
+        billingPeriod === 'yearly' && tier.price > 0 ? 
+          Math.floor(tier.price * 12 * 0.8) : // 20% discount on yearly
+          tier.price
+    }));
 
   const handleSubscribe = async (tierId) => {
     if (!user) {
@@ -40,13 +47,17 @@ export default function Pricing() {
 
     try {
       setLoading((prev) => ({ ...prev, [tierId]: true }));
-      await redirectToCheckout(tierId);
+      await redirectToCheckout(tierId, billingPeriod);
     } catch (error) {
       console.error("Subscription error:", error);
       alert(`Failed to start subscription: ${error.message}`);
     } finally {
       setLoading((prev) => ({ ...prev, [tierId]: false }));
     }
+  };
+
+  const handleContactSales = () => {
+    window.location.href = "mailto:sales@statementconverter.com?subject=Enterprise%20Plan%20Inquiry";
   };
 
   return (
@@ -60,9 +71,37 @@ export default function Pricing() {
             Choose the right plan for you
           </p>
           <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            Start for free, upgrade as you grow. All plans include our core
-            conversion features.
+            Start with our 14-day free trial. No credit card required.
           </p>
+        </div>
+
+        {/* Billing period toggle */}
+        <div className="mt-8 flex justify-center">
+          <div className="relative bg-gray-100 rounded-full p-1 flex">
+            <button
+              onClick={() => setBillingPeriod("monthly")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                billingPeriod === "monthly"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingPeriod("yearly")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                billingPeriod === "yearly"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Yearly
+              <Badge className="ml-2 bg-green-100 text-green-800" variant="secondary">
+                Save 20%
+              </Badge>
+            </button>
+          </div>
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,19 +126,19 @@ export default function Pricing() {
                 </CardTitle>
                 <div className="mt-4">
                   <span className="text-4xl font-bold text-gray-900">
-                    ${tier.price}
+                    ${typeof tier.displayPrice === 'number' ? tier.displayPrice : tier.displayPrice}
                   </span>
                   {tier.price > 0 && (
                     <span className="text-lg font-medium text-gray-500">
-                      /month
+                      /{billingPeriod === 'yearly' ? 'year' : 'month'}
                     </span>
                   )}
                 </div>
                 <CardDescription className="mt-2">
                   {tier.id === "free" && "Perfect for trying out our service"}
-                  {tier.id === "basic" &&
+                  {tier.id === "professional" &&
                     "Best for regular users and small businesses"}
-                  {tier.id === "premium" && "Advanced features for power users"}
+                  {tier.id === "business" && "Advanced features for growing teams"}
                 </CardDescription>
               </CardHeader>
 
@@ -124,12 +163,12 @@ export default function Pricing() {
                   {loading[tier.id] && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {tier.id === "free" ? "Start Free" : "Get Started"}
+                  {tier.id === "free" ? "Start Free" : "Start 14-Day Trial"}
                 </Button>
 
                 {tier.id !== "free" && (
                   <p className="text-center text-sm text-gray-500 mt-3">
-                    Cancel anytime. No hidden fees.
+                    14-day free trial • Cancel anytime
                   </p>
                 )}
               </CardContent>
@@ -137,18 +176,28 @@ export default function Pricing() {
           ))}
         </div>
 
-        <div className="mt-16 bg-gray-50 rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Need a custom solution?
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            We offer enterprise plans with custom features, dedicated support,
-            and volume discounts for organizations processing large numbers of
-            statements.
-          </p>
-          <Button variant="outline" size="lg">
-            Contact Sales
-          </Button>
+        {/* Enterprise section */}
+        <div className="mt-16 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Enterprise Plan
+            </h3>
+            <p className="text-lg text-gray-600 mb-6">
+              Need unlimited conversions, custom integrations, or on-premise deployment? 
+              Our Enterprise plan is tailored to meet your organization's specific needs.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
+              {SUBSCRIPTION_TIERS.enterprise.features.slice(0, 6).map((feature, index) => (
+                <div key={index} className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <span className="text-gray-700">{feature}</span>
+                </div>
+              ))}
+            </div>
+            <Button onClick={handleContactSales} size="lg" className="bg-blue-600 hover:bg-blue-700">
+              Contact Sales
+            </Button>
+          </div>
         </div>
 
         <div className="mt-12 text-center">
@@ -170,8 +219,8 @@ export default function Pricing() {
                 What file formats are supported?
               </h5>
               <p className="text-sm text-gray-600">
-                We support PDF bank statements from all major banks. Export
-                formats include Excel (.xlsx) and CSV.
+                We support PDF bank statements from 200+ banks with AI-powered
+                recognition. Export to Excel, CSV, and more.
               </p>
             </div>
             <div>
@@ -185,10 +234,11 @@ export default function Pricing() {
             </div>
             <div>
               <h5 className="font-medium text-gray-900 mb-2">
-                Do you offer refunds?
+                Do you offer a free trial?
               </h5>
               <p className="text-sm text-gray-600">
-                Yes, we offer a 30-day money-back guarantee for all paid plans.
+                Yes! All paid plans include a 14-day free trial. No credit card
+                required to start.
               </p>
             </div>
           </div>

@@ -29,14 +29,16 @@ export async function createCheckoutSession({
   userEmail,
   priceId,
   successUrl,
-  cancelUrl
+  cancelUrl,
+  trialPeriodDays = null
 }) {
   try {
     const stripe = getStripe()
     if (!stripe) {
       throw new Error('Stripe is not configured')
     }
-    const session = await stripe.checkout.sessions.create({
+    
+    const sessionConfig = {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
@@ -57,7 +59,14 @@ export async function createCheckoutSession({
           userId: userId
         }
       }
-    })
+    }
+    
+    // Add trial period if specified
+    if (trialPeriodDays) {
+      sessionConfig.subscription_data.trial_period_days = trialPeriodDays
+    }
+    
+    const session = await stripe.checkout.sessions.create(sessionConfig)
 
     return { session, error: null }
   } catch (error) {

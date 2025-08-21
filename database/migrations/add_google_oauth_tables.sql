@@ -1,84 +1,70 @@
+-- Create table for storing OAuth state parameters
+CREATE TABLE IF NOT EXISTS google_oauth_states (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    state TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL
+);
+
+-- Create index for faster state lookups
+CREATE INDEX idx_google_oauth_states_state ON google_oauth_states(state);
+CREATE INDEX idx_google_oauth_states_expires_at ON google_oauth_states(expires_at);
+
 -- Create table for storing Google OAuth tokens
-CREATE TABLE IF NOT EXISTS google_tokens (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS google_oauth_tokens (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+    google_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    name TEXT,
+    picture TEXT,
     access_token TEXT NOT NULL,
     refresh_token TEXT,
-    token_expires_at TIMESTAMPTZ NOT NULL,
-    scopes TEXT[],
+    expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Create index for faster lookups
-CREATE INDEX idx_google_tokens_user_id ON google_tokens(user_id);
+-- Create indexes for faster lookups
+CREATE INDEX idx_google_oauth_tokens_user_id ON google_oauth_tokens(user_id);
+CREATE INDEX idx_google_oauth_tokens_google_id ON google_oauth_tokens(google_id);
 
--- Enable RLS
-ALTER TABLE google_tokens ENABLE ROW LEVEL SECURITY;
+-- Enable RLS (Row Level Security)
+ALTER TABLE google_oauth_states ENABLE ROW LEVEL SECURITY;
+ALTER TABLE google_oauth_tokens ENABLE ROW LEVEL SECURITY;
 
--- Create RLS policies
--- Users can only see their own tokens
-CREATE POLICY "Users can view own Google tokens" ON google_tokens
+-- Create RLS policies for google_oauth_states
+CREATE POLICY "Users can view their own OAuth states" ON google_oauth_states
     FOR SELECT USING (auth.uid() = user_id);
 
--- Users can insert their own tokens
-CREATE POLICY "Users can insert own Google tokens" ON google_tokens
+CREATE POLICY "Users can insert their own OAuth states" ON google_oauth_states
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Users can update their own tokens
-CREATE POLICY "Users can update own Google tokens" ON google_tokens
-    FOR UPDATE USING (auth.uid() = user_id);
-
--- Users can delete their own tokens
-CREATE POLICY "Users can delete own Google tokens" ON google_tokens
+CREATE POLICY "Users can delete their own OAuth states" ON google_oauth_states
     FOR DELETE USING (auth.uid() = user_id);
 
--- Create function to update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+-- Create RLS policies for google_oauth_tokens
+CREATE POLICY "Users can view their own Google tokens" ON google_oauth_tokens
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own Google tokens" ON google_oauth_tokens
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own Google tokens" ON google_oauth_tokens
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own Google tokens" ON google_oauth_tokens
+    FOR DELETE USING (auth.uid() = user_id);
+
+-- Clean up expired OAuth states automatically
+CREATE OR REPLACE FUNCTION cleanup_expired_oauth_states()
+RETURNS void AS $$
 BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
+    DELETE FROM google_oauth_states
+    WHERE expires_at < NOW();
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Create trigger to automatically update updated_at
-CREATE TRIGGER update_google_tokens_updated_at BEFORE UPDATE ON google_tokens
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Create function to safely upsert Google tokens
-CREATE OR REPLACE FUNCTION upsert_google_token(
-    p_user_id UUID,
-    p_access_token TEXT,
-    p_refresh_token TEXT,
-    p_expires_at TIMESTAMPTZ,
-    p_scopes TEXT[]
-)
-RETURNS UUID AS $$
-DECLARE
-    v_token_id UUID;
-BEGIN
-    INSERT INTO google_tokens (user_id, access_token, refresh_token, token_expires_at, scopes)
-    VALUES (p_user_id, p_access_token, p_refresh_token, p_expires_at, p_scopes)
-    ON CONFLICT (user_id) DO UPDATE
-    SET access_token = EXCLUDED.access_token,
-        refresh_token = COALESCE(EXCLUDED.refresh_token, google_tokens.refresh_token),
-        token_expires_at = EXCLUDED.token_expires_at,
-        scopes = EXCLUDED.scopes,
-        updated_at = NOW()
-    RETURNING id INTO v_token_id;
-    
-    RETURN v_token_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Grant execute permission to authenticated users
-GRANT EXECUTE ON FUNCTION upsert_google_token TO authenticated;
-
--- Add Google account info to user profiles (optional)
-ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS raw_app_meta_data JSONB;
-ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS raw_user_meta_data JSONB;
-
--- Note: Supabase automatically stores provider info in auth.users table
--- The raw_user_meta_data column will contain Google profile information
--- like avatar_url, full_name, email, etc. when users sign in with Google
+-- Optional: Create a scheduled job to clean up expired states (requires pg_cron extension)
+-- SELECT cron.schedule('cleanup-oauth-states', '0 * * * *', 'SELECT cleanup_expired_oauth_states();');

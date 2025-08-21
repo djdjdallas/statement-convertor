@@ -1,9 +1,9 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Bank Statement Converter - Convert PDF to Excel & CSV",
+  title: "Statement Desk - Convert PDF to Excel & CSV",
   description: "Easily convert your PDF bank statements to Excel and CSV formats. Secure, fast, and accurate financial data extraction.",
-  keywords: "bank statement converter, PDF to Excel, PDF to CSV, financial data, bank statement parser",
+  keywords: "statement desk, bank statement converter, PDF to Excel, PDF to CSV, financial data, bank statement parser",
 };
 
 import { AuthProvider } from '@/contexts/AuthContext'

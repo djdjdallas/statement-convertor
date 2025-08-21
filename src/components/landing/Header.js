@@ -14,6 +14,8 @@ export default function Header() {
     { name: 'Features', href: '#features' },
     { name: 'Pricing', href: '#pricing' },
     { name: 'How it works', href: '#how-it-works' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Contact', href: '/contact' },
   ]
 
   return (
@@ -23,7 +25,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <FileText className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">StatementConverter</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">Statement Desk</span>
             </Link>
           </div>
           
