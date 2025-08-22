@@ -74,7 +74,9 @@ export default function DataPreview({
         limit: filters.limit.toString()
       })
 
-      const response = await fetch(`/api/transactions?${params}`)
+      const response = await fetch(`/api/transactions?${params}`, {
+        credentials: 'same-origin'
+      })
       const result = await response.json()
 
       if (!response.ok) {
@@ -116,7 +118,8 @@ export default function DataPreview({
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ transactionId, updates })
+        body: JSON.stringify({ transactionId, updates }),
+        credentials: 'same-origin'
       })
 
       const result = await response.json()

@@ -52,7 +52,8 @@ export default function FinancialChat({ transactions, userProfile, className = "
         body: JSON.stringify({ 
           transactions: transactions.slice(0, 100), // Limit for performance
           userProfile 
-        })
+        }),
+        credentials: 'same-origin'
       })
 
       const result = await response.json()
@@ -108,7 +109,8 @@ export default function FinancialChat({ transactions, userProfile, className = "
           transactions: transactions.slice(0, 500), // Limit for performance
           userProfile,
           conversationId
-        })
+        }),
+        credentials: 'same-origin'
       })
 
       const result = await response.json()

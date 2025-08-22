@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createApiRouteClient } from '@/lib/supabase/api-route'
 
 export async function GET(request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createApiRouteClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -160,7 +160,7 @@ export async function GET(request) {
 // Update transaction (for editing)
 export async function PATCH(request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createApiRouteClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

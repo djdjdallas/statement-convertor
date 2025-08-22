@@ -44,7 +44,8 @@ export default function BudgetRecommendations({ transactions, userProfile }) {
         body: JSON.stringify({
           transactions,
           userProfile
-        })
+        }),
+        credentials: 'same-origin'
       })
 
       const result = await response.json()

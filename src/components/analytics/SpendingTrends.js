@@ -49,7 +49,8 @@ export default function SpendingTrends({ transactions }) {
           transactions,
           period: 'monthly',
           includeAllFiles: false
-        })
+        }),
+        credentials: 'same-origin'
       })
 
       const result = await response.json()

@@ -1,27 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 import { enhancedBankStatementParser } from '@/lib/enhanced-pdf-parser'
 import { checkUsageLimit, getTierLimits } from '@/lib/subscription-tiers'
 
 export async function POST(request) {
   try {
     console.log('PDF processing API called')
-    const supabase = await createClient()
     
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
-      console.log('Authentication error:', authError)
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-    
-    console.log('User authenticated:', user.id)
-
-    // Get request data
+    // Get request data first
     const { fileId } = await request.json()
     
     if (!fileId) {
@@ -30,12 +16,44 @@ export async function POST(request) {
         { status: 400 }
       )
     }
+    
+    // Create Supabase client with service role for backend operations
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY, // Use service role for backend operations
+      {
+        cookies: {
+          getAll() {
+            return []
+          },
+          setAll() {
+            // Service role doesn't need cookies
+          },
+        },
+      }
+    )
 
-    // Get user profile and check subscription limits
+    // Get file record from database to check ownership and get user_id
+    const { data: fileRecord, error: fileError } = await supabase
+      .from('files')
+      .select('*')
+      .eq('id', fileId)
+      .single()
+
+    if (fileError || !fileRecord) {
+      return NextResponse.json(
+        { error: 'File not found' },
+        { status: 404 }
+      )
+    }
+
+    const userId = fileRecord.user_id
+
+    // Get user profile to check subscription limits
     const { data: userProfile } = await supabase
       .from('user_profiles')
       .select('subscription_tier')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single()
 
     const userTier = userProfile?.subscription_tier || 'free'
@@ -45,7 +63,7 @@ export async function POST(request) {
     const { data: monthlyUsage } = await supabase
       .from('usage_tracking')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('action', 'pdf_process')
       .gte('created_at', `${currentMonth}-01`)
       .lt('created_at', `${currentMonth}-32`)
@@ -56,21 +74,6 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'Monthly processing limit exceeded. Please upgrade your plan.' },
         { status: 429 }
-      )
-    }
-
-    // Get file record from database
-    const { data: fileRecord, error: fileError } = await supabase
-      .from('files')
-      .select('*')
-      .eq('id', fileId)
-      .eq('user_id', user.id)
-      .single()
-
-    if (fileError || !fileRecord) {
-      return NextResponse.json(
-        { error: 'File not found' },
-        { status: 404 }
       )
     }
 
@@ -140,7 +143,7 @@ export async function POST(request) {
           .from('ai_insights')
           .insert({
             file_id: fileId,
-            user_id: user.id,
+            user_id: userId,
             insights_data: extractedData.aiInsights,
             generated_at: new Date().toISOString()
           })
@@ -160,7 +163,7 @@ export async function POST(request) {
 
       // Log successful processing
       await supabase.from('usage_tracking').insert({
-        user_id: user.id,
+        user_id: userId,
         action: 'pdf_process',
         details: {
           file_id: fileId,

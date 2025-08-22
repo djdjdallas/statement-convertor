@@ -176,7 +176,8 @@ export default function UploadPage() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ fileId: file.id })
+            body: JSON.stringify({ fileId: file.id }),
+            credentials: 'same-origin' // Ensure cookies are sent with same-origin requests
           })
 
           const result = await response.json()
@@ -261,65 +262,91 @@ export default function UploadPage() {
   const canProcess = uploadedFiles.length > 0 && !processing
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Upload Bank Statements</h1>
-              <p className="text-gray-600 mt-2">
-                Upload your PDF bank statements to convert them to Excel or CSV format
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Modern Header with Glass Effect */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <Link href="/dashboard" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                <ArrowLeft className="h-5 w-5 text-gray-600" />
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-xl shadow-lg">
+                    <FileText className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                      Statement Desk
+                    </span>
+                    <div className="text-xs text-gray-500 -mt-1">AI-Powered Analytics</div>
+                  </div>
+                </div>
+              </Link>
             </div>
+            
             {userProfile && (
-              <Badge variant="outline" className="capitalize">
-                {userProfile.subscription_tier} Plan
+              <Badge 
+                variant="outline" 
+                className={`capitalize px-3 py-1 font-medium border-2 ${
+                  userProfile.subscription_tier === 'premium' 
+                    ? 'border-gradient-to-r from-purple-500 to-pink-500 text-purple-700 bg-purple-50' 
+                    : userProfile.subscription_tier === 'basic'
+                    ? 'border-blue-500 text-blue-700 bg-blue-50'
+                    : 'border-gray-300 text-gray-600 bg-gray-50'
+                }`}
+              >
+                ✨ {userProfile.subscription_tier} Plan
               </Badge>
             )}
           </div>
         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Modern Welcome Section */}
+        <div className="mb-8">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-white/30 shadow-xl">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent">
+              Upload Bank Statements
+            </h1>
+            <p className="text-gray-600 mt-3 text-lg">
+              Transform your PDF bank statements into structured Excel or CSV data with AI-powered accuracy
+            </p>
+          </div>
+        </div>
 
         {/* How it works steps */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white/70 backdrop-blur-sm border-white/30 shadow-xl">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Settings className="h-5 w-5 mr-2" />
+            <CardTitle className="flex items-center text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <Settings className="h-6 w-6 mr-2 text-gray-700" />
               How it works
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-600 text-lg">
               Follow these simple steps to convert your bank statements
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <FileText className="h-6 w-6 text-blue-600" />
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <FileText className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">1. Upload Files</h3>
+                <h3 className="font-semibold text-gray-900 mb-2 text-lg">1. Upload Files</h3>
                 <p className="text-sm text-gray-600">Drag and drop your PDF bank statements</p>
               </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Settings className="h-6 w-6 text-blue-600" />
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-violet-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Settings className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">2. Process</h3>
+                <h3 className="font-semibold text-gray-900 mb-2 text-lg">2. Process</h3>
                 <p className="text-sm text-gray-600">Our AI extracts transaction data</p>
               </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Download className="h-6 w-6 text-blue-600" />
+              <div className="text-center group">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Download className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-2">3. Download</h3>
+                <h3 className="font-semibold text-gray-900 mb-2 text-lg">3. Download</h3>
                 <p className="text-sm text-gray-600">Get your Excel or CSV files</p>
               </div>
             </div>
@@ -337,32 +364,34 @@ export default function UploadPage() {
 
         {/* Process Files Section */}
         {uploadedFiles.length > 0 && (
-          <Card className="mt-8">
+          <Card className="mt-8 bg-white/70 backdrop-blur-sm border-white/30 shadow-xl">
             <CardHeader>
-              <CardTitle>Ready to Process</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                🚀 Ready to Process
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-lg">
                 {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} ready for conversion
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {processing && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 p-4 bg-blue-50/50 rounded-lg">
                     <div className="flex items-center justify-between text-sm">
-                      <span>Processing files...</span>
-                      <span>{completedFiles.length} / {uploadedFiles.length} completed</span>
+                      <span className="text-blue-700 font-medium">Processing files...</span>
+                      <span className="text-blue-600">{completedFiles.length} / {uploadedFiles.length} completed</span>
                     </div>
-                    <Progress value={(completedFiles.length / uploadedFiles.length) * 100} />
+                    <Progress value={(completedFiles.length / uploadedFiles.length) * 100} className="h-2" />
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 gap-3">
                   {uploadedFiles.map((file) => (
-                    <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={file.id} className="flex items-center justify-between p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30 shadow-md hover:shadow-lg transition-all duration-300">
                       <div className="flex items-center space-x-3">
                         {getStatusIcon(file.status)}
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">{file.name}</p>
+                          <p className="font-semibold text-gray-900">{file.name}</p>
                           <div className="flex items-center space-x-4 text-sm text-gray-500">
                             <span>{(file.size / 1024 / 1024).toFixed(1)} MB</span>
                             {file.bankType && (
@@ -377,24 +406,24 @@ export default function UploadPage() {
                           )}
                         </div>
                       </div>
-                      <Badge className={getStatusColor(file.status)}>
+                      <Badge className={`${getStatusColor(file.status)} font-medium`}>
                         {file.status || 'uploaded'}
                       </Badge>
                     </div>
                   ))}
                 </div>
 
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 pt-4">
                   <Button 
                     onClick={processFiles}
                     disabled={!canProcess}
-                    className="flex-1"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     {processing ? 'Processing...' : `Process ${uploadedFiles.length} File${uploadedFiles.length !== 1 ? 's' : ''}`}
                   </Button>
                   {completedFiles.length > 0 && (
                     <Link href="/dashboard">
-                      <Button variant="outline">
+                      <Button variant="outline" className="border-2 border-indigo-200 hover:bg-indigo-50 transition-all duration-300">
                         View Results
                       </Button>
                     </Link>

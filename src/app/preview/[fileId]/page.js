@@ -109,7 +109,8 @@ export default function PreviewPage() {
         body: JSON.stringify({
           fileId,
           format
-        })
+        }),
+        credentials: 'same-origin'
       })
 
       if (!response.ok) {

@@ -9,7 +9,7 @@ export class ClaudeAIService {
     this.anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     })
-    this.model = process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20241022'
+    this.model = process.env.CLAUDE_MODEL || 'claude-3-7-sonnet-20250219'
   }
 
   /**
@@ -48,7 +48,7 @@ Focus on accuracy and be conservative with confidence scores. Flag anything unus
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const result = JSON.parse(response.content[0].text)
+      const result = this.extractJSON(response.content[0].text)
       return result
     } catch (error) {
       console.error('Claude categorization error:', error)
@@ -187,7 +187,7 @@ Return a JSON object with:
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const insights = JSON.parse(response.content[0].text)
+      const insights = this.extractJSON(response.content[0].text)
       return insights
     } catch (error) {
       console.error('Claude insights error:', error)

@@ -17,7 +17,9 @@ export default function GoogleDriveIntegration() {
 
   const checkGoogleLinkStatus = async () => {
     try {
-      const response = await fetch('/api/auth/google/link');
+      const response = await fetch('/api/auth/google/link', {
+        credentials: 'same-origin'
+      });
       const data = await response.json();
       
       if (response.ok) {
@@ -33,7 +35,9 @@ export default function GoogleDriveIntegration() {
 
   const handleGoogleLink = async () => {
     try {
-      const response = await fetch('/api/auth/google');
+      const response = await fetch('/api/auth/google', {
+        credentials: 'same-origin'
+      });
       const data = await response.json();
       
       if (response.ok && data.authUrl) {
@@ -55,6 +59,7 @@ export default function GoogleDriveIntegration() {
     try {
       const response = await fetch('/api/auth/google/link', {
         method: 'DELETE',
+        credentials: 'same-origin'
       });
       
       if (response.ok) {

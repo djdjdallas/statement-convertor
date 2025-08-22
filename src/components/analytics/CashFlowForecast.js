@@ -97,7 +97,8 @@ export default function CashFlowForecast({ transactions, onRefresh }) {
         body: JSON.stringify({
           transactions,
           forecastPeriod: selectedPeriod
-        })
+        }),
+        credentials: 'same-origin'
       })
 
       if (!response.ok) {

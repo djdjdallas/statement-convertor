@@ -21,7 +21,8 @@ export async function redirectToCheckout(tier, billingPeriod = 'monthly') {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ tier, billingPeriod })
+      body: JSON.stringify({ tier, billingPeriod }),
+      credentials: 'same-origin'
     })
 
     const data = await response.json()
@@ -48,7 +49,8 @@ export async function redirectToPortal() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      credentials: 'same-origin'
     })
 
     const data = await response.json()

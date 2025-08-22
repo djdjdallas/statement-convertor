@@ -11,29 +11,104 @@ function AuthCallbackContent() {
   const searchParams = useSearchParams()
   const [error, setError] = useState(null)
   
+  const handleSuccessfulAuth = async (session, isLinking) => {
+    if (!session) return
+    
+    const supabase = createClient()
+    const { user } = session
+    const providerToken = session.provider_token
+    const providerRefreshToken = session.provider_refresh_token
+    
+    // Store Google tokens if available
+    if (providerToken && user) {
+      try {
+        // Calculate token expiration (Google tokens typically expire in 1 hour)
+        const expiresAt = new Date()
+        expiresAt.setHours(expiresAt.getHours() + 1)
+        
+        // Extract Google user info from session/user metadata
+        const googleId = user.user_metadata?.sub || user.id
+        const email = user.email || user.user_metadata?.email || ''
+        
+        console.log('Storing Google tokens for user:', user.id)
+        console.log('Provider token:', providerToken ? 'Present' : 'Missing')
+        console.log('Refresh token:', providerRefreshToken ? 'Present' : 'Missing')
+        
+        const { error: tokenError } = await supabase.rpc('upsert_google_token', {
+          p_user_id: user.id,
+          p_access_token: providerToken,
+          p_refresh_token: providerRefreshToken,
+          p_expires_at: expiresAt.toISOString(),
+          p_scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets'],
+          p_google_id: googleId,
+          p_email: email
+        })
+        
+        if (tokenError) {
+          console.error('Error storing Google tokens:', tokenError)
+        } else {
+          console.log('Google tokens stored successfully')
+        }
+      } catch (err) {
+        console.error('Error in token storage:', err)
+      }
+    } else {
+      console.log('No provider token available to store')
+    }
+    
+    // Redirect based on operation type
+    if (isLinking) {
+      router.push('/settings/integrations?linked=google')
+    } else {
+      router.push('/dashboard')
+    }
+  }
+  
   useEffect(() => {
     const handleCallback = async () => {
       try {
         const supabase = createClient()
         
-        // Get the auth code from URL
+        // First, let Supabase handle the session detection automatically
+        // This works because detectSessionInUrl is true in the client config
+        const { data: { session }, error: autoError } = await supabase.auth.getSession()
+        
+        if (session) {
+          console.log('Session detected automatically by Supabase')
+          // Handle the session (store tokens, redirect, etc.)
+          handleSuccessfulAuth(session, searchParams.get('link') === 'true')
+          return
+        }
+        
+        // If auto-detection failed, try manual extraction
         const code = searchParams.get('code')
         const error = searchParams.get('error')
         const errorDescription = searchParams.get('error_description')
         
-        if (error) {
-          console.error('OAuth error:', error, errorDescription)
-          setError(errorDescription || error)
+        // Also check hash fragment for parameters
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const hashCode = hashParams.get('code')
+        const hashError = hashParams.get('error')
+        
+        const finalCode = code || hashCode
+        const finalError = error || hashError
+        
+        if (finalError) {
+          console.error('OAuth error:', finalError, errorDescription)
+          setError(errorDescription || finalError)
           return
         }
         
-        if (!code) {
+        if (!finalCode) {
+          console.log('Debug - Current URL:', window.location.href)
+          console.log('Debug - Search params:', window.location.search)
+          console.log('Debug - Hash:', window.location.hash)
           setError('No authorization code received')
           return
         }
         
         // Exchange code for session
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(finalCode)
         
         if (sessionError) {
           console.error('Session exchange error:', sessionError)
@@ -41,47 +116,9 @@ function AuthCallbackContent() {
           return
         }
         
-        // Check if this was a link operation
-        const isLinking = searchParams.get('link') === 'true'
-        
         if (data.session) {
-          // Extract Google tokens from the session
-          const providerToken = data.session.provider_token
-          const providerRefreshToken = data.session.provider_refresh_token
-          const user = data.session.user
-          
-          // Store Google tokens if available
-          if (providerToken && user) {
-            try {
-              // Calculate token expiration (Google tokens typically expire in 1 hour)
-              const expiresAt = new Date()
-              expiresAt.setHours(expiresAt.getHours() + 1)
-              
-              // Upsert tokens to our google_tokens table
-              const { error: tokenError } = await supabase.rpc('upsert_google_token', {
-                p_user_id: user.id,
-                p_access_token: providerToken,
-                p_refresh_token: providerRefreshToken,
-                p_expires_at: expiresAt.toISOString(),
-                p_scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets']
-              })
-              
-              if (tokenError) {
-                console.error('Error storing Google tokens:', tokenError)
-                // Don't fail the auth flow for this
-              }
-            } catch (err) {
-              console.error('Error in token storage:', err)
-              // Don't fail the auth flow for this
-            }
-          }
-          
-          // Redirect based on operation type
-          if (isLinking) {
-            router.push('/settings/integrations?linked=google')
-          } else {
-            router.push('/dashboard')
-          }
+          // Handle successful authentication
+          handleSuccessfulAuth(data.session, searchParams.get('link') === 'true')
         }
       } catch (err) {
         console.error('Unexpected error in auth callback:', err)

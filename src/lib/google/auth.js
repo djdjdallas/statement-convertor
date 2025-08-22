@@ -17,13 +17,13 @@ export async function getValidAccessToken(userId) {
   
   // Get stored tokens
   const { data: tokenData, error: tokenError } = await supabase
-    .from('google_tokens')
+    .from('google_oauth_tokens')
     .select('*')
     .eq('user_id', userId)
     .single()
   
   if (tokenError || !tokenData) {
-    throw new Error('No Google tokens found for user')
+    throw new Error('No Google OAuth tokens found for user')
   }
   
   // Check if token is expired
@@ -84,7 +84,7 @@ export async function hasGoogleIntegration(userId) {
   const supabase = createClient()
   
   const { data, error } = await supabase
-    .from('google_tokens')
+    .from('google_oauth_tokens')
     .select('id')
     .eq('user_id', userId)
     .single()
@@ -106,7 +106,7 @@ export async function revokeGoogleAccess(userId) {
     
     // Delete from our database
     const { error } = await supabase
-      .from('google_tokens')
+      .from('google_oauth_tokens')
       .delete()
       .eq('user_id', userId)
     

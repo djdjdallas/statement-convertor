@@ -85,7 +85,7 @@ ALTER TABLE files ADD COLUMN extraction_method TEXT DEFAULT 'traditional';
 ```bash
 # Claude AI Integration
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
-CLAUDE_MODEL=claude-3-5-sonnet-20241022
+CLAUDE_MODEL=claude-3-7-sonnet-20250219
 
 # Existing Supabase, Stripe, etc. (unchanged)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -292,4 +292,4 @@ For AI-related issues or questions:
 
 **Last Updated**: January 2025
 **AI Integration Version**: v3.0 (Conversational Interface Complete)
-**Claude Model**: claude-3-5-sonnet-20241022
+**Claude Model**: claude-3-7-sonnet-20250219

@@ -28,23 +28,10 @@ export async function middleware(request) {
   )
 
   // Refresh session if expired - required for Server Components
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // This is important for API routes too
+  await supabase.auth.getUser()
 
-  // Temporarily disable redirects to fix loop - handled by client-side auth
-  // TODO: Re-enable and fix after authentication is working
-  
-  // // Protect dashboard routes
-  // if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-  //   return NextResponse.redirect(new URL('/auth/signin', request.url))
-  // }
-
-  // // Redirect authenticated users away from auth pages
-  // if (request.nextUrl.pathname.startsWith('/auth') && user) {
-  //   return NextResponse.redirect(new URL('/dashboard', request.url))
-  // }
-
+  // Return the response with updated cookies
   return supabaseResponse
 }
 
@@ -55,6 +42,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - api (to ensure API routes get proper auth handling)
      * Feel free to modify this pattern to include more paths.
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
