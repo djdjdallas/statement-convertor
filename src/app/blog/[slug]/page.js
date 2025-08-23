@@ -6,12 +6,13 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 export async function generateMetadata({ params }) {
+  const { slug } = await params
   const supabase = await createClient()
   
   const { data: post } = await supabase
     .from('blog_posts')
     .select('title, excerpt, meta_title, meta_description')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .eq('status', 'published')
     .single()
 
@@ -83,9 +84,11 @@ function formatDate(date) {
 }
 
 import MarkdownContent from '@/components/MarkdownContent'
+import ShareButton from '@/components/ShareButton'
 
 export default async function BlogPostPage({ params }) {
-  const post = await getPost(params.slug)
+  const { slug } = await params
+  const post = await getPost(slug)
 
   if (!post) {
     notFound()
@@ -158,17 +161,7 @@ export default async function BlogPostPage({ params }) {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Share this article</h3>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href)
-                  // You might want to add a toast notification here
-                }}
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Copy Link
-              </Button>
+              <ShareButton />
             </div>
           </div>
         </div>
