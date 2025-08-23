@@ -3,16 +3,16 @@
 export const STRIPE_PRODUCTS = {
   // Professional Plan
   professional: {
-    productId: 'prod_SsWqt9lxfaItVe',
+    productId: 'prod_SvAiSMpM6lf588',
     name: 'Statement Converter - Professional',
     prices: {
       monthly: {
-        id: 'price_1RwlmXANbh9FIPlH8aJ46s1s',
+        id: 'price_1RzKN9CXTM9N40b8tNI3iUw5',
         amount: 4900, // $49.00
         interval: 'month'
       },
       yearly: {
-        id: 'price_1RwlnAANbh9FIPlH9puYXjoF',
+        id: 'price_1RzKNFCXTM9N40b86nzH5zl2',
         amount: 47000, // $470.00 (20% discount)
         interval: 'year'
       }
@@ -36,16 +36,16 @@ export const STRIPE_PRODUCTS = {
 
   // Business Plan
   business: {
-    productId: 'prod_SsWqa9NJI5aXbG',
+    productId: 'prod_SvAiCrAtIqAEhn',
     name: 'Statement Converter - Business',
     prices: {
       monthly: {
-        id: 'price_1RwlmoANbh9FIPlHw0jOA66A',
+        id: 'price_1RzKNRCXTM9N40b8opWJUOtu',
         amount: 9900, // $99.00
         interval: 'month'
       },
       yearly: {
-        id: 'price_1RwlnIANbh9FIPlHTulM4kCC',
+        id: 'price_1RzKNYCXTM9N40b8km4hhRkP',
         amount: 95000, // $950.00 (20% discount)
         interval: 'year'
       }
@@ -70,7 +70,7 @@ export const STRIPE_PRODUCTS = {
 
   // Enterprise Plan (Custom Pricing)
   enterprise: {
-    productId: 'prod_SsWq8KPnOoSGoq',
+    productId: 'prod_SvAj60HACNgwDc',
     name: 'Statement Converter - Enterprise',
     prices: {
       custom: true

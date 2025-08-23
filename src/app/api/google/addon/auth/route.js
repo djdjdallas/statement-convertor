@@ -23,7 +23,7 @@ export async function GET(request) {
       }
       
       // Verify user exists
-      const supabase = createClient();
+      const supabase = await createClient();
       const { data: user, error } = await supabase
         .from('profiles')
         .select('id, email')
@@ -60,7 +60,7 @@ export async function POST(request) {
     }
     
     // Verify the user exists in our system
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: user, error } = await supabase
       .from('profiles')
       .select('id, email')

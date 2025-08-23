@@ -1,0 +1,147 @@
+import { google } from 'googleapis'
+import { OAuth2Client } from 'google-auth-library'
+import { createClient } from '@/lib/supabase/client'
+import { createClient as createServerClient } from '@/utils/supabase/server'
+import { 
+  withGoogleErrorHandling, 
+  GOOGLE_ERROR_CODES,
+  createErrorResponse,
+  handleTokenRefresh 
+} from './error-handler'
+
+// Initialize OAuth2 client
+export function createOAuth2Client() {
+  return new OAuth2Client(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+  )
+}
+
+// Get valid access token for a user
+export async function getValidAccessToken(userId, isServerSide = false) {
+  return withGoogleErrorHandling(async () => {
+    const supabase = isServerSide ? await createServerClient() : createClient()
+    
+    // Get stored tokens
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('google_oauth_tokens')
+      .select('*')
+      .eq('user_id', userId)
+      .single()
+    
+    if (tokenError || !tokenData) {
+      const error = new Error('No Google OAuth tokens found for user')
+      error.code = GOOGLE_ERROR_CODES.INVALID_CREDENTIALS
+      throw error
+    }
+    
+    // Check if token is expired
+    const now = new Date()
+    const expiresAt = new Date(tokenData.token_expires_at)
+    
+    if (now >= expiresAt) {
+      // Token is expired, refresh it
+      const oauth2Client = createOAuth2Client()
+      oauth2Client.setCredentials({
+        refresh_token: tokenData.refresh_token
+      })
+      
+      try {
+        const { credentials } = await oauth2Client.refreshAccessToken()
+        
+        // Update stored tokens
+        const newExpiresAt = new Date()
+        newExpiresAt.setSeconds(newExpiresAt.getSeconds() + (credentials.expiry_date - Date.now()) / 1000)
+        
+        const { error: updateError } = await supabase.rpc('upsert_google_token', {
+          p_user_id: userId,
+          p_access_token: credentials.access_token,
+          p_refresh_token: credentials.refresh_token || tokenData.refresh_token,
+          p_expires_at: newExpiresAt.toISOString(),
+          p_scopes: tokenData.scopes,
+          p_google_email: tokenData.google_email,
+          p_google_name: tokenData.google_name,
+          p_google_picture: tokenData.google_picture
+        })
+        
+        if (updateError) {
+          console.error('Error updating tokens:', updateError)
+          // Continue even if update fails - we have the new token
+        }
+        
+        return credentials.access_token
+      } catch (error) {
+        // Check if it's a revoked token error
+        if (error.message?.includes('revoked') || error.message?.includes('invalid_grant')) {
+          error.code = GOOGLE_ERROR_CODES.PERMISSION_REVOKED
+        } else {
+          error.code = GOOGLE_ERROR_CODES.TOKEN_EXPIRED
+        }
+        throw error
+      }
+    }
+    
+    // Token is still valid
+    return tokenData.access_token
+  }, {
+    context: { userId, operation: 'getValidAccessToken' },
+    retryEnabled: true
+  })
+}
+
+// Get authenticated OAuth2 client for a user
+export async function getAuthenticatedClient(userId, isServerSide = false) {
+  const accessToken = await getValidAccessToken(userId, isServerSide)
+  const oauth2Client = createOAuth2Client()
+  
+  oauth2Client.setCredentials({
+    access_token: accessToken
+  })
+  
+  return oauth2Client
+}
+
+// Check if user has Google integration
+export async function hasGoogleIntegration(userId, isServerSide = false) {
+  // Use server client if called from server-side (API routes)
+  const supabase = isServerSide ? await createServerClient() : createClient()
+  
+  const { data, error } = await supabase
+    .from('google_oauth_tokens')
+    .select('id')
+    .eq('user_id', userId)
+    .single()
+  
+  return !error && data !== null
+}
+
+// Revoke Google access
+export async function revokeGoogleAccess(userId) {
+  return withGoogleErrorHandling(async () => {
+    const supabase = createClient()
+    
+    // Get the access token
+    const accessToken = await getValidAccessToken(userId)
+    
+    // Revoke the token with Google
+    const oauth2Client = createOAuth2Client()
+    await oauth2Client.revokeToken(accessToken)
+    
+    // Delete from our database
+    const { error } = await supabase
+      .from('google_oauth_tokens')
+      .delete()
+      .eq('user_id', userId)
+    
+    if (error) {
+      throw error
+    }
+    
+    return { success: true }
+  }, {
+    context: { userId, operation: 'revokeGoogleAccess' },
+    throwOnError: false,
+    retryEnabled: false // Don't retry revoke operations
+  })
+}

@@ -1,7 +1,25 @@
 import { updateSession } from '@/utils/supabase/middleware'
+import { securityMiddleware } from '@/lib/security/middleware'
+import { NextResponse } from 'next/server'
 
 export async function middleware(request) {
-  return await updateSession(request)
+  // Apply security middleware first
+  const securityResponse = await securityMiddleware(request)
+  if (securityResponse.status !== 200) {
+    return securityResponse
+  }
+
+  // Then apply session middleware
+  const response = await updateSession(request)
+
+  // Copy security headers from security response
+  securityResponse.headers.forEach((value, key) => {
+    if (!response.headers.has(key)) {
+      response.headers.set(key, value)
+    }
+  })
+
+  return response
 }
 
 export const config = {

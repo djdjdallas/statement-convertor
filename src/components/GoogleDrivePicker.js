@@ -22,6 +22,7 @@ export default function GoogleDrivePicker({
   const [pickerApiLoaded, setPickerApiLoaded] = useState(false)
   const [accessToken, setAccessToken] = useState(null)
   const [isInitializing, setIsInitializing] = useState(true)
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
 
   // Load Google Picker API
   useEffect(() => {
@@ -52,42 +53,56 @@ export default function GoogleDrivePicker({
     loadPickerApi()
   }, [])
 
-  // Get access token when component mounts or user changes
+  // Check Google connection status and get access token
   useEffect(() => {
-    const getToken = async () => {
+    const checkGoogleConnection = async () => {
       if (!user) return
 
       try {
-        const response = await fetch('/api/google/auth/token', {
+        // First check if Google is connected
+        const linkResponse = await fetch('/api/auth/google/link', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         })
 
-        if (response.ok) {
-          const data = await response.json()
-          setAccessToken(data.accessToken)
-        } else {
-          if (response.status === 401) {
-            toast({
-              title: 'Authentication Required',
-              description: 'Please sign in to use Google Drive features.',
-              variant: 'destructive'
+        if (linkResponse.ok) {
+          const linkData = await linkResponse.json()
+          setIsGoogleConnected(linkData.linked)
+          
+          // Only try to get token if Google is connected
+          if (linkData.linked) {
+            const tokenResponse = await fetch('/api/google/auth/token', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
             })
+
+            if (tokenResponse.ok) {
+              const tokenData = await tokenResponse.json()
+              setAccessToken(tokenData.accessToken)
+            }
           }
         }
       } catch (error) {
-        console.error('Error getting access token:', error)
+        console.error('Error checking Google connection:', error)
       } finally {
         setIsInitializing(false)
       }
     }
 
-    getToken()
+    checkGoogleConnection()
   }, [user])
 
   const handleOpenPicker = () => {
+    if (!isGoogleConnected) {
+      // Redirect to settings page to connect Google
+      window.location.href = '/settings?tab=integrations'
+      return
+    }
+
     if (!pickerApiLoaded) {
       toast({
         title: 'Google Picker Not Ready',
@@ -112,13 +127,18 @@ export default function GoogleDrivePicker({
       const view = new window.google.picker.DocsView(window.google.picker.ViewId.DOCS)
       view.setMimeTypes(acceptedMimeTypes.join(','))
 
-      const picker = new window.google.picker.PickerBuilder()
+      const pickerBuilder = new window.google.picker.PickerBuilder()
         .addView(view)
         .setOAuthToken(accessToken)
-        .setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_API_KEY)
         .setCallback(pickerCallback)
         .setTitle('Select a file')
-        .build()
+      
+      // Only set developer key if it's defined
+      if (process.env.NEXT_PUBLIC_GOOGLE_API_KEY) {
+        pickerBuilder.setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_API_KEY)
+      }
+      
+      const picker = pickerBuilder.build()
 
       picker.setVisible(true)
     } catch (error) {
@@ -160,13 +180,13 @@ export default function GoogleDrivePicker({
     }
   }
 
-  const isReady = pickerApiLoaded && accessToken && user
+  const isReady = pickerApiLoaded && accessToken && user && isGoogleConnected
 
   return (
     <Button
       variant={buttonVariant}
       onClick={handleOpenPicker}
-      disabled={!isReady || isLoading}
+      disabled={!user || isLoading || isInitializing}
       className={`google-drive-button ${className}`}
     >
       {isLoading ? (
@@ -179,10 +199,15 @@ export default function GoogleDrivePicker({
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Initializing...
         </>
-      ) : !isReady ? (
+      ) : !user ? (
         <>
           <AlertCircle className="mr-2 h-4 w-4" />
-          {!user ? 'Sign In Required' : 'Connect Google Drive'}
+          Sign In Required
+        </>
+      ) : !isGoogleConnected ? (
+        <>
+          <AlertCircle className="mr-2 h-4 w-4" />
+          Connect Google Drive
         </>
       ) : (
         <>

@@ -1,0 +1,140 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#F9FAFB"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1280" height="80" fill="white"/>
+  <text x="60" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#1F2937">Financial Analytics Dashboard</text>
+  
+  <!-- Date Range Selector -->
+  <rect x="1000" y="25" width="220" height="40" rx="8" fill="#F3F4F6"/>
+  <text x="1020" y="50" font-family="Arial" font-size="14" fill="#6B7280">Last 3 Months</text>
+  <path d="M1180 40 L1190 50 L1200 40" stroke="#6B7280" stroke-width="2" fill="none"/>
+  
+  <!-- Cash Flow Forecast -->
+  <rect x="60" y="120" width="580" height="300" rx="12" fill="white"/>
+  <text x="90" y="150" font-family="Arial" font-size="18" font-weight="bold" fill="#1F2937">Cash Flow Forecast</text>
+  <text x="90" y="175" font-family="Arial" font-size="14" fill="#6B7280">AI-powered 3-month prediction</text>
+  
+  <!-- Forecast Chart -->
+  <g transform="translate(90, 200)">
+    <!-- Axes -->
+    <line x1="0" y1="180" x2="480" y2="180" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="0" y1="0" x2="0" y2="180" stroke="#E5E7EB" stroke-width="2"/>
+    
+    <!-- Historical Data -->
+    <path d="M 0 120 L 80 100 L 160 110 L 240 90" stroke="#6B7280" stroke-width="2" fill="none"/>
+    
+    <!-- Forecast -->
+    <path d="M 240 90 L 320 85 L 400 95 L 480 100" stroke="#4F46E5" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+    
+    <!-- Confidence Band -->
+    <path d="M 240 90 L 320 75 L 400 80 L 480 85 L 480 115 L 400 110 L 320 95 L 240 90" fill="#4F46E5" opacity="0.1"/>
+    
+    <!-- Labels -->
+    <text x="0" y="200" font-family="Arial" font-size="12" fill="#6B7280">Nov</text>
+    <text x="80" y="200" font-family="Arial" font-size="12" fill="#6B7280">Dec</text>
+    <text x="160" y="200" font-family="Arial" font-size="12" fill="#6B7280">Jan</text>
+    <text x="240" y="200" font-family="Arial" font-size="12" fill="#6B7280">Feb</text>
+    <text x="320" y="200" font-family="Arial" font-size="12" fill="#6B7280">Mar</text>
+    <text x="400" y="200" font-family="Arial" font-size="12" fill="#6B7280">Apr</text>
+    
+    <!-- Legend -->
+    <line x1="300" y1="20" x2="320" y2="20" stroke="#6B7280" stroke-width="2"/>
+    <text x="330" y="25" font-family="Arial" font-size="12" fill="#6B7280">Historical</text>
+    <line x1="300" y1="40" x2="320" y2="40" stroke="#4F46E5" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="330" y="45" font-family="Arial" font-size="12" fill="#4F46E5">Forecast</text>
+  </g>
+  
+  <!-- Budget Recommendations -->
+  <rect x="660" y="120" width="560" height="300" rx="12" fill="white"/>
+  <text x="690" y="150" font-family="Arial" font-size="18" font-weight="bold" fill="#1F2937">AI Budget Recommendations</text>
+  <text x="690" y="175" font-family="Arial" font-size="14" fill="#6B7280">Personalized based on your spending patterns</text>
+  
+  <!-- Budget Categories -->
+  <g transform="translate(690, 200)">
+    <!-- Housing -->
+    <rect x="0" y="0" width="500" height="40" rx="4" fill="#F3F4F6"/>
+    <rect x="0" y="0" width="300" height="40" rx="4" fill="#10B981"/>
+    <text x="10" y="25" font-family="Arial" font-size="14" fill="white">Housing: $2,100</text>
+    <text x="450" y="25" font-family="Arial" font-size="14" fill="#6B7280">30%</text>
+    
+    <!-- Food -->
+    <rect x="0" y="50" width="500" height="40" rx="4" fill="#F3F4F6"/>
+    <rect x="0" y="50" width="175" height="40" rx="4" fill="#F59E0B"/>
+    <text x="10" y="75" font-family="Arial" font-size="14" fill="white">Food: $800</text>
+    <text x="450" y="75" font-family="Arial" font-size="14" fill="#6B7280">15%</text>
+    <rect x="480" y="55" width="30" height="30" rx="15" fill="#FEF3C7"/>
+    <text x="495" y="75" font-family="Arial" font-size="16" text-anchor="middle">!</text>
+    
+    <!-- Transportation -->
+    <rect x="0" y="100" width="500" height="40" rx="4" fill="#F3F4F6"/>
+    <rect x="0" y="100" width="140" height="40" rx="4" fill="#4F46E5"/>
+    <text x="10" y="125" font-family="Arial" font-size="14" fill="white">Transport: $600</text>
+    <text x="450" y="125" font-family="Arial" font-size="14" fill="#6B7280">10%</text>
+    
+    <!-- Savings -->
+    <rect x="0" y="150" width="500" height="40" rx="4" fill="#F3F4F6"/>
+    <rect x="0" y="150" width="210" height="40" rx="4" fill="#10B981"/>
+    <text x="10" y="175" font-family="Arial" font-size="14" fill="white">Savings: $1,400</text>
+    <text x="450" y="175" font-family="Arial" font-size="14" fill="#6B7280">20%</text>
+  </g>
+  
+  <!-- Spending Trends -->
+  <rect x="60" y="440" width="560" height="300" rx="12" fill="white"/>
+  <text x="90" y="470" font-family="Arial" font-size="18" font-weight="bold" fill="#1F2937">Spending Trends by Category</text>
+  
+  <!-- Category Trends -->
+  <g transform="translate(90, 500)">
+    <text x="0" y="0" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Groceries</text>
+    <text x="400" y="0" font-family="Arial" font-size="14" fill="#10B981">-8% ↓</text>
+    <rect x="0" y="10" width="480" height="6" rx="3" fill="#E5E7EB"/>
+    <rect x="0" y="10" width="360" height="6" rx="3" fill="#10B981"/>
+    
+    <text x="0" y="40" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Dining Out</text>
+    <text x="400" y="40" font-family="Arial" font-size="14" fill="#EF4444">+18% ↑</text>
+    <rect x="0" y="50" width="480" height="6" rx="3" fill="#E5E7EB"/>
+    <rect x="0" y="50" width="420" height="6" rx="3" fill="#EF4444"/>
+    
+    <text x="0" y="80" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Entertainment</text>
+    <text x="400" y="80" font-family="Arial" font-size="14" fill="#F59E0B">+5% ↑</text>
+    <rect x="0" y="90" width="480" height="6" rx="3" fill="#E5E7EB"/>
+    <rect x="0" y="90" width="280" height="6" rx="3" fill="#F59E0B"/>
+    
+    <text x="0" y="120" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Shopping</text>
+    <text x="400" y="120" font-family="Arial" font-size="14" fill="#10B981">-12% ↓</text>
+    <rect x="0" y="130" width="480" height="6" rx="3" fill="#E5E7EB"/>
+    <rect x="0" y="130" width="320" height="6" rx="3" fill="#10B981"/>
+  </g>
+  
+  <!-- Insights Panel -->
+  <rect x="640" y="440" width="580" height="300" rx="12" fill="white"/>
+  <text x="670" y="470" font-family="Arial" font-size="18" font-weight="bold" fill="#1F2937">AI Financial Insights</text>
+  
+  <g transform="translate(670, 500)">
+    <!-- Insight 1 -->
+    <rect x="0" y="0" width="520" height="60" rx="8" fill="#EFF6FF"/>
+    <circle cx="30" cy="30" r="20" fill="#4F46E5"/>
+    <text x="30" y="36" font-family="Arial" font-size="16" fill="white" text-anchor="middle">💡</text>
+    <text x="70" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Dining Budget Alert</text>
+    <text x="70" y="45" font-family="Arial" font-size="13" fill="#6B7280">You're on track to exceed your dining budget by $150 this month</text>
+    
+    <!-- Insight 2 -->
+    <rect x="0" y="70" width="520" height="60" rx="8" fill="#FEFCE8"/>
+    <circle cx="30" cy="100" r="20" fill="#F59E0B"/>
+    <text x="30" y="106" font-family="Arial" font-size="16" fill="white" text-anchor="middle">📊</text>
+    <text x="70" y="95" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Subscription Optimization</text>
+    <text x="70" y="115" font-family="Arial" font-size="13" fill="#6B7280">Found 3 duplicate streaming services - potential savings: $45/month</text>
+    
+    <!-- Insight 3 -->
+    <rect x="0" y="140" width="520" height="60" rx="8" fill="#F0FDF4"/>
+    <circle cx="30" cy="170" r="20" fill="#10B981"/>
+    <text x="30" y="176" font-family="Arial" font-size="16" fill="white" text-anchor="middle">✓</text>
+    <text x="70" y="165" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Savings Goal Progress</text>
+    <text x="70" y="185" font-family="Arial" font-size="13" fill="#6B7280">You're 85% toward your quarterly savings goal - keep it up!</text>
+  </g>
+  
+  <!-- Description -->
+  <text x="640" y="770" font-family="Arial" font-size="18" text-anchor="middle" fill="#6B7280">
+    Screenshot 6: Comprehensive analytics dashboard with AI-powered forecasting and insights
+  </text>
+</svg>

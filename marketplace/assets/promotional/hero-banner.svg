@@ -1,0 +1,76 @@
+<svg width="1400" height="560" viewBox="0 0 1400 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="1400" height="560" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="1200" cy="100" r="200" fill="#5B52F5" opacity="0.3"/>
+  <circle cx="200" cy="400" r="150" fill="#6D64F7" opacity="0.2"/>
+  
+  <!-- Main Content -->
+  <text x="100" y="150" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
+    Transform Your Bank Statements
+  </text>
+  <text x="100" y="210" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
+    with AI-Powered Intelligence
+  </text>
+  
+  <text x="100" y="270" font-family="Arial, sans-serif" font-size="24" fill="white" opacity="0.9">
+    Convert PDFs to Excel/Sheets in seconds • Works with 200+ banks
+  </text>
+  <text x="100" y="310" font-family="Arial, sans-serif" font-size="24" fill="white" opacity="0.9">
+    Smart categorization • Financial insights • Google Workspace integrated
+  </text>
+  
+  <!-- CTA Button -->
+  <rect x="100" y="360" width="300" height="60" rx="30" fill="white"/>
+  <text x="250" y="395" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#4F46E5" text-anchor="middle">
+    Get Started Free
+  </text>
+  
+  <!-- Feature Icons -->
+  <g transform="translate(100, 460)">
+    <!-- AI Icon -->
+    <circle cx="30" cy="30" r="25" fill="white" opacity="0.2"/>
+    <text x="30" y="38" font-family="Arial" font-size="24" fill="white" text-anchor="middle">🤖</text>
+    <text x="70" y="35" font-family="Arial" font-size="16" fill="white">AI-Powered</text>
+    
+    <!-- Security Icon -->
+    <circle cx="230" cy="30" r="25" fill="white" opacity="0.2"/>
+    <text x="230" y="38" font-family="Arial" font-size="24" fill="white" text-anchor="middle">🔒</text>
+    <text x="270" y="35" font-family="Arial" font-size="16" fill="white">Bank-Level Security</text>
+    
+    <!-- Speed Icon -->
+    <circle cx="450" cy="30" r="25" fill="white" opacity="0.2"/>
+    <text x="450" y="38" font-family="Arial" font-size="24" fill="white" text-anchor="middle">⚡</text>
+    <text x="490" y="35" font-family="Arial" font-size="16" fill="white">Lightning Fast</text>
+  </g>
+  
+  <!-- Product Preview -->
+  <rect x="800" y="100" width="500" height="360" rx="12" fill="white" opacity="0.1"/>
+  <rect x="820" y="120" width="460" height="320" rx="8" fill="white"/>
+  
+  <!-- Mock Dashboard -->
+  <rect x="840" y="140" width="420" height="40" fill="#F3F4F6" rx="4"/>
+  <text x="860" y="165" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Chase Bank Statement - AI Processing Complete</text>
+  
+  <rect x="840" y="200" width="200" height="60" rx="4" fill="#F0FDF4"/>
+  <text x="860" y="225" font-family="Arial" font-size="12" fill="#6B7280">Total Income</text>
+  <text x="860" y="245" font-family="Arial" font-size="20" font-weight="bold" fill="#10B981">$8,450</text>
+  
+  <rect x="1060" y="200" width="200" height="60" rx="4" fill="#FEF2F2"/>
+  <text x="1080" y="225" font-family="Arial" font-size="12" fill="#6B7280">Total Expenses</text>
+  <text x="1080" y="245" font-family="Arial" font-size="20" font-weight="bold" fill="#EF4444">$6,234</text>
+  
+  <rect x="840" y="280" width="420" height="140" rx="4" fill="#F9FAFB"/>
+  <text x="860" y="305" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">AI Insights</text>
+  <text x="860" y="330" font-family="Arial" font-size="12" fill="#6B7280">• 3 unusual transactions detected</text>
+  <text x="860" y="350" font-family="Arial" font-size="12" fill="#6B7280">• Dining expenses up 18% this month</text>
+  <text x="860" y="370" font-family="Arial" font-size="12" fill="#6B7280">• On track to exceed budget by $150</text>
+  <text x="860" y="390" font-family="Arial" font-size="12" fill="#6B7280">• Recommended savings: $487/month</text>
+</svg>

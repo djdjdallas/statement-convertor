@@ -11,35 +11,37 @@
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/drive.readonly",
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/script.container.ui",
-    "https://www.googleapis.com/auth/userinfo.email"
-  ],
   "addOns": {
     "common": {
       "name": "Statement Desk",
-      "logoUrl": "https://your-domain.com/logo.png",
+      "logoUrl": "https://statementdesk.com/logo.png",
+      "layoutProperties": {
+        "primaryColor": "#4F46E5",
+        "secondaryColor": "#818CF8"
+      },
       "homepageTrigger": {
         "runFunction": "onHomepage"
       },
       "universalActions": [
         {
           "label": "Help",
-          "runFunction": "showHelp"
+          "openLink": "https://statementdesk.com/help"
         }
       ]
     },
     "drive": {
       "homepageTrigger": {
-        "enabled": true,
         "runFunction": "onDriveHomepage"
       },
       "onItemsSelectedTrigger": {
         "runFunction": "onDriveItemsSelected"
       }
     }
-  }
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/drive.addons.metadata.readonly",
+    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/script.external_request"
+  ]
 }

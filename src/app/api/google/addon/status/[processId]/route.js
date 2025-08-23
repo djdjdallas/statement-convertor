@@ -26,7 +26,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Process ID required' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get file status
     const { data: file, error } = await supabase

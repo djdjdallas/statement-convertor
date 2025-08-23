@@ -1,0 +1,44 @@
+{
+  "name": "Statement Desk",
+  "version": "1.0.0",
+  "manifestVersion": "1.0",
+  "description": "AI-powered bank statement to Excel converter with advanced financial insights",
+  "icons": {
+    "128": "https://statementdesk.com/assets/icon-128.png",
+    "48": "https://statementdesk.com/assets/icon-48.png",
+    "32": "https://statementdesk.com/assets/icon-32.png",
+    "16": "https://statementdesk.com/assets/icon-16.png"
+  },
+  "supportUrl": "https://statementdesk.com/support",
+  "developerUrl": "https://statementdesk.com",
+  "productId": "statement-desk",
+  "marketplaceAppId": "YOUR_MARKETPLACE_APP_ID",
+  "scopes": [
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+  ],
+  "installUrl": "https://statementdesk.com/install",
+  "uninstallUrl": "https://statementdesk.com/uninstall",
+  "configUrl": "https://statementdesk.com/admin/config",
+  "homepageUrl": "https://statementdesk.com",
+  "tosUrl": "https://statementdesk.com/terms",
+  "privacyUrl": "https://statementdesk.com/privacy",
+  "domainInstallUrl": "https://statementdesk.com/install/domain",
+  "individualInstallUrl": "https://statementdesk.com/install/individual",
+  "openIdConnectUrl": "https://statementdesk.com/.well-known/openid-configuration",
+  "universalNavigationExtensionUrl": "https://statementdesk.com/nav-extension",
+  "categories": ["PRODUCTIVITY", "FINANCE"],
+  "regions": ["US", "CA", "GB", "AU", "EU"],
+  "languages": ["en"],
+  "pricingModel": "FREEMIUM",
+  "features": [
+    "PDF_TO_EXCEL_CONVERSION",
+    "AI_CATEGORIZATION",
+    "GOOGLE_SHEETS_EXPORT",
+    "FINANCIAL_INSIGHTS",
+    "ANOMALY_DETECTION",
+    "CASH_FLOW_FORECASTING"
+  ]
+}

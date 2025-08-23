@@ -16,6 +16,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, CheckCircle, AlertCircle, ExternalLink, CloudUpload } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from '@/hooks/use-toast'
+import { GoogleErrorHandler, useGoogleErrorHandler } from '@/components/GoogleErrorHandler'
+import { GOOGLE_ERROR_CODES } from '@/lib/google/error-handler'
 
 export default function DriveExportDialog({ 
   isOpen, 
@@ -33,6 +35,7 @@ export default function DriveExportDialog({
   const [hasGoogle, setHasGoogle] = useState(false)
   const [isCheckingGoogle, setIsCheckingGoogle] = useState(true)
   const [exportProgress, setExportProgress] = useState(0)
+  const { handleGoogleError, clearError } = useGoogleErrorHandler()
 
   // Check Google integration status when dialog opens
   useEffect(() => {
@@ -132,17 +135,29 @@ export default function DriveExportDialog({
           }
         } else {
           clearInterval(progressInterval)
-          throw new Error(data.error || 'Failed to upload to Google Drive')
+          // Handle Google-specific errors
+          if (data.error && data.code) {
+            handleGoogleError(data)
+            setError(data)
+          } else {
+            throw new Error(data.error || 'Failed to upload to Google Drive')
+          }
         }
       }
     } catch (err) {
       console.error('Export error:', err)
-      setError(err.message)
-      toast({
-        title: 'Export Failed',
-        description: err.message || 'An error occurred during export. Please try again.',
-        variant: 'destructive'
-      })
+      // Check if it's a Google API error
+      if (err.code && err.code.includes('/')) {
+        handleGoogleError(err)
+        setError(err)
+      } else {
+        setError(err.message)
+        toast({
+          title: 'Export Failed',
+          description: err.message || 'An error occurred during export. Please try again.',
+          variant: 'destructive'
+        })
+      }
     } finally {
       setIsExporting(false)
       setExportProgress(0)
@@ -165,6 +180,7 @@ export default function DriveExportDialog({
     setExportResult(null)
     setError(null)
     setExportProgress(0)
+    clearError()
     onClose()
   }
 
@@ -198,7 +214,11 @@ export default function DriveExportDialog({
               {destination === 'drive' && (
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="sheets" id="sheets" />
-                  <Label htmlFor="sheets" className="cursor-pointer">
+                  <Label htmlFor="sheets" className="cursor-pointer flex items-center gap-2">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="3" width="18" height="18" rx="2" fill="#0F9D58"/>
+                      <path d="M8 7h8M8 12h8M8 17h5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
                     Google Sheets - Interactive spreadsheet with AI insights & charts
                   </Label>
                 </div>
@@ -224,8 +244,14 @@ export default function DriveExportDialog({
                 />
                 <Label 
                   htmlFor="drive" 
-                  className={`cursor-pointer ${!hasGoogle ? 'text-muted-foreground' : ''}`}
+                  className={`cursor-pointer flex items-center gap-2 ${!hasGoogle ? 'text-muted-foreground' : ''}`}
                 >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z" fill="#4285F4"/>
+                    <path d="M7.71 3.5h8.58L22.85 15H9.71z" fill="#34A853"/>
+                    <path d="M1.15 15l6.56-11.5L14.27 15H1.15z" fill="#FBBC04"/>
+                    <path d="M14.27 15l-6.56 7.5L1.15 15h13.12z" fill="#EA4335"/>
+                  </svg>
                   {isCheckingGoogle ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-3 w-3 animate-spin" />
@@ -244,10 +270,18 @@ export default function DriveExportDialog({
 
           {/* Error Alert */}
           {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            error.code ? (
+              <GoogleErrorHandler 
+                error={error} 
+                onRetry={handleExport}
+                onDismiss={() => setError(null)}
+              />
+            ) : (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )
           )}
 
           {/* Success Result */}

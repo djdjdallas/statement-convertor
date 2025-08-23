@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/client'
 import { SUBSCRIPTION_TIERS, checkUsageLimit } from '@/lib/subscription-tiers'
 import SubscriptionCard from '@/components/SubscriptionCard'
 import CheckoutSuccess from '@/components/CheckoutSuccess'
+import { toast } from '@/hooks/use-toast'
 import { 
   Upload, 
   FileText, 
@@ -43,6 +44,7 @@ export default function DashboardPage() {
     totalExports: 0
   })
   const [loading, setLoading] = useState(true)
+  const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
   const { user, signOut, loading: authLoading } = useAuth()
   const router = useRouter()
   const supabase = createClient()
@@ -63,6 +65,25 @@ export default function DashboardPage() {
     
     console.log('User authenticated, fetching dashboard data...')
     fetchDashboardData()
+    
+    // Check for Google linking success
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('google_linked') === 'true') {
+      toast({
+        title: "Success!",
+        description: "Your Google account has been linked successfully.",
+      })
+      // Remove the parameter from URL
+      router.replace('/dashboard')
+    } else if (params.get('error')) {
+      toast({
+        title: "Error",
+        description: params.get('error'),
+        variant: "destructive"
+      })
+      // Remove the parameter from URL
+      router.replace('/dashboard')
+    }
   }, [user, authLoading, router])
 
   const fetchDashboardData = async () => {
@@ -77,6 +98,17 @@ export default function DashboardPage() {
         .single()
 
       setUserProfile(profile || { subscription_tier: 'free' })
+
+      // Check Google Drive connection
+      try {
+        const response = await fetch('/api/auth/google/link')
+        if (response.ok) {
+          const data = await response.json()
+          setHasGoogleDrive(data.linked)
+        }
+      } catch (err) {
+        console.log('Could not check Google Drive status')
+      }
 
       // Fetch files with transaction counts
       const { data: filesData } = await supabase
@@ -278,6 +310,14 @@ export default function DashboardPage() {
               >
                 ✨ {userTier} Plan
               </Badge>
+              {hasGoogleDrive && (
+                <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
+                  <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
+                  </svg>
+                  Google Connected
+                </Badge>
+              )}
               <div className="flex items-center space-x-1">
                 <Link href="/settings">
                   <Button variant="ghost" size="sm" className="hover:bg-white/60 transition-all duration-200">
@@ -505,6 +545,67 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Google Workspace Integration Highlight */}
+        {hasGoogleDrive && (
+          <Card className="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-lg shadow-md">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z" fill="#4285F4"/>
+                    <path d="M7.71 3.5h8.58L22.85 15H9.71z" fill="#34A853"/>
+                    <path d="M1.15 15l6.56-11.5L14.27 15H1.15z" fill="#FBBC04"/>
+                    <path d="M14.27 15l-6.56 7.5L1.15 15h13.12z" fill="#EA4335"/>
+                  </svg>
+                </div>
+                Google Workspace Connected
+              </CardTitle>
+              <CardDescription>
+                Seamlessly work with your financial data across Google's productivity suite
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Upload className="h-4 w-4 text-blue-600" />
+                    Import from Drive
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Access PDF statements directly from your Google Drive
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Sheet className="h-4 w-4 text-green-600" />
+                    Export to Sheets
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Create interactive spreadsheets with charts & AI insights
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-600" />
+                    Auto-sync
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Processed files automatically saved to your Drive
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Link href="/settings">
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Manage Integration
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Subscription Management */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">
@@ -585,9 +686,19 @@ export default function DashboardPage() {
                     <div className="flex items-center space-x-4">
                       {getStatusIcon(file.processing_status)}
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">
-                          {file.original_filename}
-                        </h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium text-gray-900">
+                            {file.original_filename}
+                          </h4>
+                          {file.source === 'google_drive' && (
+                            <Badge variant="outline" className="text-xs px-1.5 py-0 border-blue-300 text-blue-700 bg-blue-50">
+                              <svg className="w-3 h-3 mr-0.5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
+                              </svg>
+                              Drive
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                           <span>{formatFileSize(file.file_size)}</span>
                           <span>•</span>

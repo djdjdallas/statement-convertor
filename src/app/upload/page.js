@@ -24,6 +24,7 @@ export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [processing, setProcessing] = useState(false)
   const [userProfile, setUserProfile] = useState(null)
+  const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
   const { user } = useAuth()
   const router = useRouter()
   const supabase = createClient()
@@ -54,6 +55,17 @@ export default function UploadPage() {
       setUserProfile(data || { subscription_tier: 'free' })
     } catch (error) {
       console.error('Error fetching user profile:', error)
+    }
+
+    // Check Google Drive connection
+    try {
+      const response = await fetch('/api/auth/google/link')
+      if (response.ok) {
+        const data = await response.json()
+        setHasGoogleDrive(data.linked)
+      }
+    } catch (err) {
+      console.log('Could not check Google Drive status')
     }
   }
 
@@ -305,20 +317,30 @@ export default function UploadPage() {
               </Link>
             </div>
             
-            {userProfile && (
-              <Badge 
-                variant="outline" 
-                className={`capitalize px-3 py-1 font-medium border-2 ${
-                  userProfile.subscription_tier === 'premium' 
-                    ? 'border-gradient-to-r from-purple-500 to-pink-500 text-purple-700 bg-purple-50' 
-                    : userProfile.subscription_tier === 'basic'
-                    ? 'border-blue-500 text-blue-700 bg-blue-50'
-                    : 'border-gray-300 text-gray-600 bg-gray-50'
-                }`}
-              >
-                ✨ {userProfile.subscription_tier} Plan
-              </Badge>
-            )}
+            <div className="flex items-center space-x-3">
+              {hasGoogleDrive && (
+                <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
+                  <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
+                  </svg>
+                  Google Connected
+                </Badge>
+              )}
+              {userProfile && (
+                <Badge 
+                  variant="outline" 
+                  className={`capitalize px-3 py-1 font-medium border-2 ${
+                    userProfile.subscription_tier === 'premium' 
+                      ? 'border-gradient-to-r from-purple-500 to-pink-500 text-purple-700 bg-purple-50' 
+                      : userProfile.subscription_tier === 'basic'
+                      ? 'border-blue-500 text-blue-700 bg-blue-50'
+                      : 'border-gray-300 text-gray-600 bg-gray-50'
+                  }`}
+                >
+                  ✨ {userProfile.subscription_tier} Plan
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
       </div>

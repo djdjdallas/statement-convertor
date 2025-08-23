@@ -1,0 +1,90 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#F9FAFB"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1280" height="120" fill="white"/>
+  <text x="60" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#1F2937">Chase Bank Statement - January 2025</text>
+  <text x="60" y="80" font-family="Arial" font-size="16" fill="#6B7280">1,247 transactions processed • 98.5% accuracy</text>
+  
+  <!-- Export Buttons -->
+  <rect x="900" y="40" width="140" height="40" rx="8" fill="#10B981"/>
+  <text x="970" y="65" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Export to Sheets</text>
+  
+  <rect x="1060" y="40" width="140" height="40" rx="8" fill="#4F46E5"/>
+  <text x="1130" y="65" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Download Excel</text>
+  
+  <!-- Summary Cards -->
+  <g transform="translate(60, 140)">
+    <rect x="0" y="0" width="280" height="100" rx="8" fill="white"/>
+    <text x="20" y="30" font-family="Arial" font-size="14" fill="#6B7280">Total Income</text>
+    <text x="20" y="60" font-family="Arial" font-size="28" font-weight="bold" fill="#10B981">$8,450.00</text>
+    <text x="20" y="85" font-family="Arial" font-size="12" fill="#10B981">+12% from last month</text>
+    
+    <rect x="300" y="0" width="280" height="100" rx="8" fill="white"/>
+    <text x="320" y="30" font-family="Arial" font-size="14" fill="#6B7280">Total Expenses</text>
+    <text x="320" y="60" font-family="Arial" font-size="28" font-weight="bold" fill="#EF4444">$6,234.56</text>
+    <text x="320" y="85" font-family="Arial" font-size="12" fill="#EF4444">+5% from last month</text>
+    
+    <rect x="600" y="0" width="280" height="100" rx="8" fill="white"/>
+    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6B7280">Net Savings</text>
+    <text x="620" y="60" font-family="Arial" font-size="28" font-weight="bold" fill="#4F46E5">$2,215.44</text>
+    <text x="620" y="85" font-family="Arial" font-size="12" fill="#4F46E5">26% savings rate</text>
+    
+    <rect x="900" y="0" width="280" height="100" rx="8" fill="white"/>
+    <text x="920" y="30" font-family="Arial" font-size="14" fill="#6B7280">AI Insights</text>
+    <text x="920" y="60" font-family="Arial" font-size="20" font-weight="bold" fill="#F59E0B">3 Anomalies</text>
+    <text x="920" y="85" font-family="Arial" font-size="12" fill="#6B7280">Click to review</text>
+  </g>
+  
+  <!-- Transaction Table -->
+  <rect x="60" y="260" width="1160" height="480" rx="8" fill="white"/>
+  
+  <!-- Table Header -->
+  <rect x="60" y="260" width="1160" height="50" rx="8 8 0 0" fill="#F3F4F6"/>
+  <text x="80" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">Date</text>
+  <text x="200" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">Description</text>
+  <text x="500" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">AI Category</text>
+  <text x="700" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">Amount</text>
+  <text x="850" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">Balance</text>
+  <text x="1000" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">Confidence</text>
+  <text x="1120" y="290" font-family="Arial" font-size="14" font-weight="bold" fill="#374151">Status</text>
+  
+  <!-- Transaction Rows -->
+  <g transform="translate(80, 330)">
+    <!-- Row 1 -->
+    <text x="0" y="0" font-family="Arial" font-size="14" fill="#1F2937">01/28</text>
+    <text x="120" y="0" font-family="Arial" font-size="14" fill="#1F2937">Direct Deposit - ACME Corp</text>
+    <rect x="420" y="-15" width="80" height="24" rx="12" fill="#DBEAFE"/>
+    <text x="460" y="0" font-family="Arial" font-size="12" fill="#1E40AF" text-anchor="middle">Income</text>
+    <text x="620" y="0" font-family="Arial" font-size="14" fill="#10B981">+$4,225.00</text>
+    <text x="770" y="0" font-family="Arial" font-size="14" fill="#1F2937">$12,456.78</text>
+    <text x="920" y="0" font-family="Arial" font-size="14" fill="#10B981">99%</text>
+    <text x="1040" y="0" font-family="Arial" font-size="14" fill="#10B981">✓</text>
+    
+    <!-- Row 2 -->
+    <text x="0" y="40" font-family="Arial" font-size="14" fill="#1F2937">01/27</text>
+    <text x="120" y="40" font-family="Arial" font-size="14" fill="#1F2937">Whole Foods Market</text>
+    <rect x="420" y="25" width="100" height="24" rx="12" fill="#FEF3C7"/>
+    <text x="470" y="40" font-family="Arial" font-size="12" fill="#92400E" text-anchor="middle">Groceries</text>
+    <text x="620" y="40" font-family="Arial" font-size="14" fill="#EF4444">-$156.34</text>
+    <text x="770" y="40" font-family="Arial" font-size="14" fill="#1F2937">$8,231.78</text>
+    <text x="920" y="40" font-family="Arial" font-size="14" fill="#10B981">96%</text>
+    <text x="1040" y="40" font-family="Arial" font-size="14" fill="#10B981">✓</text>
+    
+    <!-- Row 3 - Anomaly -->
+    <rect x="-20" y="65" width="1100" height="40" rx="4" fill="#FEF2F2"/>
+    <text x="0" y="85" font-family="Arial" font-size="14" fill="#1F2937">01/26</text>
+    <text x="120" y="85" font-family="Arial" font-size="14" fill="#1F2937">Unknown Merchant #4829</text>
+    <rect x="420" y="70" width="80" height="24" rx="12" fill="#FCA5A5"/>
+    <text x="460" y="85" font-family="Arial" font-size="12" fill="#991B1B" text-anchor="middle">Unknown</text>
+    <text x="620" y="85" font-family="Arial" font-size="14" fill="#EF4444">-$2,847.00</text>
+    <text x="770" y="85" font-family="Arial" font-size="14" fill="#1F2937">$8,388.12</text>
+    <text x="920" y="85" font-family="Arial" font-size="14" fill="#EF4444">45%</text>
+    <text x="1040" y="85" font-family="Arial" font-size="14" fill="#F59E0B">⚠</text>
+  </g>
+  
+  <!-- Description -->
+  <text x="640" y="770" font-family="Arial" font-size="18" text-anchor="middle" fill="#6B7280">
+    Screenshot 3: Enhanced transaction view with AI categorization, confidence scores, and anomaly detection
+  </text>
+</svg>

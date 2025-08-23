@@ -36,7 +36,8 @@ import {
   TrendingDown,
   Brain,
   AlertTriangle,
-  Star
+  Star,
+  Cloud
 } from 'lucide-react'
 import DriveExportDialog from '@/components/DriveExportDialog'
 
@@ -342,8 +343,11 @@ export default function DataPreview({
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => setShowExportDialog(true)}>
-                <Download className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={() => setShowExportDialog(true)}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+              >
+                <Cloud className="h-4 w-4 mr-2" />
                 Export
               </Button>
             </div>

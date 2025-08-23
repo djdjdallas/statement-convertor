@@ -1,0 +1,55 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="socialGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="1200" height="630" fill="url(#socialGradient)"/>
+  
+  <!-- Pattern Background -->
+  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  
+  <!-- Logo Area -->
+  <circle cx="600" cy="150" r="80" fill="white" opacity="0.2"/>
+  <circle cx="600" cy="150" r="60" fill="white"/>
+  <text x="600" y="165" font-family="Arial" font-size="48" font-weight="bold" fill="#4F46E5" text-anchor="middle">SD</text>
+  
+  <!-- Main Text -->
+  <text x="600" y="280" font-family="Arial, sans-serif" font-size="56" font-weight="bold" fill="white" text-anchor="middle">
+    Statement Desk
+  </text>
+  
+  <text x="600" y="340" font-family="Arial, sans-serif" font-size="28" fill="white" opacity="0.9" text-anchor="middle">
+    Bank Statements → Excel in Seconds
+  </text>
+  
+  <text x="600" y="380" font-family="Arial, sans-serif" font-size="24" fill="white" opacity="0.8" text-anchor="middle">
+    Powered by AI • Works with 200+ Banks
+  </text>
+  
+  <!-- Feature Pills -->
+  <g transform="translate(300, 430)">
+    <rect x="0" y="0" width="120" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="60" y="26" font-family="Arial" font-size="16" fill="white" text-anchor="middle">AI-Powered</text>
+    
+    <rect x="140" y="0" width="160" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="220" y="26" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Google Integrated</text>
+    
+    <rect x="320" y="0" width="120" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="380" y="26" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Secure</text>
+    
+    <rect x="460" y="0" width="140" height="40" rx="20" fill="white" opacity="0.2"/>
+    <text x="530" y="26" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Free Trial</text>
+  </g>
+  
+  <!-- Website -->
+  <text x="600" y="550" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">
+    statementdesk.ai
+  </text>
+</svg>

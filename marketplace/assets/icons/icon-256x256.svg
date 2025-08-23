@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="32" fill="#4F46E5"/>
+  
+  <!-- Document -->
+  <rect x="48" y="48" width="160" height="200" rx="8" fill="white" opacity="0.1"/>
+  
+  <!-- Document lines -->
+  <path d="M64 80h128M64 112h96M64 144h112M64 176h80" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- AI Badge -->
+  <circle cx="192" cy="192" r="48" fill="#10B981"/>
+  <path d="M176 192l8 8L208 176" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- AI sparkle effects -->
+  <circle cx="208" cy="80" r="6" fill="#FDE047"/>
+  <circle cx="224" cy="96" r="4" fill="#FDE047"/>
+  <circle cx="216" cy="112" r="5" fill="#FDE047"/>
+  
+  <!-- Statement Desk text -->
+  <text x="128" y="36" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Statement Desk</text>
+</svg>

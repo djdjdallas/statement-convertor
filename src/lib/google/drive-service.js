@@ -1,5 +1,12 @@
 import { google } from 'googleapis';
 import { getAuthenticatedClient } from './auth';
+import { 
+  withGoogleErrorHandling, 
+  GOOGLE_ERROR_CODES,
+  createErrorResponse,
+  isRecoverableError,
+  parseGoogleError
+} from './error-handler';
 
 const STATEMENT_FOLDER_NAME = 'Statement Converter';
 const MIME_TYPES = {
@@ -18,19 +25,25 @@ class GoogleDriveService {
   }
 
   async initialize() {
-    const auth = await getAuthenticatedClient(this.userId, this.isServerSide);
-    if (!auth) {
-      throw new Error('No Google authentication found');
-    }
-    this.drive = google.drive({ version: 'v3', auth });
-    return this;
+    return withGoogleErrorHandling(async () => {
+      const auth = await getAuthenticatedClient(this.userId, this.isServerSide);
+      if (!auth) {
+        const error = new Error('No Google authentication found');
+        error.code = GOOGLE_ERROR_CODES.INVALID_CREDENTIALS;
+        throw error;
+      }
+      this.drive = google.drive({ version: 'v3', auth });
+      return this;
+    }, {
+      context: { userId: this.userId, operation: 'initializeDriveService' }
+    });
   }
 
   /**
    * Get or create the Statement Converter folder
    */
   async getOrCreateFolder() {
-    try {
+    return withGoogleErrorHandling(async () => {
       // Search for existing folder
       const response = await this.drive.files.list({
         q: `name='${STATEMENT_FOLDER_NAME}' and mimeType='${MIME_TYPES.FOLDER}' and trashed=false`,
@@ -54,17 +67,33 @@ class GoogleDriveService {
       });
 
       return folder.data.id;
-    } catch (error) {
-      console.error('Error getting/creating folder:', error);
-      throw new Error('Failed to access Google Drive folder');
-    }
+    }, {
+      context: { operation: 'getOrCreateFolder', folderName: STATEMENT_FOLDER_NAME }
+    });
   }
 
   /**
    * Upload a file to Google Drive
    */
   async uploadFile(fileData, fileName, mimeType, folderId = null) {
-    try {
+    return withGoogleErrorHandling(async () => {
+      // Check for duplicate file names in the target folder
+      if (folderId) {
+        const existingFiles = await this.drive.files.list({
+          q: `name='${fileName}' and '${folderId}' in parents and trashed=false`,
+          fields: 'files(id, name)'
+        });
+
+        if (existingFiles.data.files && existingFiles.data.files.length > 0) {
+          // Generate unique filename
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const nameParts = fileName.split('.');
+          const extension = nameParts.pop();
+          const baseName = nameParts.join('.');
+          fileName = `${baseName}_${timestamp}.${extension}`;
+        }
+      }
+
       const fileMetadata = {
         name: fileName,
         parents: folderId ? [folderId] : []
@@ -98,17 +127,24 @@ class GoogleDriveService {
         size: response.data.size,
         createdTime: response.data.createdTime
       };
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      throw new Error('Failed to upload file to Google Drive');
-    }
+    }, {
+      context: { operation: 'uploadFile', fileName, mimeType }
+    });
   }
 
   /**
    * Upload converted statement file with organized naming
    */
   async uploadStatementFile(fileBuffer, originalFileName, format, metadata = {}) {
-    try {
+    return withGoogleErrorHandling(async () => {
+      // Check storage quota before uploading
+      const quota = await this.checkStorageQuota();
+      if (quota.available < fileBuffer.length) {
+        const error = new Error(`Insufficient Google Drive storage. Need ${(fileBuffer.length / 1024 / 1024).toFixed(2)}MB but only ${(quota.available / 1024 / 1024).toFixed(2)}MB available.`);
+        error.code = GOOGLE_ERROR_CODES.STORAGE_FULL;
+        throw error;
+      }
+
       const folderId = await this.getOrCreateFolder();
       
       // Generate organized filename
@@ -120,10 +156,9 @@ class GoogleDriveService {
       const mimeType = format === 'csv' ? MIME_TYPES.CSV : MIME_TYPES.EXCEL;
       
       return await this.uploadFile(fileBuffer, fileName, mimeType, folderId);
-    } catch (error) {
-      console.error('Error uploading statement file:', error);
-      throw error;
-    }
+    }, {
+      context: { operation: 'uploadStatementFile', format, metadata }
+    });
   }
 
   /**
@@ -249,28 +284,38 @@ class GoogleDriveService {
    * Check if user has sufficient Drive storage
    */
   async checkStorageQuota() {
-    try {
+    return withGoogleErrorHandling(async () => {
       const about = await this.drive.about.get({
         fields: 'storageQuota'
       });
 
       const quota = about.data.storageQuota;
+      const limit = parseInt(quota.limit || 0);
+      const usage = parseInt(quota.usage || 0);
+      const available = limit - usage;
+      
+      // If no limit (unlimited storage), set a reasonable default
+      const effectiveLimit = limit || 15 * 1024 * 1024 * 1024; // 15GB default
+      
       return {
-        limit: parseInt(quota.limit || 0),
-        usage: parseInt(quota.usage || 0),
-        available: parseInt(quota.limit || 0) - parseInt(quota.usage || 0),
-        percentUsed: quota.limit ? (parseInt(quota.usage || 0) / parseInt(quota.limit) * 100).toFixed(2) : 0
+        limit: effectiveLimit,
+        usage: usage,
+        available: limit ? available : effectiveLimit - usage,
+        percentUsed: limit ? ((usage / limit) * 100).toFixed(2) : ((usage / effectiveLimit) * 100).toFixed(2),
+        unlimited: !limit
       };
-    } catch (error) {
-      console.error('Error checking storage quota:', error);
-      // Return default values if quota check fails
-      return {
-        limit: 0,
-        usage: 0,
-        available: 0,
-        percentUsed: 0
-      };
-    }
+    }, {
+      context: { operation: 'checkStorageQuota' },
+      throwOnError: false // Don't throw, return default values on error
+    }) || {
+      // Default values if error occurs
+      limit: 15 * 1024 * 1024 * 1024, // 15GB
+      usage: 0,
+      available: 15 * 1024 * 1024 * 1024,
+      percentUsed: 0,
+      unlimited: false,
+      error: true
+    };
   }
 }
 

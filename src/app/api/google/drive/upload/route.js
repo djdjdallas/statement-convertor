@@ -2,11 +2,17 @@ import { NextResponse } from 'next/server';
 import { createDriveService } from '@/lib/google/drive-service';
 import { hasGoogleIntegration } from '@/lib/google/auth';
 import { createClient } from '@/lib/supabase/server';
+import { 
+  createErrorResponse, 
+  GOOGLE_ERROR_CODES,
+  createErrorNotification,
+  isRecoverableError 
+} from '@/lib/google/error-handler';
 
 export async function POST(request) {
   try {
     // Get user session
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {
@@ -45,14 +51,8 @@ export async function POST(request) {
     // Create Drive service and upload file
     const driveService = await createDriveService(user.id);
     
-    // Check storage quota first
-    const quota = await driveService.checkStorageQuota();
-    if (quota.available < fileBuffer.length) {
-      return NextResponse.json(
-        { error: 'Insufficient Google Drive storage space' },
-        { status: 507 }
-      );
-    }
+    // Check storage quota first (now handled internally with proper error handling)
+    // The uploadStatementFile method will check quota and throw appropriate error
 
     // Upload the file
     const uploadResult = await driveService.uploadStatementFile(
@@ -92,9 +92,16 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Error uploading to Google Drive:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to upload file to Google Drive' },
-      { status: 500 }
-    );
+    
+    // Create standardized error response
+    const errorResponse = createErrorResponse(error, {
+      userId: user?.id,
+      operation: 'uploadToGoogleDrive'
+    });
+    
+    // Return error with appropriate status code
+    return NextResponse.json(errorResponse, { 
+      status: errorResponse.statusCode 
+    });
   }
 }

@@ -1,5 +1,11 @@
 import { google } from 'googleapis';
 import { getAuthenticatedClient } from './auth';
+import { 
+  withGoogleErrorHandling, 
+  GOOGLE_ERROR_CODES,
+  createErrorResponse,
+  parseGoogleError
+} from './error-handler';
 
 const SHEETS_MIME_TYPE = 'application/vnd.google-apps.spreadsheet';
 const STATEMENT_FOLDER_NAME = 'Statement Converter';
@@ -13,20 +19,26 @@ class GoogleSheetsService {
   }
 
   async initialize() {
-    const auth = await getAuthenticatedClient(this.userId, this.isServerSide);
-    if (!auth) {
-      throw new Error('No Google authentication found');
-    }
-    this.sheets = google.sheets({ version: 'v4', auth });
-    this.drive = google.drive({ version: 'v3', auth });
-    return this;
+    return withGoogleErrorHandling(async () => {
+      const auth = await getAuthenticatedClient(this.userId, this.isServerSide);
+      if (!auth) {
+        const error = new Error('No Google authentication found');
+        error.code = GOOGLE_ERROR_CODES.INVALID_CREDENTIALS;
+        throw error;
+      }
+      this.sheets = google.sheets({ version: 'v4', auth });
+      this.drive = google.drive({ version: 'v3', auth });
+      return this;
+    }, {
+      context: { userId: this.userId, operation: 'initializeSheetsService' }
+    });
   }
 
   /**
    * Create a new Google Sheets file with transaction data and AI insights
    */
   async createStatementSheet(transactions, insights, metadata) {
-    try {
+    return withGoogleErrorHandling(async () => {
       const { fileName = 'Statement Export', bankName = 'Bank' } = metadata;
       
       // Create a new spreadsheet
@@ -136,21 +148,28 @@ class GoogleSheetsService {
         createdTime: fileInfo.data.createdTime
       };
 
-    } catch (error) {
-      console.error('Error creating Google Sheet:', error);
-      throw new Error('Failed to create Google Sheet: ' + error.message);
-    }
+    }, {
+      context: { 
+        operation: 'createStatementSheet', 
+        transactionCount: transactions.length,
+        metadata 
+      }
+    });
   }
 
   /**
    * Update sheet with data
    */
   async updateSheet(spreadsheetId, range, values) {
-    await this.sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values }
+    return withGoogleErrorHandling(async () => {
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values }
+      });
+    }, {
+      context: { operation: 'updateSheet', spreadsheetId, range }
     });
   }
 
@@ -811,7 +830,7 @@ class GoogleSheetsService {
    * Get or create the Statement Converter folder
    */
   async getOrCreateFolder() {
-    try {
+    return withGoogleErrorHandling(async () => {
       const response = await this.drive.files.list({
         q: `name='${STATEMENT_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
         fields: 'files(id, name)',
@@ -833,10 +852,10 @@ class GoogleSheetsService {
       });
 
       return folder.data.id;
-    } catch (error) {
-      console.error('Error getting/creating folder:', error);
-      return null;
-    }
+    }, {
+      context: { operation: 'getOrCreateFolder', folderName: STATEMENT_FOLDER_NAME },
+      throwOnError: false // Return null on error
+    });
   }
 }
 

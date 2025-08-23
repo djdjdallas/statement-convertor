@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="16" fill="#4F46E5"/>
+  
+  <!-- Document lines -->
+  <path d="M32 40h64M32 64h48M32 88h40" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- AI Badge -->
+  <circle cx="96" cy="96" r="24" fill="#10B981"/>
+  <path d="M88 96l4 4L104 88" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- AI sparkle effect -->
+  <circle cx="104" cy="40" r="3" fill="#FDE047"/>
+  <circle cx="112" cy="48" r="2" fill="#FDE047"/>
+  <circle cx="108" cy="56" r="2.5" fill="#FDE047"/>
+</svg>

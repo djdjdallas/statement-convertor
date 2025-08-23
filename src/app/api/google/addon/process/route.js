@@ -43,7 +43,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Only PDF files are supported' }, { status: 400 });
     }
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Create file record
     const { data: file, error: fileError } = await supabase

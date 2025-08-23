@@ -1,126 +1,180 @@
-# Statement Desk Google Workspace Add-on
+# Statement Desk Google Drive Add-on
 
-This directory contains the Google Apps Script code for the Statement Desk Google Workspace Add-on, which allows users to process bank statements directly from Google Drive.
-
-## Files
-
-### Core Files
-- **`appsscript.json`** - Add-on manifest file defining permissions, triggers, and UI elements
-- **`Code.js`** - Main add-on logic including card UI builders and file processing
-- **`SidebarCode.js`** - Functions specific to the sidebar interface
-- **`Sidebar.html`** - HTML interface for the sidebar with file selection and processing UI
-- **`AuthCallback.js`** - OAuth and authentication handling code
-
-### Documentation
-- **`DEPLOYMENT.md`** - Detailed deployment instructions
-- **`README.md`** - This file
+This Google Workspace Add-on integrates Statement Desk directly into Google Drive, allowing users to process PDF bank statements without leaving their Drive interface.
 
 ## Features
 
-### 1. Drive Integration
-- Automatically detects when PDF files are selected in Google Drive
-- Shows contextual UI based on file selection
-- Processes files directly from Drive without downloading
+- **In-Context Processing**: Process bank statements directly from Drive
+- **AI Enhancement**: Toggle AI-powered extraction for better accuracy
+- **Batch Processing**: Process multiple statements at once
+- **Real-time Status**: See processing progress and results
+- **Export Options**: Choose between Excel (.xlsx) or CSV format
+- **Authentication**: Secure OAuth2 integration with Statement Desk
 
-### 2. Authentication
-- Secure OAuth-based authentication with Statement Desk
-- Token stored securely in Apps Script Properties
-- Automatic token refresh
+## Installation & Deployment
 
-### 3. File Processing
-- Converts PDF bank statements to Excel (.xlsx) or CSV format
-- AI-enhanced transaction extraction
-- Progress tracking during processing
-- Results saved back to Google Drive
+### Prerequisites
 
-### 4. User Interface
-- Card-based UI for the add-on homepage
-- Interactive sidebar for file selection and processing
-- Real-time status updates
-- Error handling and user feedback
+1. Google Cloud Project with Apps Script API enabled
+2. Statement Desk API credentials
+3. Google Workspace account
 
-## Architecture
+### Setup Steps
 
-### Authentication Flow
-1. User clicks "Connect Statement Desk"
-2. OAuth window opens to Statement Desk auth page
-3. User signs in (if needed) and authorizes
-4. Token is passed back to add-on
-5. Token stored securely for future use
+1. **Create Apps Script Project**
+   ```bash
+   # Go to https://script.google.com
+   # Create a new project
+   # Copy all files from google-addon/src/ to the project
+   ```
 
-### Processing Flow
-1. User selects PDF files in Drive
-2. Add-on shows selected files
-3. User chooses export format
-4. Files are sent to Statement Desk API
-5. Processed files are saved back to Drive
-6. User sees results with links to new files
+2. **Configure Script Properties**
+   - In Apps Script Editor, go to Project Settings > Script Properties
+   - Add property: `STATEMENT_DESK_API_KEY` = `your-api-key`
+
+3. **Deploy as Add-on**
+   ```
+   # In Apps Script Editor:
+   1. Click "Deploy" > "Test deployments"
+   2. Select "Install add-on" 
+   3. Choose your Google account
+   4. Grant necessary permissions
+   ```
+
+4. **Production Deployment**
+   ```
+   # For organization-wide deployment:
+   1. Click "Deploy" > "New deployment"
+   2. Type: "Add-on"
+   3. Description: "Statement Desk - Bank Statement Processor"
+   4. Execute as: "User accessing the add-on"
+   5. Who has access: "Anyone" or specific domain
+   ```
+
+## Project Structure
+
+```
+google-addon/
+├── appsscript.json          # Add-on manifest and configuration
+├── src/
+│   ├── Code.js             # Main entry point and UI logic
+│   ├── AuthHandler.js      # OAuth authentication handling
+│   └── BatchProcessor.js   # Batch file processing logic
+├── assets/                 # Icons and images (if needed)
+└── README.md              # This file
+```
 
 ## Configuration
 
-Update these values before deployment:
+### appsscript.json
+- Defines add-on metadata and permissions
+- Configures Drive integration triggers
+- Sets OAuth scopes for API access
 
-### In `Code.js`:
-```javascript
-const CONFIG = {
-  baseUrl: 'https://your-domain.com',  // Your Statement Desk domain
-  googleClientId: 'your-client-id',     // From Google Cloud Console
-  googleClientSecret: 'your-secret',    // From Google Cloud Console
-  // ...
-};
-```
+### Required Scopes
+- `drive.addons.metadata.readonly` - Read file metadata
+- `drive.readonly` - Read file contents
+- `userinfo.email` - Get user email for authentication
+- `script.external_request` - Make API calls to Statement Desk
 
-### In `appsscript.json`:
-```json
-{
-  "addOns": {
-    "common": {
-      "logoUrl": "https://your-domain.com/logo.png",
-      // ...
-    }
-  }
-}
-```
+## API Integration
+
+The add-on communicates with Statement Desk API endpoints:
+
+- `POST /api/upload` - Upload PDF file
+- `POST /api/process-pdf` - Process uploaded file
+- `POST /api/export` - Export processed data
+- `GET /api/auth/verify` - Verify authentication
+- `POST /api/auth/token` - Exchange auth code for token
+- `POST /api/auth/refresh` - Refresh access token
+
+## User Flow
+
+1. **Initial Setup**
+   - User installs add-on from Google Workspace Marketplace
+   - Opens Drive and selects a PDF bank statement
+   - Add-on sidebar appears
+
+2. **Authentication**
+   - User clicks "Connect Account"
+   - Redirected to Statement Desk for OAuth consent
+   - Returns to Drive with authenticated session
+
+3. **Processing**
+   - User selects processing options (AI enhancement, export format)
+   - Clicks "Process Statement"
+   - Sees real-time progress updates
+   - Downloads result or views in dashboard
+
+4. **Batch Processing**
+   - Select multiple PDF files
+   - Choose "Process All X Files"
+   - Receive email notification when complete
 
 ## Development
 
 ### Local Testing
-1. Open [script.google.com](https://script.google.com)
-2. Create a new project
-3. Copy all files from this directory
-4. Update configuration values
-5. Deploy as test add-on
-6. Install and test in Google Drive
+```bash
+# Use clasp for local development
+npm install -g @google/clasp
+clasp login
+clasp create --type addon --title "Statement Desk"
+clasp push
+```
 
 ### Debugging
-- Use `console.log()` for debugging
-- View logs in Apps Script editor (View > Logs)
-- Check Stackdriver logs for detailed errors
+- Use `console.log()` for logging (visible in Apps Script Editor)
+- Test with sample PDF files in Drive
+- Check Stackdriver logs for errors
 
-## API Integration
-
-The add-on communicates with these Statement Desk endpoints:
-
-- `POST /api/google/addon/auth` - Generate auth token
-- `GET /api/google/addon/auth` - Verify auth status  
-- `POST /api/google/addon/process` - Process PDF file
-- `GET /api/google/addon/status/[id]` - Check processing status
+### Error Handling
+- All API calls wrapped in try-catch blocks
+- User-friendly error messages displayed
+- Fallback to traditional processing if AI fails
 
 ## Security
 
-- All API calls use HTTPS
-- JWT tokens expire after 30 days
-- File size limited to 10MB
-- Only PDF files are accepted
-- User data isolated by authentication
+- OAuth tokens stored in UserProperties (encrypted)
+- API key stored in ScriptProperties (server-side only)
+- No sensitive data logged or exposed
+- Automatic token refresh before expiry
+
+## Maintenance
+
+### Regular Tasks
+- Monitor API usage and rate limits
+- Update API endpoints if changed
+- Review and update OAuth scopes as needed
+- Clean up old batch processing records
+
+### Troubleshooting
+
+**Add-on not appearing in Drive:**
+- Check deployment status
+- Verify manifest configuration
+- Ensure proper OAuth scopes
+
+**Authentication failures:**
+- Verify API key is set correctly
+- Check OAuth redirect URLs
+- Ensure Statement Desk API is accessible
+
+**Processing errors:**
+- Check file size limits (10MB)
+- Verify PDF mime type
+- Review API response errors
+
+## Future Enhancements
+
+- Google Sheets integration for direct export
+- Scheduled batch processing
+- Advanced filtering options
+- Multi-language support
+- Offline capability with sync
 
 ## Support
 
 For issues or questions:
-1. Check the [Deployment Guide](DEPLOYMENT.md)
-2. Review Apps Script logs
-3. Contact Statement Desk support
-
-## License
-
-This add-on is part of Statement Desk and subject to the same license terms.
+- Check Statement Desk documentation
+- Review Apps Script logs
+- Contact support@statementdesk.com

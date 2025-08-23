@@ -1,0 +1,64 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#F9FAFB"/>
+  
+  <!-- Browser Frame -->
+  <rect x="0" y="0" width="1280" height="60" fill="#E5E7EB"/>
+  <circle cx="30" cy="30" r="6" fill="#EF4444"/>
+  <circle cx="50" cy="30" r="6" fill="#F59E0B"/>
+  <circle cx="70" cy="30" r="6" fill="#10B981"/>
+  
+  <!-- Processing Animation Area -->
+  <rect x="340" y="150" width="600" height="100" rx="12" fill="white"/>
+  <text x="640" y="190" font-family="Arial" font-size="20" font-weight="bold" text-anchor="middle" fill="#1F2937">AI Processing Your Statement</text>
+  
+  <!-- Progress Bar -->
+  <rect x="400" y="210" width="480" height="8" rx="4" fill="#E5E7EB"/>
+  <rect x="400" y="210" width="360" height="8" rx="4" fill="#4F46E5"/>
+  
+  <!-- AI Processing Steps -->
+  <g transform="translate(200, 300)">
+    <!-- Step 1 -->
+    <rect x="0" y="0" width="260" height="80" rx="8" fill="white" stroke="#10B981" stroke-width="2"/>
+    <circle cx="30" cy="40" r="16" fill="#10B981"/>
+    <path d="M22 40 L28 46 L38 36" stroke="white" stroke-width="2" fill="none"/>
+    <text x="60" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#1F2937">Extracting Data</text>
+    <text x="60" y="55" font-family="Arial" font-size="14" fill="#6B7280">1,247 transactions found</text>
+    
+    <!-- Step 2 -->
+    <rect x="290" y="0" width="260" height="80" rx="8" fill="white" stroke="#10B981" stroke-width="2"/>
+    <circle cx="320" cy="40" r="16" fill="#10B981"/>
+    <path d="M312 40 L318 46 L328 36" stroke="white" stroke-width="2" fill="none"/>
+    <text x="350" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#1F2937">AI Categorization</text>
+    <text x="350" y="55" font-family="Arial" font-size="14" fill="#6B7280">Smart categorizing...</text>
+    
+    <!-- Step 3 -->
+    <rect x="580" y="0" width="260" height="80" rx="8" fill="white" stroke="#E5E7EB" stroke-width="2"/>
+    <circle cx="610" cy="40" r="16" fill="#E5E7EB"/>
+    <text x="640" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#9CA3AF">Generating Insights</text>
+    <text x="640" y="55" font-family="Arial" font-size="14" fill="#9CA3AF">Pending...</text>
+  </g>
+  
+  <!-- Live Processing Feed -->
+  <rect x="240" y="420" width="800" height="300" rx="12" fill="white"/>
+  <text x="260" y="450" font-family="Arial" font-size="16" font-weight="bold" fill="#1F2937">Live Processing Log</text>
+  
+  <!-- Transaction Examples -->
+  <g transform="translate(260, 470)">
+    <rect x="0" y="0" width="760" height="40" rx="4" fill="#F9FAFB"/>
+    <text x="10" y="25" font-family="monospace" font-size="12" fill="#059669">✓ STARBUCKS #1234 → Food & Dining (95% confidence)</text>
+    
+    <rect x="0" y="50" width="760" height="40" rx="4" fill="#F9FAFB"/>
+    <text x="10" y="75" font-family="monospace" font-size="12" fill="#059669">✓ WALMART STORE #5678 → Shopping (92% confidence)</text>
+    
+    <rect x="0" y="100" width="760" height="40" rx="4" fill="#F9FAFB"/>
+    <text x="10" y="125" font-family="monospace" font-size="12" fill="#059669">✓ NETFLIX.COM → Entertainment (98% confidence)</text>
+    
+    <rect x="0" y="150" width="760" height="40" rx="4" fill="#F9FAFB"/>
+    <text x="10" y="175" font-family="monospace" font-size="12" fill="#DC2626">⚠ Unusual transaction detected: $2,847.00 at UNKNOWN MERCHANT</text>
+  </g>
+  
+  <!-- Description -->
+  <text x="640" y="770" font-family="Arial" font-size="18" text-anchor="middle" fill="#6B7280">
+    Screenshot 2: AI-powered processing with real-time categorization and anomaly detection
+  </text>
+</svg>

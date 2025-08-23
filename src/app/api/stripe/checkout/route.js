@@ -81,8 +81,8 @@ export async function POST(request) {
       userId: user.id,
       userEmail: user.email,
       priceId,
-      successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
+      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
       trialPeriodDays: 14 // 14-day free trial
     })
 

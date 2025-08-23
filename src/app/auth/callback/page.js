@@ -19,7 +19,15 @@ function AuthCallbackContent() {
     const providerToken = session.provider_token
     const providerRefreshToken = session.provider_refresh_token
     
-    // Store Google tokens if available
+    // Debug: Log the entire session object
+    console.log('Session object:', JSON.stringify({
+      ...session,
+      access_token: session.access_token ? 'HIDDEN' : 'Missing',
+      provider_token: session.provider_token ? 'HIDDEN' : 'Missing',
+      provider_refresh_token: session.provider_refresh_token ? 'HIDDEN' : 'Missing'
+    }, null, 2))
+    
+    // Great! Supabase is now providing the tokens directly in the session
     if (providerToken && user) {
       try {
         // Calculate token expiration (Google tokens typically expire in 1 hour)
@@ -27,8 +35,10 @@ function AuthCallbackContent() {
         expiresAt.setHours(expiresAt.getHours() + 1)
         
         // Extract Google user info from session/user metadata
-        const googleId = user.user_metadata?.sub || user.id
         const email = user.email || user.user_metadata?.email || ''
+        const name = user.user_metadata?.name || user.user_metadata?.full_name || ''
+        const picture = user.user_metadata?.picture || user.user_metadata?.avatar_url || ''
+        const googleId = user.user_metadata?.provider_id || user.user_metadata?.sub || user.identities?.[0]?.id || ''
         
         console.log('Storing Google tokens for user:', user.id)
         console.log('Provider token:', providerToken ? 'Present' : 'Missing')
@@ -40,8 +50,11 @@ function AuthCallbackContent() {
           p_refresh_token: providerRefreshToken,
           p_expires_at: expiresAt.toISOString(),
           p_scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets'],
+          p_google_email: email,
+          p_google_name: name,
+          p_google_picture: picture,
           p_google_id: googleId,
-          p_email: email
+          p_metadata: { provider_id: googleId }
         })
         
         if (tokenError) {
@@ -71,7 +84,7 @@ function AuthCallbackContent() {
         
         // First, let Supabase handle the session detection automatically
         // This works because detectSessionInUrl is true in the client config
-        const { data: { session }, error: autoError } = await supabase.auth.getSession()
+        const { data: { session } } = await supabase.auth.getSession()
         
         if (session) {
           console.log('Session detected automatically by Supabase')

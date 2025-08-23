@@ -1,0 +1,114 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#F9FAFB"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1280" height="80" fill="white"/>
+  <text x="60" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#1F2937">Google Drive Integration</text>
+  <rect x="1060" y="25" width="160" height="40" rx="8" fill="#4285F4"/>
+  <text x="1140" y="50" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Connect Drive</text>
+  
+  <!-- Drive Files Grid -->
+  <text x="60" y="120" font-family="Arial" font-size="18" font-weight="bold" fill="#1F2937">Select Bank Statements from Google Drive</text>
+  
+  <!-- File Grid -->
+  <g transform="translate(60, 160)">
+    <!-- File 1 - Selected -->
+    <rect x="0" y="0" width="280" height="160" rx="8" fill="white" stroke="#4F46E5" stroke-width="2"/>
+    <rect x="0" y="0" width="280" height="40" rx="8 8 0 0" fill="#EFF6FF"/>
+    <rect x="10" y="10" width="20" height="20" fill="#4F46E5" rx="4"/>
+    <path d="M15 20 L18 23 L25 16" stroke="white" stroke-width="2" fill="none"/>
+    
+    <!-- PDF Icon -->
+    <rect x="110" y="60" width="60" height="80" rx="4" fill="#DC2626"/>
+    <text x="140" y="110" font-family="Arial" font-size="24" fill="white" text-anchor="middle">PDF</text>
+    
+    <text x="140" y="160" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">Chase_Jan_2025.pdf</text>
+    <text x="140" y="180" font-family="Arial" font-size="12" fill="#6B7280" text-anchor="middle">2.3 MB • Modified 2 days ago</text>
+    
+    <!-- File 2 - Selected -->
+    <rect x="300" y="0" width="280" height="160" rx="8" fill="white" stroke="#4F46E5" stroke-width="2"/>
+    <rect x="300" y="0" width="280" height="40" rx="8 8 0 0" fill="#EFF6FF"/>
+    <rect x="310" y="10" width="20" height="20" fill="#4F46E5" rx="4"/>
+    <path d="M315 20 L318 23 L325 16" stroke="white" stroke-width="2" fill="none"/>
+    
+    <!-- PDF Icon -->
+    <rect x="410" y="60" width="60" height="80" rx="4" fill="#DC2626"/>
+    <text x="440" y="110" font-family="Arial" font-size="24" fill="white" text-anchor="middle">PDF</text>
+    
+    <text x="440" y="160" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">Chase_Dec_2024.pdf</text>
+    <text x="440" y="180" font-family="Arial" font-size="12" fill="#6B7280" text-anchor="middle">1.8 MB • Modified 1 month ago</text>
+    
+    <!-- File 3 - Not Selected -->
+    <rect x="600" y="0" width="280" height="160" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+    <rect x="600" y="0" width="280" height="40" rx="8 8 0 0" fill="#F9FAFB"/>
+    <rect x="610" y="10" width="20" height="20" fill="white" stroke="#E5E7EB" rx="4"/>
+    
+    <!-- PDF Icon -->
+    <rect x="710" y="60" width="60" height="80" rx="4" fill="#DC2626"/>
+    <text x="740" y="110" font-family="Arial" font-size="24" fill="white" text-anchor="middle">PDF</text>
+    
+    <text x="740" y="160" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">Chase_Nov_2024.pdf</text>
+    <text x="740" y="180" font-family="Arial" font-size="12" fill="#6B7280" text-anchor="middle">2.1 MB • Modified 2 months ago</text>
+    
+    <!-- File 4 - Not PDF -->
+    <rect x="900" y="0" width="280" height="160" rx="8" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+    <rect x="900" y="0" width="280" height="40" rx="8 8 0 0" fill="#F9FAFB"/>
+    <rect x="910" y="10" width="20" height="20" fill="#F3F4F6" stroke="#E5E7EB" rx="4"/>
+    
+    <!-- Excel Icon -->
+    <rect x="1010" y="60" width="60" height="80" rx="4" fill="#10B981"/>
+    <text x="1040" y="110" font-family="Arial" font-size="24" fill="white" text-anchor="middle">XLS</text>
+    
+    <text x="1040" y="160" font-family="Arial" font-size="14" font-weight="bold" fill="#9CA3AF" text-anchor="middle">Budget_2025.xlsx</text>
+    <text x="1040" y="180" font-family="Arial" font-size="12" fill="#9CA3AF" text-anchor="middle">Not a bank statement</text>
+  </g>
+  
+  <!-- Processing Options -->
+  <rect x="60" y="380" width="1160" height="200" rx="12" fill="white"/>
+  <text x="90" y="420" font-family="Arial" font-size="18" font-weight="bold" fill="#1F2937">Processing Options</text>
+  
+  <g transform="translate(90, 450)">
+    <!-- Option 1 -->
+    <rect x="0" y="0" width="16" height="16" fill="#4F46E5" rx="2"/>
+    <path d="M3 8 L6 11 L13 4" stroke="white" stroke-width="2" fill="none"/>
+    <text x="30" y="12" font-family="Arial" font-size="14" fill="#1F2937">Combine all statements into single sheet</text>
+    
+    <!-- Option 2 -->
+    <rect x="400" y="0" width="16" height="16" fill="white" stroke="#E5E7EB" rx="2"/>
+    <text x="430" y="12" font-family="Arial" font-size="14" fill="#1F2937">Create separate sheet for each statement</text>
+    
+    <!-- Option 3 -->
+    <rect x="0" y="40" width="16" height="16" fill="#4F46E5" rx="2"/>
+    <path d="M3 48 L6 51 L13 44" stroke="white" stroke-width="2" fill="none"/>
+    <text x="30" y="52" font-family="Arial" font-size="14" fill="#1F2937">Enable AI categorization and insights</text>
+    
+    <!-- Option 4 -->
+    <rect x="400" y="40" width="16" height="16" fill="#4F46E5" rx="2"/>
+    <path d="M403 48 L406 51 L413 44" stroke="white" stroke-width="2" fill="none"/>
+    <text x="430" y="52" font-family="Arial" font-size="14" fill="#1F2937">Detect and merge duplicate transactions</text>
+    
+    <!-- Output Format -->
+    <text x="0" y="100" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Export Format:</text>
+    <rect x="120" y="85" width="120" height="30" rx="6" fill="#4285F4"/>
+    <text x="180" y="105" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Google Sheets</text>
+    <rect x="250" y="85" width="100" height="30" rx="6" fill="white" stroke="#E5E7EB"/>
+    <text x="300" y="105" font-family="Arial" font-size="14" fill="#6B7280" text-anchor="middle">Excel</text>
+    <rect x="360" y="85" width="100" height="30" rx="6" fill="white" stroke="#E5E7EB"/>
+    <text x="410" y="105" font-family="Arial" font-size="14" fill="#6B7280" text-anchor="middle">CSV</text>
+  </g>
+  
+  <!-- Process Button -->
+  <rect x="460" y="620" width="360" height="50" rx="8" fill="#10B981"/>
+  <text x="640" y="650" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Process 2 Selected Statements</text>
+  
+  <!-- Features -->
+  <rect x="240" y="700" width="800" height="40" rx="20" fill="#F3F4F6"/>
+  <text x="640" y="725" font-family="Arial" font-size="14" text-anchor="middle" fill="#6B7280">
+    ✓ Secure OAuth connection • ✓ No files stored • ✓ Process directly from Drive
+  </text>
+  
+  <!-- Description -->
+  <text x="640" y="770" font-family="Arial" font-size="18" text-anchor="middle" fill="#6B7280">
+    Screenshot 7: Seamless Google Drive integration for batch processing multiple statements
+  </text>
+</svg>

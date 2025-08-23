@@ -1,185 +1,129 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
-function GoogleAddonAuthContent() {
+export default function GoogleAddonAuth() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState('checking'); // checking, authenticated, unauthenticated, connecting, success, error
-  const [message, setMessage] = useState('');
-  const [user, setUser] = useState(null);
+  const [status, setStatus] = useState('authenticating');
+  const [error, setError] = useState(null);
+  const [authCode, setAuthCode] = useState(null);
 
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
+    const authenticateAddon = async () => {
+      try {
+        const email = searchParams.get('email');
+        const addon = searchParams.get('addon');
+        
+        if (!email || addon !== 'drive') {
+          throw new Error('Invalid authentication request');
+        }
 
-  const checkAuthStatus = async () => {
-    const supabase = createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-      setStatus('unauthenticated');
-      setMessage('Please sign in to connect Google Add-on');
-      return;
-    }
-    
-    setUser(user);
-    
-    // Check if email matches
-    const addonEmail = searchParams.get('email');
-    if (addonEmail && addonEmail !== user.email) {
-      setStatus('error');
-      setMessage(`Email mismatch. Add-on email: ${addonEmail}, Statement Desk email: ${user.email}`);
-      return;
-    }
-    
-    setStatus('authenticated');
-  };
+        // Generate auth code for the add-on
+        const response = await fetch('/api/auth/google-addon', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            addon: 'drive'
+          })
+        });
 
-  const connectAddon = async () => {
-    setStatus('connecting');
-    setMessage('Connecting your Google Add-on...');
-    
-    const temporaryToken = searchParams.get('token');
-    if (!temporaryToken) {
-      setStatus('error');
-      setMessage('Missing authentication token');
-      return;
-    }
-    
-    try {
-      const response = await fetch('/api/google/addon/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          temporaryToken
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to connect add-on');
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Authentication failed');
+        }
+
+        const data = await response.json();
+        setAuthCode(data.code);
+        setStatus('success');
+
+        // Auto-close after 3 seconds
+        setTimeout(() => {
+          if (window.opener) {
+            window.close();
+          }
+        }, 3000);
+
+      } catch (err) {
+        console.error('Authentication error:', err);
+        setError(err.message);
+        setStatus('error');
       }
-      
-      // Send token back to add-on
-      if (window.opener) {
-        window.opener.postMessage({
-          type: 'statementDesk.authComplete',
-          token: data.token
-        }, '*');
-      }
-      
-      setStatus('success');
-      setMessage('Successfully connected! You can close this window.');
-      
-      // Auto-close after 3 seconds
-      setTimeout(() => {
-        window.close();
-      }, 3000);
-      
-    } catch (error) {
-      setStatus('error');
-      setMessage(error.message);
-    }
-  };
+    };
 
-  const signIn = () => {
-    const returnUrl = window.location.href;
-    window.location.href = `/login?returnUrl=${encodeURIComponent(returnUrl)}`;
-  };
+    authenticateAddon();
+  }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">Connect Google Add-on</CardTitle>
+          <CardTitle className="text-center">
+            Google Drive Add-on Authentication
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {status === 'checking' && (
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-              <p className="text-muted-foreground">Checking authentication...</p>
+        <CardContent>
+          {status === 'authenticating' && (
+            <div className="text-center py-8">
+              <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary mb-4" />
+              <p className="text-gray-600">Authenticating your account...</p>
             </div>
           )}
-          
-          {status === 'unauthenticated' && (
-            <>
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{message}</AlertDescription>
-              </Alert>
-              <Button onClick={signIn} className="w-full">
-                Sign In to Statement Desk
-              </Button>
-            </>
-          )}
-          
-          {status === 'authenticated' && (
-            <>
-              <Alert className="border-blue-200 bg-blue-50">
-                <AlertDescription>
-                  <div className="space-y-2">
-                    <p>Ready to connect your Google Add-on to Statement Desk.</p>
-                    <p className="text-sm text-muted-foreground">
-                      Logged in as: {user?.email}
-                    </p>
-                  </div>
-                </AlertDescription>
-              </Alert>
-              <Button onClick={connectAddon} className="w-full">
-                Connect Add-on
-              </Button>
-            </>
-          )}
-          
-          {status === 'connecting' && (
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-              <p className="text-muted-foreground">{message}</p>
-            </div>
-          )}
-          
+
           {status === 'success' && (
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
-                {message}
-              </AlertDescription>
-            </Alert>
-          )}
-          
-          {status === 'error' && (
-            <>
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{message}</AlertDescription>
-              </Alert>
-              <Button onClick={connectAddon} variant="outline" className="w-full">
-                Try Again
+            <div className="text-center py-8">
+              <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Authentication Successful!</h3>
+              <p className="text-gray-600 mb-4">
+                You can now use Statement Desk in Google Drive.
+              </p>
+              {authCode && (
+                <div className="bg-gray-100 p-3 rounded-md mb-4">
+                  <p className="text-sm text-gray-500 mb-1">Auth Code:</p>
+                  <code className="text-xs font-mono">{authCode}</code>
+                </div>
+              )}
+              <Button 
+                onClick={() => window.close()} 
+                className="w-full"
+              >
+                Close Window
               </Button>
-            </>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className="text-center py-8">
+              <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Authentication Failed</h3>
+              <p className="text-gray-600 mb-4">
+                {error || 'An error occurred during authentication.'}
+              </p>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  className="w-full"
+                >
+                  Try Again
+                </Button>
+                <Button 
+                  onClick={() => window.close()} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Close Window
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-export default function GoogleAddonAuth() {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    }>
-      <GoogleAddonAuthContent />
-    </Suspense>
   );
 }

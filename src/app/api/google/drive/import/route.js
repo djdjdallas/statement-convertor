@@ -8,7 +8,7 @@ import crypto from 'crypto';
 export async function POST(request) {
   try {
     // Get user session
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {

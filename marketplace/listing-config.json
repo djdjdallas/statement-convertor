@@ -1,0 +1,199 @@
+{
+  "application": {
+    "name": "Statement Desk",
+    "shortDescription": "Convert bank statements to Excel with AI-powered insights",
+    "longDescription": "Statement Desk revolutionizes financial data processing for businesses and individuals. Our AI-powered platform converts PDF bank statements into organized Excel spreadsheets, complete with intelligent categorization, anomaly detection, and financial insights.\n\n**Key Features:**\n• **AI-Powered Extraction**: Advanced OCR and NLP technology ensures 99% accuracy in transaction extraction\n• **Smart Categorization**: Automatically categorize transactions with machine learning\n• **Google Sheets Integration**: Export directly to Google Sheets with one click\n• **Financial Analytics**: Get insights on spending patterns, cash flow forecasts, and budget recommendations\n• **Anomaly Detection**: Identify unusual transactions and potential fraud\n• **Multi-Bank Support**: Works with 200+ banks worldwide\n\n**Perfect for:**\n• Small business owners managing finances\n• Accountants and bookkeepers\n• Financial advisors\n• Individuals tracking personal finances\n• Teams collaborating on financial data\n\n**Security & Compliance:**\n• Bank-level encryption for all data\n• GDPR and SOC 2 compliant\n• No data retention after processing\n• OAuth 2.0 secure authentication",
+    "detailedDescription": {
+      "overview": "Statement Desk is the most advanced bank statement conversion tool available, combining traditional data extraction with cutting-edge AI to deliver unparalleled accuracy and insights.",
+      "majorFeatures": [
+        {
+          "title": "AI-Enhanced Processing",
+          "description": "Our Claude AI integration provides 60% better accuracy than traditional OCR, understanding complex statement formats and extracting data that other tools miss."
+        },
+        {
+          "title": "Smart Financial Insights",
+          "description": "Go beyond simple conversion - get AI-powered insights including spending trends, budget recommendations, and cash flow forecasts."
+        },
+        {
+          "title": "Seamless Google Workspace Integration",
+          "description": "Export directly to Google Sheets, collaborate with your team, and integrate with your existing Google Workspace workflow."
+        },
+        {
+          "title": "Enterprise-Grade Security",
+          "description": "Your financial data is protected with bank-level encryption, and we never store your statements after processing."
+        }
+      ]
+    },
+    "category": "PRODUCTIVITY",
+    "additionalCategories": ["FINANCE", "ACCOUNTING"],
+    "industries": [
+      "ACCOUNTING",
+      "FINANCIAL_SERVICES", 
+      "SMALL_BUSINESS",
+      "CONSULTING",
+      "REAL_ESTATE"
+    ],
+    "languages": ["en"],
+    "countries": ["US", "CA", "GB", "AU", "NZ", "IE"],
+    "screenshots": [
+      {
+        "url": "https://statementdesk.com/assets/screenshots/dashboard-main.png",
+        "caption": "Intuitive dashboard for managing and processing bank statements"
+      },
+      {
+        "url": "https://statementdesk.com/assets/screenshots/ai-categorization.png",
+        "caption": "AI-powered automatic transaction categorization with confidence scores"
+      },
+      {
+        "url": "https://statementdesk.com/assets/screenshots/google-sheets-export.png",
+        "caption": "One-click export to Google Sheets with formatting preserved"
+      },
+      {
+        "url": "https://statementdesk.com/assets/screenshots/financial-insights.png",
+        "caption": "Comprehensive financial insights and spending analysis"
+      },
+      {
+        "url": "https://statementdesk.com/assets/screenshots/cash-flow-forecast.png",
+        "caption": "AI-generated cash flow forecasts and trend analysis"
+      }
+    ],
+    "videos": [
+      {
+        "url": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
+        "title": "Statement Desk Overview",
+        "description": "See how Statement Desk transforms your bank statements in under 30 seconds"
+      }
+    ],
+    "supportLinks": {
+      "setupGuide": "https://statementdesk.com/docs/google-workspace-setup",
+      "userGuide": "https://statementdesk.com/docs/user-guide",
+      "adminGuide": "https://statementdesk.com/docs/admin-guide",
+      "apiDocumentation": "https://statementdesk.com/docs/api",
+      "support": "https://statementdesk.com/support",
+      "forum": "https://community.statementdesk.com",
+      "knowledgeBase": "https://help.statementdesk.com"
+    },
+    "pricing": {
+      "type": "FREEMIUM",
+      "currencyCode": "USD",
+      "freeTrialDays": 14,
+      "plans": [
+        {
+          "planId": "free",
+          "name": "Free",
+          "price": 0,
+          "pricePerMonth": 0,
+          "features": [
+            "5 statements per month",
+            "Basic transaction extraction",
+            "CSV export",
+            "Email support"
+          ],
+          "limitations": [
+            "No AI insights",
+            "No Google Sheets export",
+            "Basic categorization only"
+          ]
+        },
+        {
+          "planId": "basic",
+          "name": "Basic",
+          "price": 9.99,
+          "pricePerMonth": 9.99,
+          "features": [
+            "50 statements per month",
+            "AI-powered categorization",
+            "Google Sheets export",
+            "Financial insights dashboard",
+            "Priority email support",
+            "All bank formats supported"
+          ],
+          "recommended": true
+        },
+        {
+          "planId": "premium",
+          "name": "Premium",
+          "price": 19.99,
+          "pricePerMonth": 19.99,
+          "features": [
+            "Unlimited statements",
+            "Advanced AI insights",
+            "Cash flow forecasting",
+            "API access",
+            "Priority support",
+            "Custom categories",
+            "Bulk processing",
+            "White-label options"
+          ]
+        },
+        {
+          "planId": "enterprise",
+          "name": "Enterprise",
+          "price": 0,
+          "pricePerMonth": 0,
+          "customPricing": true,
+          "features": [
+            "Everything in Premium",
+            "Dedicated account manager",
+            "Custom integrations",
+            "SLA guarantee",
+            "On-premise deployment option",
+            "Advanced security features"
+          ]
+        }
+      ]
+    },
+    "developerInfo": {
+      "name": "Statement Desk Inc.",
+      "url": "https://statementdesk.com",
+      "email": "developers@statementdesk.com",
+      "address": "123 Finance Street, San Francisco, CA 94105",
+      "countryCode": "US"
+    },
+    "termsOfService": "https://statementdesk.com/terms",
+    "privacyPolicy": "https://statementdesk.com/privacy",
+    "dataProcessingAddendum": "https://statementdesk.com/dpa"
+  },
+  "integrations": {
+    "drive": {
+      "enabled": true,
+      "mimeTypes": ["application/pdf"],
+      "openWith": true
+    },
+    "gmail": {
+      "enabled": false
+    },
+    "calendar": {
+      "enabled": false
+    },
+    "sheets": {
+      "enabled": true,
+      "export": true
+    }
+  },
+  "permissions": {
+    "scopes": [
+      {
+        "scope": "https://www.googleapis.com/auth/drive.file",
+        "reason": "Required to access and process PDF bank statements stored in Google Drive"
+      },
+      {
+        "scope": "https://www.googleapis.com/auth/spreadsheets",
+        "reason": "Required to create and update Google Sheets with processed transaction data"
+      },
+      {
+        "scope": "https://www.googleapis.com/auth/userinfo.email",
+        "reason": "Required to identify users and provide personalized service"
+      },
+      {
+        "scope": "https://www.googleapis.com/auth/userinfo.profile",
+        "reason": "Required to display user information and provide personalized experience"
+      }
+    ]
+  },
+  "deployment": {
+    "individualInstall": true,
+    "domainInstall": true,
+    "allowMultipleInstalls": false
+  }
+}

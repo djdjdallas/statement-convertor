@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import DataPreview from '@/components/DataPreview'
 import AIInsights from '@/components/AIInsights'
@@ -232,9 +233,19 @@ export default function PreviewPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Transaction Preview</h1>
-              <p className="text-gray-600 mt-2">
-                Review your extracted transaction data and export to Excel or CSV
-              </p>
+              <div className="flex items-center gap-3 mt-2">
+                <p className="text-gray-600">
+                  Review your extracted transaction data and export to Excel or CSV
+                </p>
+                {fileInfo?.source === 'google_drive' && (
+                  <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">
+                    <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
+                    </svg>
+                    Imported from Drive
+                  </Badge>
+                )}
+              </div>
             </div>
             
             <div className="flex space-x-3">

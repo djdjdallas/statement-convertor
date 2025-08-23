@@ -1,0 +1,38 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#F9FAFB"/>
+  
+  <!-- Browser Frame -->
+  <rect x="0" y="0" width="1280" height="60" fill="#E5E7EB"/>
+  <circle cx="30" cy="30" r="6" fill="#EF4444"/>
+  <circle cx="50" cy="30" r="6" fill="#F59E0B"/>
+  <circle cx="70" cy="30" r="6" fill="#10B981"/>
+  <rect x="200" y="20" width="880" height="20" rx="10" fill="white"/>
+  <text x="210" y="35" font-family="Arial" font-size="14" fill="#6B7280">statementdesk.ai/upload</text>
+  
+  <!-- Header -->
+  <rect x="0" y="60" width="1280" height="80" fill="white"/>
+  <text x="60" y="110" font-family="Arial" font-size="32" font-weight="bold" fill="#4F46E5">Statement Desk</text>
+  <rect x="1100" y="90" width="120" height="40" rx="20" fill="#4F46E5"/>
+  <text x="1130" y="115" font-family="Arial" font-size="16" fill="white">Dashboard</text>
+  
+  <!-- Upload Area -->
+  <rect x="240" y="200" width="800" height="400" rx="16" fill="white" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="8,8"/>
+  
+  <!-- Upload Icon -->
+  <circle cx="640" cy="350" r="60" fill="#EFF6FF"/>
+  <path d="M620 350 L640 330 L660 350 M640 330 L640 370" stroke="#4F46E5" stroke-width="4" stroke-linecap="round"/>
+  <rect x="620" y="370" width="40" height="4" fill="#4F46E5"/>
+  
+  <!-- Upload Text -->
+  <text x="640" y="450" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#1F2937">Drop your PDF bank statement here</text>
+  <text x="640" y="480" font-family="Arial" font-size="16" text-anchor="middle" fill="#6B7280">or click to browse files</text>
+  
+  <!-- Features -->
+  <rect x="440" y="520" width="400" height="40" rx="20" fill="#F3F4F6"/>
+  <text x="640" y="545" font-family="Arial" font-size="14" text-anchor="middle" fill="#6B7280">Supports 200+ banks • AI-powered • Secure processing</text>
+  
+  <!-- Description -->
+  <text x="640" y="50" font-family="Arial" font-size="18" text-anchor="middle" fill="#6B7280" transform="translate(0, 620)">
+    Screenshot 1: Simple drag-and-drop interface for uploading bank statements
+  </text>
+</svg>

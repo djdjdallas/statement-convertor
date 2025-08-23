@@ -1,0 +1,42 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="400" fill="#F9FAFB"/>
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#1F2937" text-anchor="middle">
+    Why Choose Statement Desk?
+  </text>
+  
+  <!-- Feature Cards -->
+  <g transform="translate(50, 100)">
+    <!-- Card 1 -->
+    <rect x="0" y="0" width="340" height="240" rx="12" fill="white" stroke="#E5E7EB"/>
+    <circle cx="170" cy="60" r="40" fill="#EFF6FF"/>
+    <text x="170" y="70" font-family="Arial" font-size="32" text-anchor="middle">🏦</text>
+    <text x="170" y="130" font-family="Arial" font-size="20" font-weight="bold" fill="#1F2937" text-anchor="middle">200+ Banks Supported</text>
+    <text x="30" y="160" font-family="Arial" font-size="14" fill="#6B7280">Works with virtually any bank statement</text>
+    <text x="30" y="180" font-family="Arial" font-size="14" fill="#6B7280">format through AI understanding.</text>
+    <text x="30" y="200" font-family="Arial" font-size="14" fill="#6B7280">No more compatibility issues!</text>
+    
+    <!-- Card 2 -->
+    <rect x="380" y="0" width="340" height="240" rx="12" fill="white" stroke="#E5E7EB"/>
+    <circle cx="550" cy="60" r="40" fill="#F0FDF4"/>
+    <text x="550" y="70" font-family="Arial" font-size="32" text-anchor="middle">🎯</text>
+    <text x="550" y="130" font-family="Arial" font-size="20" font-weight="bold" fill="#1F2937" text-anchor="middle">99% Accuracy</text>
+    <text x="410" y="160" font-family="Arial" font-size="14" fill="#6B7280">AI-powered extraction with confidence</text>
+    <text x="410" y="180" font-family="Arial" font-size="14" fill="#6B7280">scoring ensures your data is accurate</text>
+    <text x="410" y="200" font-family="Arial" font-size="14" fill="#6B7280">and categorized correctly.</text>
+    
+    <!-- Card 3 -->
+    <rect x="760" y="0" width="340" height="240" rx="12" fill="white" stroke="#E5E7EB"/>
+    <circle cx="930" cy="60" r="40" fill="#FEF3C7"/>
+    <text x="930" y="70" font-family="Arial" font-size="32" text-anchor="middle">💬</text>
+    <text x="930" y="130" font-family="Arial" font-size="20" font-weight="bold" fill="#1F2937" text-anchor="middle">AI Financial Assistant</text>
+    <text x="790" y="160" font-family="Arial" font-size="14" fill="#6B7280">Chat with your data! Ask questions</text>
+    <text x="790" y="180" font-family="Arial" font-size="14" fill="#6B7280">about spending, get budget advice,</text>
+    <text x="790" y="200" font-family="Arial" font-size="14" fill="#6B7280">and receive personalized insights.</text>
+  </g>
+  
+  <!-- Bottom CTA -->
+  <rect x="450" y="360" width="300" height="50" rx="25" fill="#4F46E5"/>
+  <text x="600" y="390" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Start Free Trial</text>
+</svg>

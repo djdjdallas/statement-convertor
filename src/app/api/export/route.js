@@ -5,6 +5,7 @@ import { Parser } from 'json2csv'
 import { createDriveService } from '@/lib/google/drive-service'
 import { createSheetsService } from '@/lib/google/sheets-service'
 import { hasGoogleIntegration } from '@/lib/google/auth'
+import { createErrorResponse, GOOGLE_ERROR_CODES } from '@/lib/google/error-handler'
 
 export async function POST(request) {
   try {
@@ -268,10 +269,18 @@ export async function POST(request) {
         })
       } catch (driveError) {
         console.error('Google Drive upload error:', driveError)
-        return NextResponse.json(
-          { error: 'Failed to upload to Google Drive: ' + driveError.message },
-          { status: 500 }
-        )
+        
+        // Return Google-specific error response
+        const errorResponse = createErrorResponse(driveError, {
+          userId: user.id,
+          operation: 'exportToGoogleDrive',
+          fileId,
+          format
+        })
+        
+        return NextResponse.json(errorResponse, { 
+          status: errorResponse.statusCode 
+        })
       }
     } else {
       // Local download - existing behavior
@@ -313,6 +322,17 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Export API error:', error)
+    
+    // Check if it's a Google API error
+    if (error.code && error.code.includes('/')) {
+      const errorResponse = createErrorResponse(error, {
+        operation: 'export'
+      })
+      return NextResponse.json(errorResponse, { 
+        status: errorResponse.statusCode 
+      })
+    }
+    
     return NextResponse.json(
       { error: 'Export failed' },
       { status: 500 }
