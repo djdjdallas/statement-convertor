@@ -174,6 +174,13 @@ export async function POST(request) {
         }
       })
 
+      // Increment conversion usage counter
+      await supabase.rpc('increment_user_usage', {
+        p_user_id: userId,
+        p_usage_type: 'conversion',
+        p_amount: 1
+      })
+
       // Return success response with extracted data
       return NextResponse.json({
         success: true,

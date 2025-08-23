@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,17 +38,20 @@ import {
   AlertTriangle,
   Star
 } from 'lucide-react'
+import DriveExportDialog from '@/components/DriveExportDialog'
 
 export default function DataPreview({ 
   fileId, 
   onExport, 
   exportFormats = ['csv', 'xlsx'],
-  transactions: propTransactions = null
+  transactions: propTransactions = null,
+  user = null
 }) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [editingTransaction, setEditingTransaction] = useState(null)
+  const [showExportDialog, setShowExportDialog] = useState(false)
   const [filters, setFilters] = useState({
     search: '',
     category: 'all',
@@ -56,6 +60,7 @@ export default function DataPreview({
     page: 1,
     limit: 25
   })
+  const supabase = createClient()
 
   useEffect(() => {
     if (fileId) {
@@ -67,23 +72,109 @@ export default function DataPreview({
     try {
       setLoading(true)
       
-      const params = new URLSearchParams({
-        fileId,
-        ...filters,
-        page: filters.page.toString(),
-        limit: filters.limit.toString()
-      })
-
-      const response = await fetch(`/api/transactions?${params}`, {
-        credentials: 'same-origin'
-      })
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch transactions')
+      // Get current user
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError || !currentUser) {
+        throw new Error('Authentication required')
       }
 
-      setData(result.data)
+      // Verify user owns the file
+      const { data: fileRecord, error: fileError } = await supabase
+        .from('files')
+        .select('id, original_filename, processing_status')
+        .eq('id', fileId)
+        .eq('user_id', currentUser.id)
+        .single()
+
+      if (fileError || !fileRecord) {
+        throw new Error('File not found')
+      }
+
+      // Build transactions query
+      let query = supabase
+        .from('transactions')
+        .select('*', { count: 'exact' })
+        .eq('file_id', fileId)
+
+      // Apply filters
+      if (filters.category && filters.category !== 'all') {
+        query = query.eq('category', filters.category)
+      }
+
+      if (filters.search) {
+        query = query.ilike('description', `%${filters.search}%`)
+      }
+
+      // Apply sorting
+      if (filters.sortBy && ['date', 'amount', 'description', 'category', 'balance'].includes(filters.sortBy)) {
+        query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' })
+      } else {
+        query = query.order('date', { ascending: false })
+      }
+
+      // Apply pagination
+      const offset = (filters.page - 1) * filters.limit
+      query = query.range(offset, offset + filters.limit - 1)
+
+      // Execute query
+      const { data: transactions, error: transactionError, count } = await query
+
+      if (transactionError) {
+        throw new Error('Failed to fetch transactions')
+      }
+
+      // Get summary statistics
+      const { data: allTransactions } = await supabase
+        .from('transactions')
+        .select('amount, transaction_type')
+        .eq('file_id', fileId)
+
+      const stats = {
+        totalTransactions: count || 0,
+        totalCredits: 0,
+        totalDebits: 0,
+        netAmount: 0,
+        averageTransaction: 0
+      }
+
+      if (allTransactions && allTransactions.length > 0) {
+        stats.totalCredits = allTransactions
+          .filter(t => t.transaction_type === 'credit')
+          .reduce((sum, t) => sum + (t.amount || 0), 0)
+        
+        stats.totalDebits = allTransactions
+          .filter(t => t.transaction_type === 'debit')
+          .reduce((sum, t) => sum + Math.abs(t.amount || 0), 0)
+        
+        stats.netAmount = stats.totalCredits - stats.totalDebits
+        stats.averageTransaction = allTransactions.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0) / allTransactions.length
+      }
+
+      // Get unique categories
+      const { data: categories } = await supabase
+        .from('transactions')
+        .select('category')
+        .eq('file_id', fileId)
+        .not('category', 'is', null)
+
+      const uniqueCategories = [...new Set(categories?.map(c => c.category) || [])]
+        .filter(Boolean)
+        .sort()
+
+      setData({
+        file: fileRecord,
+        transactions,
+        pagination: {
+          page: filters.page,
+          limit: filters.limit,
+          total: count || 0,
+          pages: Math.ceil((count || 0) / filters.limit)
+        },
+        filters,
+        stats,
+        categories: uniqueCategories
+      })
       setError(null)
     } catch (err) {
       console.error('Error fetching transactions:', err)
@@ -113,19 +204,45 @@ export default function DataPreview({
 
   const handleEditTransaction = async (transactionId, updates) => {
     try {
-      const response = await fetch('/api/transactions', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ transactionId, updates }),
-        credentials: 'same-origin'
-      })
+      // Get current user
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError || !currentUser) {
+        throw new Error('Authentication required')
+      }
 
-      const result = await response.json()
+      // Verify user owns the transaction (through file ownership)
+      const { data: transaction } = await supabase
+        .from('transactions')
+        .select(`
+          id,
+          files!inner(user_id)
+        `)
+        .eq('id', transactionId)
+        .single()
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to update transaction')
+      if (!transaction || transaction.files.user_id !== currentUser.id) {
+        throw new Error('Transaction not found')
+      }
+
+      // Update transaction
+      const allowedUpdates = ['description', 'category', 'transaction_type']
+      const filteredUpdates = Object.keys(updates)
+        .filter(key => allowedUpdates.includes(key))
+        .reduce((obj, key) => {
+          obj[key] = updates[key]
+          return obj
+        }, {})
+
+      const { data: updatedTransaction, error: updateError } = await supabase
+        .from('transactions')
+        .update(filteredUpdates)
+        .eq('id', transactionId)
+        .select()
+        .single()
+
+      if (updateError) {
+        throw new Error('Failed to update transaction')
       }
 
       // Update local data
@@ -225,18 +342,10 @@ export default function DataPreview({
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              {exportFormats.includes('csv') && (
-                <Button onClick={() => onExport('csv')} variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
-                </Button>
-              )}
-              {exportFormats.includes('xlsx') && (
-                <Button onClick={() => onExport('xlsx')}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Excel
-                </Button>
-              )}
+              <Button onClick={() => setShowExportDialog(true)}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -544,6 +653,20 @@ export default function DataPreview({
           </CardContent>
         </Card>
       )}
+
+      {/* Export Dialog */}
+      <DriveExportDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        fileId={fileId}
+        fileName={data?.fileName || 'Statement'}
+        onExportComplete={(result) => {
+          console.log('Export completed:', result)
+          if (onExport) {
+            onExport(result.format, result.destination)
+          }
+        }}
+      />
     </div>
   )
 }

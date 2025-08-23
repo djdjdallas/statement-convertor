@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createApiRouteClient } from '@/lib/supabase/api-route'
 import * as XLSX from 'xlsx'
 import { Parser } from 'json2csv'
+import { createDriveService } from '@/lib/google/drive-service'
+import { createSheetsService } from '@/lib/google/sheets-service'
+import { hasGoogleIntegration } from '@/lib/google/auth'
 
 export async function POST(request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createApiRouteClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -17,7 +20,7 @@ export async function POST(request) {
       )
     }
 
-    const { fileId, format } = await request.json()
+    const { fileId, format, destination = 'local' } = await request.json()
     
     if (!fileId || !format) {
       return NextResponse.json(
@@ -26,11 +29,29 @@ export async function POST(request) {
       )
     }
 
-    if (!['csv', 'xlsx'].includes(format)) {
+    if (!['csv', 'xlsx', 'sheets'].includes(format)) {
       return NextResponse.json(
-        { error: 'Invalid format. Supported formats: csv, xlsx' },
+        { error: 'Invalid format. Supported formats: csv, xlsx, sheets' },
         { status: 400 }
       )
+    }
+
+    if (!['local', 'drive'].includes(destination)) {
+      return NextResponse.json(
+        { error: 'Invalid destination. Supported destinations: local, drive' },
+        { status: 400 }
+      )
+    }
+
+    // Check Google integration if destination is drive
+    if (destination === 'drive') {
+      const hasGoogle = await hasGoogleIntegration(user.id, true) // Pass true for server-side
+      if (!hasGoogle) {
+        return NextResponse.json(
+          { error: 'Google Drive not connected. Please connect your Google account first.' },
+          { status: 400 }
+        )
+      }
     }
 
     // Verify user owns the file
@@ -160,39 +181,135 @@ export async function POST(request) {
       fileName = `${fileRecord.original_filename.replace('.pdf', '')}_transactions.xlsx`
     }
 
-    // Store export record
-    const { data: exportRecord } = await supabase
-      .from('file_exports')
-      .insert({
-        file_id: fileId,
-        user_id: user.id,
-        format: format,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single()
+    // Handle destination
+    if (destination === 'drive') {
+      // Upload to Google Drive
+      try {
+        let uploadResult;
+        const bankName = fileRecord.original_filename.split('_')[0] || 'Statement'
+        
+        if (format === 'sheets') {
+          // Create Google Sheets directly
+          const sheetsService = await createSheetsService(user.id, true) // Pass true for server-side
+          
+          // Get AI insights if available
+          const { data: aiInsights } = await supabase
+            .from('ai_insights')
+            .select('insights_data')
+            .eq('file_id', fileId)
+            .order('generated_at', { ascending: false })
+            .limit(1)
+            .single()
+          
+          uploadResult = await sheetsService.createStatementSheet(
+            transactions,
+            aiInsights?.insights_data || null,
+            {
+              fileName: fileRecord.original_filename.replace('.pdf', ''),
+              bankName
+            }
+          )
+        } else {
+          // Upload Excel/CSV to Drive
+          const driveService = await createDriveService(user.id, true) // Pass true for server-side
+          uploadResult = await driveService.uploadStatementFile(
+            fileBuffer,
+            fileName,
+            format,
+            { 
+              bankName,
+              fileId: fileId,
+              originalFileName: fileRecord.original_filename
+            }
+          )
+        }
 
-    // Log export activity
-    await supabase.from('usage_tracking').insert({
-      user_id: user.id,
-      action: 'export',
-      details: {
-        file_id: fileId,
-        format: format,
-        transaction_count: transactions.length,
-        export_id: exportRecord?.id
+        // Store export record with Drive info
+        const { data: exportRecord } = await supabase
+          .from('file_exports')
+          .insert({
+            file_id: fileId,
+            user_id: user.id,
+            export_format: format,
+            destination: 'google_drive',
+            drive_file_id: uploadResult.id,
+            drive_file_link: uploadResult.webViewLink,
+            created_at: new Date().toISOString()
+          })
+          .select()
+          .single()
+
+        // Log export activity
+        await supabase.from('usage_tracking').insert({
+          user_id: user.id,
+          action: 'export',
+          details: {
+            file_id: fileId,
+            format: format,
+            destination: 'google_drive',
+            transaction_count: transactions.length,
+            export_id: exportRecord?.id,
+            drive_file_id: uploadResult.id
+          }
+        })
+
+        // Return Drive upload result
+        return NextResponse.json({
+          success: true,
+          destination: 'google_drive',
+          data: {
+            fileId: uploadResult.id,
+            fileName: uploadResult.name,
+            webViewLink: uploadResult.webViewLink,
+            webContentLink: uploadResult.webContentLink,
+            size: uploadResult.size,
+            createdTime: uploadResult.createdTime
+          }
+        })
+      } catch (driveError) {
+        console.error('Google Drive upload error:', driveError)
+        return NextResponse.json(
+          { error: 'Failed to upload to Google Drive: ' + driveError.message },
+          { status: 500 }
+        )
       }
-    })
+    } else {
+      // Local download - existing behavior
+      const { data: exportRecord } = await supabase
+        .from('file_exports')
+        .insert({
+          file_id: fileId,
+          user_id: user.id,
+          export_format: format,
+          destination: 'local',
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single()
 
-    // Return file as download
-    return new NextResponse(fileBuffer, {
-      status: 200,
-      headers: {
-        'Content-Type': mimeType,
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-        'Content-Length': fileBuffer.length.toString(),
-      },
-    })
+      // Log export activity
+      await supabase.from('usage_tracking').insert({
+        user_id: user.id,
+        action: 'export',
+        details: {
+          file_id: fileId,
+          format: format,
+          destination: 'local',
+          transaction_count: transactions.length,
+          export_id: exportRecord?.id
+        }
+      })
+
+      // Return file as download
+      return new NextResponse(fileBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': mimeType,
+          'Content-Disposition': `attachment; filename="${fileName}"`,
+          'Content-Length': fileBuffer.length.toString(),
+        },
+      })
+    }
 
   } catch (error) {
     console.error('Export API error:', error)

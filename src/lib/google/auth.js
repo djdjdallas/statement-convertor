@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 import { OAuth2Client } from 'google-auth-library'
 import { createClient } from '@/lib/supabase/client'
+import { createClient as createServerClient } from '@/utils/supabase/server'
 
 // Initialize OAuth2 client
 export function createOAuth2Client() {
@@ -12,8 +13,8 @@ export function createOAuth2Client() {
 }
 
 // Get valid access token for a user
-export async function getValidAccessToken(userId) {
-  const supabase = createClient()
+export async function getValidAccessToken(userId, isServerSide = false) {
+  const supabase = isServerSide ? await createServerClient() : createClient()
   
   // Get stored tokens
   const { data: tokenData, error: tokenError } = await supabase
@@ -49,7 +50,10 @@ export async function getValidAccessToken(userId) {
         p_access_token: credentials.access_token,
         p_refresh_token: credentials.refresh_token || tokenData.refresh_token,
         p_expires_at: newExpiresAt.toISOString(),
-        p_scopes: tokenData.scopes
+        p_scopes: tokenData.scopes,
+        p_google_email: tokenData.google_email,
+        p_google_name: tokenData.google_name,
+        p_google_picture: tokenData.google_picture
       })
       
       if (updateError) {
@@ -68,8 +72,8 @@ export async function getValidAccessToken(userId) {
 }
 
 // Get authenticated OAuth2 client for a user
-export async function getAuthenticatedClient(userId) {
-  const accessToken = await getValidAccessToken(userId)
+export async function getAuthenticatedClient(userId, isServerSide = false) {
+  const accessToken = await getValidAccessToken(userId, isServerSide)
   const oauth2Client = createOAuth2Client()
   
   oauth2Client.setCredentials({
@@ -80,8 +84,9 @@ export async function getAuthenticatedClient(userId) {
 }
 
 // Check if user has Google integration
-export async function hasGoogleIntegration(userId) {
-  const supabase = createClient()
+export async function hasGoogleIntegration(userId, isServerSide = false) {
+  // Use server client if called from server-side (API routes)
+  const supabase = isServerSide ? await createServerClient() : createClient()
   
   const { data, error } = await supabase
     .from('google_oauth_tokens')

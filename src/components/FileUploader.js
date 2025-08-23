@@ -14,6 +14,7 @@ import {
   Loader2
 } from 'lucide-react'
 import { getMaxFileSize } from '@/lib/subscription-tiers'
+import GoogleDrivePicker from '@/components/GoogleDrivePicker'
 
 export default function FileUploader({ 
   onFileUpload, 
@@ -25,6 +26,8 @@ export default function FileUploader({
 }) {
   const [uploadProgress, setUploadProgress] = useState({})
   const [errors, setErrors] = useState({})
+  const [isImportingFromDrive, setIsImportingFromDrive] = useState(false)
+  const [importingFiles, setImportingFiles] = useState(new Set())
 
   const maxFileSize = getMaxFileSize(userTier)
 
@@ -137,6 +140,108 @@ export default function FileUploader({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
+  const handleGoogleDriveSelect = useCallback(async (selectedFiles) => {
+    // Handle multiple files or single file
+    const files = Array.isArray(selectedFiles) ? selectedFiles : [selectedFiles]
+    
+    for (const driveFile of files) {
+      if (uploadedFiles.length >= maxFiles) {
+        setErrors(prev => ({
+          ...prev,
+          maxFiles: {
+            fileName: driveFile.name,
+            message: `Maximum ${maxFiles} files allowed`
+          }
+        }))
+        continue
+      }
+
+      const fileId = `${driveFile.name}-${Date.now()}`
+      
+      try {
+        setUploadProgress(prev => ({ ...prev, [fileId]: 0 }))
+        setIsImportingFromDrive(true)
+        setImportingFiles(prev => new Set([...prev, driveFile.id]))
+        
+        // Import file from Google Drive
+        const response = await fetch('/api/google/drive/import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileId: driveFile.id,
+            fileName: driveFile.name,
+            fileSize: driveFile.size
+          })
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          if (error.error === 'Google Drive not connected') {
+            throw new Error('Please connect your Google Drive account in Settings first')
+          }
+          if (response.status === 413) {
+            throw new Error(`File too large. Maximum size is ${formatFileSize(maxFileSize)}`)
+          }
+          throw new Error(error.error || 'Failed to import file from Google Drive')
+        }
+
+        const { file } = await response.json()
+        
+        // Update progress
+        setUploadProgress(prev => ({ ...prev, [fileId]: 100 }))
+        
+        // Create a File-like object for consistency with the onFileUpload handler
+        const importedFile = {
+          id: file.id,
+          name: file.name,
+          size: file.size,
+          status: file.status,
+          isFromGoogleDrive: true
+        }
+        
+        // Call the upload handler with the imported file
+        await onFileUpload(importedFile, (progress) => {
+          setUploadProgress(prev => ({ ...prev, [fileId]: progress }))
+        })
+        
+        // Clear progress after a delay
+        setTimeout(() => {
+          setUploadProgress(prev => {
+            const newProgress = { ...prev }
+            delete newProgress[fileId]
+            return newProgress
+          })
+        }, 2000)
+
+      } catch (error) {
+        console.error('Import error:', error)
+        setErrors(prev => ({
+          ...prev,
+          [fileId]: {
+            fileName: driveFile.name,
+            message: error.message || 'Import failed. Please try again.'
+          }
+        }))
+        setUploadProgress(prev => {
+          const newProgress = { ...prev }
+          delete newProgress[fileId]
+          return newProgress
+        })
+      } finally {
+        setImportingFiles(prev => {
+          const next = new Set(prev)
+          next.delete(driveFile.id)
+          return next
+        })
+        if (importingFiles.size === 1) {
+          setIsImportingFromDrive(false)
+        }
+      }
+    }
+  }, [onFileUpload, uploadedFiles.length, maxFiles])
+
   const getDropzoneClassName = () => {
     let className = "border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer"
     
@@ -184,9 +289,26 @@ export default function FileUploader({
                   <p className="text-sm text-gray-500 mb-4">
                     or click to browse your computer
                   </p>
-                  <Button variant="outline" disabled={disabled}>
-                    Choose Files
-                  </Button>
+                  <div className="flex items-center justify-center gap-3">
+                    <Button variant="outline" disabled={disabled}>
+                      Choose Files
+                    </Button>
+                    <div className="relative">
+                      <GoogleDrivePicker
+                        onFileSelect={handleGoogleDriveSelect}
+                        acceptedMimeTypes={['application/pdf']}
+                        multipleSelection={true}
+                        buttonText="Import from Drive"
+                        buttonVariant="outline"
+                        disabled={disabled || isImportingFromDrive}
+                      />
+                      {isImportingFromDrive && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded-md">
+                          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
               
@@ -204,7 +326,14 @@ export default function FileUploader({
       {Object.keys(uploadProgress).length > 0 && (
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Uploading Files</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                {isImportingFromDrive ? 'Importing from Google Drive' : 'Uploading Files'}
+              </h3>
+              <span className="text-sm text-gray-500">
+                {Object.keys(uploadProgress).length} file{Object.keys(uploadProgress).length !== 1 ? 's' : ''}
+              </span>
+            </div>
             <div className="space-y-3">
               {Object.entries(uploadProgress).map(([fileId, progress]) => (
                 <div key={fileId} className="flex items-center space-x-3">
@@ -215,7 +344,7 @@ export default function FileUploader({
                     </p>
                     <Progress value={progress} className="h-2 mt-1" />
                   </div>
-                  <span className="text-sm text-gray-500 flex-shrink-0">
+                  <span className="text-sm font-medium text-gray-900 flex-shrink-0">
                     {progress}%
                   </span>
                 </div>
@@ -251,9 +380,19 @@ export default function FileUploader({
                       <FileText className="h-4 w-4 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {file.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {file.name}
+                        </p>
+                        {file.isFromGoogleDrive && (
+                          <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
+                            </svg>
+                            Google Drive
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500">
                         {formatFileSize(file.size)} • {file.status || 'Ready'}
                       </p>

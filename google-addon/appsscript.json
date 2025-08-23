@@ -1,0 +1,45 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "version": "v3",
+        "serviceId": "drive"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/userinfo.email"
+  ],
+  "addOns": {
+    "common": {
+      "name": "Statement Desk",
+      "logoUrl": "https://your-domain.com/logo.png",
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      },
+      "universalActions": [
+        {
+          "label": "Help",
+          "runFunction": "showHelp"
+        }
+      ]
+    },
+    "drive": {
+      "homepageTrigger": {
+        "enabled": true,
+        "runFunction": "onDriveHomepage"
+      },
+      "onItemsSelectedTrigger": {
+        "runFunction": "onDriveItemsSelected"
+      }
+    }
+  }
+}

@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createApiRouteClient } from '@/lib/supabase/api-route';
 import { getAuthUrl } from '@/lib/google-oauth';
 import crypto from 'crypto';
 
 export async function GET(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createApiRouteClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      console.error('Authentication error in Google OAuth route:', authError);
+      return NextResponse.json({ 
+        error: 'Unauthorized', 
+        details: 'User must be logged in to connect Google account' 
+      }, { status: 401 });
     }
     
     // Generate a random state parameter for security
@@ -29,7 +32,15 @@ export async function GET(request) {
     
     if (stateError) {
       console.error('Error storing OAuth state:', stateError);
-      return NextResponse.json({ error: 'Failed to initiate OAuth flow' }, { status: 500 });
+      // If table doesn't exist, we can still continue with the OAuth flow
+      if (stateError.code === '42P01') {
+        console.warn('google_oauth_states table does not exist. Run migrations to create it.');
+      } else {
+        return NextResponse.json({ 
+          error: 'Failed to initiate OAuth flow',
+          details: stateError.message 
+        }, { status: 500 });
+      }
     }
     
     // Generate the Google OAuth URL

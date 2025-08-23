@@ -59,6 +59,27 @@ export default function UploadPage() {
 
   const handleFileUpload = async (file, onProgress) => {
     try {
+      // Check if file is from Google Drive (already imported)
+      if (file.isFromGoogleDrive && file.id) {
+        // File is already imported from Google Drive
+        onProgress(100)
+        
+        // Add to uploaded files list
+        const newFile = {
+          id: file.id,
+          name: file.name,
+          size: file.size,
+          status: file.status || 'uploaded',
+          uploadedAt: new Date().toISOString(),
+          isFromGoogleDrive: true
+        }
+
+        setUploadedFiles(prev => [...prev, newFile])
+        
+        return newFile
+      }
+      
+      // Regular file upload flow
       // Let Supabase generate the UUID
       const fileId = crypto.randomUUID()
       

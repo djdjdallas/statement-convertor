@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createApiRouteClient } from '@/lib/supabase/api-route';
 
 export async function GET(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createApiRouteClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -36,7 +35,7 @@ export async function GET(request) {
 
 export async function DELETE(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createApiRouteClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     

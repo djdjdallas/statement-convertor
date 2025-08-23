@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createApiRouteClient } from '@/lib/supabase/api-route';
 import { getTokensFromCode, getUserInfo } from '@/lib/google-oauth';
 
 export async function GET(request) {
@@ -18,7 +17,7 @@ export async function GET(request) {
       return NextResponse.redirect(new URL('/dashboard?error=missing_params', request.url));
     }
     
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createApiRouteClient();
     
     // Verify state parameter
     const { data: stateData, error: stateError } = await supabase
@@ -44,18 +43,25 @@ export async function GET(request) {
     // Get user info from Google
     const googleUserInfo = await getUserInfo(tokens.access_token);
     
+    // Calculate token expiry time
+    const expiresAt = tokens.expiry_date 
+      ? new Date(tokens.expiry_date) 
+      : new Date(Date.now() + 3600 * 1000); // Default to 1 hour if not provided
+    
     // Store Google OAuth tokens and user info
     const { error: upsertError } = await supabase
       .from('google_oauth_tokens')
       .upsert({
         user_id: stateData.user_id,
-        google_id: googleUserInfo.id,
-        email: googleUserInfo.email,
-        name: googleUserInfo.name,
-        picture: googleUserInfo.picture,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
-        expires_at: new Date(Date.now() + tokens.expiry_date).toISOString(),
+        token_expires_at: expiresAt.toISOString(),
+        google_email: googleUserInfo.email,
+        google_name: googleUserInfo.name,
+        google_picture: googleUserInfo.picture,
+        scopes: ['https://www.googleapis.com/auth/userinfo.email', 
+                 'https://www.googleapis.com/auth/userinfo.profile', 
+                 'https://www.googleapis.com/auth/drive.file'],
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'user_id'

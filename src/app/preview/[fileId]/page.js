@@ -110,7 +110,8 @@ export default function PreviewPage() {
           fileId,
           format
         }),
-        credentials: 'same-origin'
+        credentials: 'include',
+        cache: 'no-store'
       })
 
       if (!response.ok) {
@@ -314,6 +315,7 @@ export default function PreviewPage() {
             onExport={handleExport}
             exportFormats={['csv', 'xlsx']}
             transactions={transactions}
+            user={user}
           />
         )}
 

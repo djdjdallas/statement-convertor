@@ -57,3 +57,74 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Google Drive Integration Transitions */
+  .google-drive-button {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .google-drive-button:hover:not(:disabled) {
+    @apply transform scale-105;
+  }
+  
+  .google-drive-button:active:not(:disabled) {
+    @apply transform scale-95;
+  }
+  
+  /* File row hover states */
+  .file-row {
+    @apply transition-colors duration-150 ease-in-out;
+  }
+  
+  .file-row:hover {
+    @apply bg-muted/50;
+  }
+  
+  /* Loading states */
+  .skeleton-loader {
+    @apply animate-pulse bg-gradient-to-r from-muted to-muted/50;
+  }
+  
+  /* Success animations */
+  @keyframes checkmark {
+    0% {
+      stroke-dashoffset: 100;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  .success-checkmark {
+    animation: checkmark 0.5s ease-in-out;
+  }
+  
+  /* Error shake animation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+  }
+  
+  .error-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+  
+  /* Progress bar smooth transitions */
+  .progress-bar {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  /* Toast animations are handled by Radix UI */
+  
+  /* Dropzone hover effects */
+  .dropzone-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  /* Focus states for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+}

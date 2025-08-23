@@ -90,15 +90,14 @@ export default function DashboardPage() {
 
       setFiles(filesData || [])
 
-      // Fetch usage statistics
-      const currentMonth = new Date().toISOString().slice(0, 7)
-      
-      const { data: monthlyUsage } = await supabase
-        .from('usage_tracking')
-        .select('action')
-        .eq('user_id', user.id)
-        .gte('created_at', `${currentMonth}-01`)
-        .lt('created_at', `${currentMonth}-32`)
+      // Fetch usage statistics using the efficient stored function
+      const { data: monthlyUsage, error: usageError } = await supabase
+        .rpc('get_user_monthly_usage', { p_user_id: user.id })
+        .single()
+        
+      if (usageError) {
+        console.error('Error fetching monthly usage:', usageError)
+      }
 
       const { data: exports } = await supabase
         .from('file_exports')
@@ -109,7 +108,7 @@ export default function DashboardPage() {
         sum + (file.transactions?.[0]?.count || 0), 0) || 0
 
       setStats({
-        thisMonth: monthlyUsage?.filter(u => u.action === 'pdf_process').length || 0,
+        thisMonth: monthlyUsage?.conversions_count || 0,
         totalFiles: filesData?.length || 0,
         totalTransactions,
         totalExports: exports?.length || 0
@@ -280,10 +279,12 @@ export default function DashboardPage() {
                 ✨ {userTier} Plan
               </Badge>
               <div className="flex items-center space-x-1">
-                <Button variant="ghost" size="sm" className="hover:bg-white/60 transition-all duration-200">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Button>
+                <Link href="/settings">
+                  <Button variant="ghost" size="sm" className="hover:bg-white/60 transition-all duration-200">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={signOut} className="hover:bg-red-50 hover:text-red-600 transition-all duration-200">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out

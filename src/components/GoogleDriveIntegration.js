@@ -35,15 +35,32 @@ export default function GoogleDriveIntegration() {
 
   const handleGoogleLink = async () => {
     try {
+      // Call Google OAuth endpoint directly - it will check authentication
       const response = await fetch('/api/auth/google', {
-        credentials: 'same-origin'
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
+      
       const data = await response.json();
       
-      if (response.ok && data.authUrl) {
+      if (!response.ok) {
+        console.error('Google OAuth error:', response.status, data);
+        if (response.status === 401) {
+          toast.error('Please sign in to connect your Google account');
+        } else {
+          toast.error(data.details || data.error || 'Failed to initiate Google sign-in');
+        }
+        return;
+      }
+      
+      if (data.authUrl) {
         window.location.href = data.authUrl;
       } else {
-        toast.error('Failed to initiate Google sign-in');
+        console.error('No authUrl received:', data);
+        toast.error('Failed to get Google authorization URL');
       }
     } catch (error) {
       console.error('Error initiating Google OAuth:', error);

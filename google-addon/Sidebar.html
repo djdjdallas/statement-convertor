@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <style>
+    body {
+      padding: 10px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 150px;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    .section h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    .file-list {
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .file-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .file-item:last-child {
+      border-bottom: none;
+    }
+    .file-item input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: none;
+    }
+    .status.info {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+    .status.success {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .progress {
+      display: none;
+      margin: 10px 0;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #4CAF50;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .results {
+      display: none;
+      margin-top: 20px;
+    }
+    .result-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      background: white;
+      border: 1px solid #ddd;
+    }
+    .result-item.success {
+      border-color: #4CAF50;
+    }
+    .result-item.error {
+      border-color: #f44336;
+    }
+    button {
+      margin-right: 10px;
+    }
+    .export-options {
+      margin: 15px 0;
+    }
+    .export-options label {
+      display: block;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <img src="https://your-domain.com/logo.png" alt="Statement Desk">
+  </div>
+
+  <div id="authSection" class="section">
+    <h3>Authentication</h3>
+    <p id="authStatus">Checking authentication...</p>
+    <button id="authButton" class="action" onclick="authenticate()" style="display:none;">
+      Connect Statement Desk
+    </button>
+  </div>
+
+  <div id="mainSection" class="section" style="display:none;">
+    <h3>Select PDF Files</h3>
+    <button onclick="loadDriveFiles()">Load PDF Files</button>
+    <div class="file-list" id="fileList" style="display:none;">
+      <!-- Files will be loaded here -->
+    </div>
+    
+    <div class="export-options">
+      <h4>Export Format:</h4>
+      <label>
+        <input type="radio" name="format" value="excel" checked> Excel (.xlsx)
+      </label>
+      <label>
+        <input type="radio" name="format" value="csv"> CSV (.csv)
+      </label>
+    </div>
+    
+    <button class="action" onclick="processFiles()" id="processButton" disabled>
+      Process Selected Files
+    </button>
+  </div>
+
+  <div class="status" id="statusMessage"></div>
+  
+  <div class="progress" id="progressSection">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p id="progressText">Processing...</p>
+  </div>
+
+  <div class="results" id="resultsSection">
+    <h3>Results</h3>
+    <div id="resultsList"></div>
+    <button onclick="reset()">Process More Files</button>
+  </div>
+
+  <script>
+    // Configuration
+    const CONFIG = {
+      maxFiles: 10,
+      maxFileSize: 10 * 1024 * 1024 // 10MB
+    };
+
+    // State
+    let isAuthenticated = false;
+    let selectedFiles = [];
+
+    // Initialize
+    window.onload = function() {
+      checkAuthentication();
+    };
+
+    // Check authentication status
+    function checkAuthentication() {
+      google.script.run
+        .withSuccessHandler(function(result) {
+          isAuthenticated = result;
+          updateAuthUI();
+        })
+        .withFailureHandler(function(error) {
+          showStatus('Error checking authentication: ' + error.message, 'error');
+          updateAuthUI();
+        })
+        .checkAuthentication();
+    }
+
+    // Update authentication UI
+    function updateAuthUI() {
+      const authStatus = document.getElementById('authStatus');
+      const authButton = document.getElementById('authButton');
+      const mainSection = document.getElementById('mainSection');
+      
+      if (isAuthenticated) {
+        authStatus.textContent = '✅ Connected to Statement Desk';
+        authButton.style.display = 'none';
+        mainSection.style.display = 'block';
+      } else {
+        authStatus.textContent = '❌ Not connected. Please authenticate to continue.';
+        authButton.style.display = 'inline-block';
+        mainSection.style.display = 'none';
+      }
+    }
+
+    // Handle authentication
+    function authenticate() {
+      showStatus('Opening authentication window...', 'info');
+      google.script.run
+        .withSuccessHandler(function() {
+          // Authentication window opened
+          showStatus('Complete authentication in the popup window', 'info');
+        })
+        .withFailureHandler(function(error) {
+          showStatus('Authentication failed: ' + error.message, 'error');
+        })
+        .handleAuthentication();
+    }
+
+    // Load Drive files
+    function loadDriveFiles() {
+      showStatus('Loading PDF files from Google Drive...', 'info');
+      
+      google.script.run
+        .withSuccessHandler(function(files) {
+          displayFiles(files);
+          showStatus('Found ' + files.length + ' PDF files', 'info');
+        })
+        .withFailureHandler(function(error) {
+          showStatus('Failed to load files: ' + error.message, 'error');
+        })
+        .loadPDFFiles();
+    }
+
+    // Display files in the list
+    function displayFiles(files) {
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+      fileList.style.display = 'block';
+      
+      if (files.length === 0) {
+        fileList.innerHTML = '<p>No PDF files found in your Drive</p>';
+        return;
+      }
+      
+      files.forEach(function(file) {
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = file.id;
+        checkbox.id = 'file-' + file.id;
+        checkbox.onchange = updateSelection;
+        
+        const label = document.createElement('label');
+        label.htmlFor = 'file-' + file.id;
+        label.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+        
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        fileList.appendChild(div);
+      });
+    }
+
+    // Update selection
+    function updateSelection() {
+      selectedFiles = [];
+      const checkboxes = document.querySelectorAll('.file-item input[type="checkbox"]:checked');
+      
+      checkboxes.forEach(function(checkbox) {
+        selectedFiles.push(checkbox.value);
+      });
+      
+      const processButton = document.getElementById('processButton');
+      processButton.disabled = selectedFiles.length === 0;
+      
+      if (selectedFiles.length > CONFIG.maxFiles) {
+        showStatus('Maximum ' + CONFIG.maxFiles + ' files can be processed at once', 'error');
+        processButton.disabled = true;
+      }
+    }
+
+    // Process selected files
+    function processFiles() {
+      if (selectedFiles.length === 0) {
+        showStatus('Please select files to process', 'error');
+        return;
+      }
+      
+      const format = document.querySelector('input[name="format"]:checked').value;
+      
+      // Hide main section, show progress
+      document.getElementById('mainSection').style.display = 'none';
+      document.getElementById('progressSection').style.display = 'block';
+      updateProgress(0, 'Starting processing...');
+      
+      // Process files
+      google.script.run
+        .withSuccessHandler(function(results) {
+          displayResults(results);
+        })
+        .withFailureHandler(function(error) {
+          showStatus('Processing failed: ' + error.message, 'error');
+          reset();
+        })
+        .processFilesFromSidebar(selectedFiles, format);
+    }
+
+    // Update progress
+    function updateProgress(percent, text) {
+      document.getElementById('progressFill').style.width = percent + '%';
+      document.getElementById('progressText').textContent = text || 'Processing...';
+    }
+
+    // Display results
+    function displayResults(results) {
+      document.getElementById('progressSection').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'block';
+      
+      const resultsList = document.getElementById('resultsList');
+      resultsList.innerHTML = '';
+      
+      let successCount = 0;
+      let errorCount = 0;
+      
+      results.forEach(function(result) {
+        const div = document.createElement('div');
+        div.className = 'result-item ' + result.status;
+        
+        const icon = result.status === 'success' ? '✅' : '❌';
+        let html = '<strong>' + icon + ' ' + result.fileName + '</strong>';
+        
+        if (result.status === 'success') {
+          successCount++;
+          if (result.newFileName) {
+            html += '<br>→ Saved as: ' + result.newFileName;
+          }
+        } else {
+          errorCount++;
+          html += '<br>→ Error: ' + result.message;
+        }
+        
+        div.innerHTML = html;
+        resultsList.appendChild(div);
+      });
+      
+      showStatus(
+        'Processing complete: ' + successCount + ' succeeded, ' + errorCount + ' failed',
+        successCount > 0 ? 'success' : 'error'
+      );
+    }
+
+    // Reset to initial state
+    function reset() {
+      document.getElementById('mainSection').style.display = 'block';
+      document.getElementById('progressSection').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'none';
+      document.getElementById('fileList').style.display = 'none';
+      document.getElementById('processButton').disabled = true;
+      selectedFiles = [];
+      
+      // Clear checkboxes
+      const checkboxes = document.querySelectorAll('.file-item input[type="checkbox"]');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = false;
+      });
+    }
+
+    // Show status message
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('statusMessage');
+      statusDiv.textContent = message;
+      statusDiv.className = 'status ' + type;
+      statusDiv.style.display = 'block';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(function() {
+        statusDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+  </script>
+</body>
+</html>
