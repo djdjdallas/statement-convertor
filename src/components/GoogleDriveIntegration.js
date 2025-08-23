@@ -52,7 +52,11 @@ export default function GoogleDriveIntegration() {
       window.location.href = '/api/auth/google/link-account';
     } catch (error) {
       console.error('Error initiating Google OAuth:', error);
-      toast.error('Failed to connect to Google');
+      toast({
+        title: 'Connection Failed',
+        description: 'Failed to connect to Google. Please try again.',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -70,13 +74,25 @@ export default function GoogleDriveIntegration() {
       if (response.ok) {
         setIsLinked(false);
         setGoogleAccount(null);
-        toast.success('Google account unlinked successfully');
+        toast({
+          title: 'Account Unlinked',
+          description: 'Google account unlinked successfully.',
+          variant: 'success'
+        });
       } else {
-        toast.error('Failed to unlink Google account');
+        toast({
+          title: 'Unlink Failed',
+          description: 'Failed to unlink Google account. Please try again.',
+          variant: 'destructive'
+        });
       }
     } catch (error) {
       console.error('Error unlinking Google account:', error);
-      toast.error('Failed to unlink Google account');
+      toast({
+        title: 'Unlink Failed',
+        description: 'Failed to unlink Google account. Please try again.',
+        variant: 'destructive'
+      });
     }
   };
 

@@ -62,17 +62,31 @@ export async function POST(request) {
           break
         }
 
+        // Check if this was a trial user upgrading
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('signup_intent, trial_start_date, trial_end_date')
+          .eq('id', result.userId)
+          .single()
+        
         // Update user profile in database
+        const updateData = {
+          id: result.userId,
+          stripe_customer_id: result.customerId,
+          subscription_id: result.subscriptionId,
+          subscription_tier: result.tier,
+          subscription_status: result.status,
+          current_period_end: result.currentPeriodEnd
+        }
+        
+        // If this was a trial user who upgraded, preserve their trial data
+        if (existingProfile?.signup_intent === 'trial') {
+          console.log(`Trial user ${result.userId} upgraded to ${result.tier}`)
+        }
+        
         await supabase
           .from('user_profiles')
-          .upsert({
-            id: result.userId,
-            stripe_customer_id: result.customerId,
-            subscription_id: result.subscriptionId,
-            subscription_tier: result.tier,
-            subscription_status: result.status,
-            current_period_end: result.currentPeriodEnd
-          })
+          .upsert(updateData)
 
         console.log(`Updated user ${result.userId} to ${result.tier} tier`)
         break

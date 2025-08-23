@@ -13,7 +13,10 @@ import { createClient } from '@/lib/supabase/client'
 import { SUBSCRIPTION_TIERS, checkUsageLimit } from '@/lib/subscription-tiers'
 import SubscriptionCard from '@/components/SubscriptionCard'
 import CheckoutSuccess from '@/components/CheckoutSuccess'
+import TrialStatusBanner from '@/components/TrialStatusBanner'
+import TrialExpiredModal from '@/components/TrialExpiredModal'
 import { toast } from '@/hooks/use-toast'
+import { getUserLimits } from '@/lib/trial-utils'
 import { 
   Upload, 
   FileText, 
@@ -45,6 +48,7 @@ export default function DashboardPage() {
   })
   const [loading, setLoading] = useState(true)
   const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
+  const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const { user, signOut, loading: authLoading } = useAuth()
   const router = useRouter()
   const supabase = createClient()
@@ -98,6 +102,14 @@ export default function DashboardPage() {
         .single()
 
       setUserProfile(profile || { subscription_tier: 'free' })
+      
+      // Check if trial has expired
+      if (profile?.signup_intent === 'trial' && 
+          profile?.trial_end_date && 
+          new Date(profile.trial_end_date) < new Date() &&
+          (!profile?.subscription_tier || profile?.subscription_tier === 'free')) {
+        setShowTrialExpiredModal(true)
+      }
 
       // Check Google Drive connection
       try {
@@ -175,10 +187,21 @@ export default function DashboardPage() {
         ...prev,
         totalFiles: prev.totalFiles - 1
       }))
+      
+      // Show success toast
+      toast({
+        title: 'File Deleted',
+        description: 'The file has been successfully deleted.',
+        variant: 'success'
+      })
 
     } catch (error) {
       console.error('Error deleting file:', error)
-      alert('Failed to delete file. Please try again.')
+      toast({
+        title: 'Delete Failed',
+        description: 'Failed to delete file. Please try again.',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -231,8 +254,8 @@ export default function DashboardPage() {
   }
 
   const userTier = userProfile?.subscription_tier || 'free'
-  const tierInfo = SUBSCRIPTION_TIERS[userTier]
-  const monthlyLimit = tierInfo?.limits.monthlyConversions
+  const tierInfo = getUserLimits(userProfile) || SUBSCRIPTION_TIERS[userTier]
+  const monthlyLimit = tierInfo?.monthlyConversions || tierInfo?.limits?.monthlyConversions
   const canProcess = monthlyLimit === -1 || stats.thisMonth < monthlyLimit
 
   if (authLoading) {
@@ -338,6 +361,16 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Checkout Success Message */}
         <CheckoutSuccess />
+        
+        {/* Trial Status Banner */}
+        <TrialStatusBanner userProfile={userProfile} userSubscription={userProfile} />
+        
+        {/* Trial Expired Modal */}
+        <TrialExpiredModal 
+          isOpen={showTrialExpiredModal} 
+          onClose={() => setShowTrialExpiredModal(false)}
+          userProfile={userProfile}
+        />
 
         {/* Modern Welcome Section with Bento Box Layout */}
         <div className="mb-12">

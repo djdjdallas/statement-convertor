@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { SUBSCRIPTION_TIERS } from '@/lib/subscription-tiers'
 import { redirectToCheckout, redirectToPortal } from '@/lib/stripe-client'
+import { toast } from '@/hooks/use-toast'
 
 export default function SubscriptionCard({ userProfile, monthlyUsage }) {
   const [loading, setLoading] = useState({})
@@ -42,7 +43,11 @@ export default function SubscriptionCard({ userProfile, monthlyUsage }) {
       await redirectToCheckout(tier)
     } catch (error) {
       console.error('Upgrade error:', error)
-      alert(`Failed to upgrade: ${error.message}`)
+      toast({
+        title: 'Upgrade Failed',
+        description: error.message || 'Failed to process upgrade. Please try again.',
+        variant: 'destructive'
+      })
     } finally {
       setLoading(prev => ({ ...prev, [tier]: false }))
     }
@@ -54,7 +59,11 @@ export default function SubscriptionCard({ userProfile, monthlyUsage }) {
       await redirectToPortal()
     } catch (error) {
       console.error('Portal error:', error)
-      alert(`Failed to open subscription management: ${error.message}`)
+      toast({
+        title: 'Portal Access Failed',
+        description: error.message || 'Failed to open subscription management. Please try again.',
+        variant: 'destructive'
+      })
     } finally {
       setLoading(prev => ({ ...prev, portal: false }))
     }

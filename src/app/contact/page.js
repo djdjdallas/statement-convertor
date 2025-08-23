@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Mail, MessageSquare, Phone, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 export default function ContactPage() {
   const { user } = useAuth();
@@ -61,12 +62,23 @@ export default function ContactPage() {
         subject: '',
         message: ''
       });
+      
+      toast({
+        title: 'Message Sent',
+        description: 'Thank you for contacting us. We\'ll get back to you soon!',
+        variant: 'success'
+      });
 
       // Reset success message after 5 seconds
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
       console.error('Contact form error:', err);
       setError('Failed to send message. Please try again.');
+      toast({
+        title: 'Failed to Send Message',
+        description: err.message || 'Failed to send message. Please try again.',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }

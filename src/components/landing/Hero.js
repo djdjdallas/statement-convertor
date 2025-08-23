@@ -14,7 +14,7 @@ export default function Hero() {
           </h1>
           <p className="mt-6 text-xl text-gray-500">
             Transform your PDF bank statements into organized Excel and CSV files in seconds. 
-            Secure, accurate, and designed for professionals who value their time.
+            Export directly to Google Sheets. Secure, accurate, and designed for professionals who value their time.
           </p>
           
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -108,8 +108,8 @@ export default function Hero() {
                       </div>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900">3. Download</h4>
-                      <p className="text-sm text-gray-500">Get Excel or CSV instantly</p>
+                      <h4 className="text-sm font-medium text-gray-900">3. Download or Export</h4>
+                      <p className="text-sm text-gray-500">Get Excel, CSV, or export to Google Sheets</p>
                     </div>
                   </div>
                 </div>

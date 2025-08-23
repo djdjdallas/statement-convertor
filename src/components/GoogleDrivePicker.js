@@ -96,7 +96,12 @@ export default function GoogleDrivePicker({
     checkGoogleConnection()
   }, [user])
 
-  const handleOpenPicker = () => {
+  const handleOpenPicker = (e) => {
+    // Prevent the click from propagating to parent elements (like Dropzone)
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
     if (!isGoogleConnected) {
       // Redirect to settings page to connect Google
       window.location.href = '/settings?tab=integrations'

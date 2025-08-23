@@ -14,6 +14,7 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { SUBSCRIPTION_TIERS } from "@/lib/subscription-tiers";
 import { redirectToCheckout } from "@/lib/stripe-client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 export default function Pricing() {
   const [loading, setLoading] = useState({});
@@ -34,8 +35,12 @@ export default function Pricing() {
 
   const handleSubscribe = async (tierId) => {
     if (!user) {
-      // Redirect to signup if not authenticated
-      window.location.href = "/auth/signup";
+      // Redirect to signup with appropriate plan parameters
+      if (tierId === "free") {
+        window.location.href = "/auth/signup?plan=free";
+      } else {
+        window.location.href = `/auth/signup?plan=trial&tier=${tierId}&trial=true`;
+      }
       return;
     }
 
@@ -50,7 +55,11 @@ export default function Pricing() {
       await redirectToCheckout(tierId, billingPeriod);
     } catch (error) {
       console.error("Subscription error:", error);
-      alert(`Failed to start subscription: ${error.message}`);
+      toast({
+        title: "Subscription Failed",
+        description: error.message || "Failed to start subscription. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setLoading((prev) => ({ ...prev, [tierId]: false }));
     }
@@ -163,7 +172,11 @@ export default function Pricing() {
                   {loading[tier.id] && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {tier.id === "free" ? "Start Free" : "Start 14-Day Trial"}
+                  {!user ? (
+                    tier.id === "free" ? "Start Free" : "Start 14-Day Trial"
+                  ) : (
+                    tier.id === "free" ? "Go to Dashboard" : "Upgrade Now"
+                  )}
                 </Button>
 
                 {tier.id !== "free" && (

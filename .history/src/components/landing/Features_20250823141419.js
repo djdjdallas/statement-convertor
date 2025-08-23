@@ -62,12 +62,12 @@ const features = [
     description:
       "Access our converter anytime, anywhere. No software installation required, just upload and convert.",
   },
-  // {
-  //   icon: Users,
-  //   title: "Team Collaboration",
-  //   description:
-  //     "Share converted files with your team or accountant directly from your dashboard with secure links.",
-  // },
+  {
+    icon: Users,
+    title: "Team Collaboration",
+    description:
+      "Share converted files with your team or accountant directly from your dashboard with secure links.",
+  },
 ];
 
 export default function Features() {

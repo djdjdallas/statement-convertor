@@ -40,6 +40,7 @@ import {
   Cloud
 } from 'lucide-react'
 import DriveExportDialog from '@/components/DriveExportDialog'
+import { toast } from '@/hooks/use-toast'
 
 export default function DataPreview({ 
   fileId, 
@@ -255,9 +256,18 @@ export default function DataPreview({
       }))
 
       setEditingTransaction(null)
+      toast({
+        title: 'Transaction Updated',
+        description: 'Transaction has been successfully updated.',
+        variant: 'success'
+      })
     } catch (err) {
       console.error('Error updating transaction:', err)
-      alert(err.message)
+      toast({
+        title: 'Update Failed',
+        description: err.message || 'Failed to update transaction. Please try again.',
+        variant: 'destructive'
+      })
     }
   }
 

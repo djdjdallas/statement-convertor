@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,9 +12,10 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Separator } from '@/components/ui/separator'
-import { Loader2, Eye, EyeOff, Check } from 'lucide-react'
+import { Loader2, Eye, EyeOff, Check, Sparkles } from 'lucide-react'
 import GoogleSignInButton from '@/components/GoogleSignInButton'
 import SocialAuthDivider from '@/components/SocialAuthDivider'
+import { Badge } from '@/components/ui/badge'
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -36,6 +37,12 @@ export default function SignUpPage() {
   const [success, setSuccess] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Get plan details from URL parameters
+  const plan = searchParams.get('plan') || 'free'
+  const trial = searchParams.get('trial') === 'true'
+  const intendedTier = searchParams.get('tier') || null
 
   const form = useForm({
     resolver: zodResolver(signUpSchema),
@@ -52,9 +59,20 @@ export default function SignUpPage() {
       setLoading(true)
       setError('')
       
+      // Calculate trial dates if this is a trial signup
+      const trialData = trial ? {
+        signup_intent: 'trial',
+        intended_tier: intendedTier,
+        trial_start_date: new Date().toISOString(),
+        trial_end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() // 14 days from now
+      } : {
+        signup_intent: 'free'
+      }
+      
       const { error } = await signUp(values.email, values.password, {
         data: {
-          full_name: values.fullName
+          full_name: values.fullName,
+          ...trialData
         }
       })
       
@@ -127,9 +145,33 @@ export default function SignUpPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Get started for free</CardTitle>
+            <CardTitle>
+              {trial ? (
+                <>
+                  Start your 14-day free trial
+                  <Badge variant="secondary" className="ml-2">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    No credit card required
+                  </Badge>
+                </>
+              ) : (
+                'Get started for free'
+              )}
+            </CardTitle>
             <CardDescription>
-              Create your account to start converting bank statements
+              {trial ? (
+                <>
+                  Experience all {intendedTier === 'business' ? 'Business' : 'Professional'} features free for 14 days.
+                  <span className="block mt-1 text-xs">
+                    • {intendedTier === 'business' ? '2000' : '500'} conversions/month
+                    • Advanced AI recognition
+                    • Priority support
+                    • {intendedTier === 'business' ? 'Team collaboration' : 'API access'}
+                  </span>
+                </>
+              ) : (
+                'Create your account to start converting bank statements with 10 free conversions per month'
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -267,7 +309,7 @@ export default function SignUpPage() {
 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create account
+                  {trial ? 'Start free trial' : 'Create free account'}
                 </Button>
               </form>
             </Form>

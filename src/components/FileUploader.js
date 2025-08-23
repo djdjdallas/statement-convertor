@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { getMaxFileSize } from '@/lib/subscription-tiers'
 import GoogleDrivePicker from '@/components/GoogleDrivePicker'
+import { toast } from '@/hooks/use-toast'
 
 export default function FileUploader({ 
   onFileUpload, 
@@ -81,6 +82,13 @@ export default function FileUploader({
         // Complete progress
         setUploadProgress(prev => ({ ...prev, [fileId]: 100 }))
         
+        // Show success toast
+        toast({
+          title: 'Upload Successful',
+          description: `${file.name} has been uploaded successfully.`,
+          variant: 'success'
+        })
+        
         // Clear progress after a delay
         setTimeout(() => {
           setUploadProgress(prev => {
@@ -92,13 +100,22 @@ export default function FileUploader({
 
       } catch (error) {
         console.error('Upload error:', error)
+        const errorMessage = error.message || 'Upload failed. Please try again.'
+        
         setErrors(prev => ({
           ...prev,
           [fileId]: {
             fileName: file.name,
-            message: error.message || 'Upload failed. Please try again.'
+            message: errorMessage
           }
         }))
+        
+        toast({
+          title: 'Upload Failed',
+          description: `${file.name}: ${errorMessage}`,
+          variant: 'destructive'
+        })
+        
         setUploadProgress(prev => {
           const newProgress = { ...prev }
           delete newProgress[fileId]
@@ -206,6 +223,13 @@ export default function FileUploader({
           setUploadProgress(prev => ({ ...prev, [fileId]: progress }))
         })
         
+        // Show success toast
+        toast({
+          title: 'Import Successful',
+          description: `${file.name} has been imported from Google Drive.`,
+          variant: 'success'
+        })
+        
         // Clear progress after a delay
         setTimeout(() => {
           setUploadProgress(prev => {
@@ -217,13 +241,22 @@ export default function FileUploader({
 
       } catch (error) {
         console.error('Import error:', error)
+        const errorMessage = error.message || 'Import failed. Please try again.'
+        
         setErrors(prev => ({
           ...prev,
           [fileId]: {
             fileName: driveFile.name,
-            message: error.message || 'Import failed. Please try again.'
+            message: errorMessage
           }
         }))
+        
+        toast({
+          title: 'Import Failed',
+          description: `${driveFile.name}: ${errorMessage}`,
+          variant: 'destructive'
+        })
+        
         setUploadProgress(prev => {
           const newProgress = { ...prev }
           delete newProgress[fileId]
@@ -290,7 +323,14 @@ export default function FileUploader({
                     or click to browse your computer
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <Button variant="outline" disabled={disabled}>
+                    <Button 
+                      variant="outline" 
+                      disabled={disabled}
+                      onClick={(e) => {
+                        // Let the dropzone handle the click
+                        // This button is just visual
+                      }}
+                    >
                       Choose Files
                     </Button>
                     <div className="relative">

@@ -12,6 +12,7 @@ import FinancialChat from '@/components/chat/FinancialChat'
 import { useAuth } from '@/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Download, Loader2, Brain, MessageCircle } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
 
 export default function PreviewPage() {
   const { fileId } = useParams()
@@ -144,7 +145,11 @@ export default function PreviewPage() {
 
     } catch (error) {
       console.error('Export error:', error)
-      alert(`Export failed: ${error.message}`)
+      toast({
+        title: 'Export Failed',
+        description: error.message || 'Failed to export file. Please try again.',
+        variant: 'destructive'
+      })
     } finally {
       setExporting(prev => ({ ...prev, [format]: false }))
     }
