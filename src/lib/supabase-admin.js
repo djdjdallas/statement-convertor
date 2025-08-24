@@ -8,3 +8,8 @@ export const supabaseAdmin = createClient(
   supabaseUrl,
   supabaseServiceKey
 )
+
+// Export createAdminClient function for API routes
+export function createAdminClient() {
+  return createClient(supabaseUrl, supabaseServiceKey)
+}

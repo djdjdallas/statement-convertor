@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import { createClient as createAdminClient } from '@/lib/supabase-admin';
+import { createAdminClient } from '@/lib/supabase-admin';
 import { createClient } from '@/lib/supabase/server';
 
 // Initialize Google Admin SDK

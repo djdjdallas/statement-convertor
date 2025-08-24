@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
-export default function GoogleAddonAuth() {
+function GoogleAddonAuthContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('authenticating');
   const [error, setError] = useState(null);
@@ -125,5 +125,24 @@ export default function GoogleAddonAuth() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function GoogleAddonAuth() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-8">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <GoogleAddonAuthContent />
+    </Suspense>
   );
 }

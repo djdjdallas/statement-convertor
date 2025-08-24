@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
 
 /**
  * Check if a user is in an active trial period
@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
  * @returns {Promise<{inTrial: boolean, daysRemaining: number, trialEndDate: Date|null}>}
  */
 export async function checkTrialStatus(userId) {
-  const supabase = await createClient()
+  const supabase = createClient()
   
   const { data: profile, error } = await supabase
     .from('user_profiles')
@@ -53,7 +53,7 @@ export async function checkTrialStatus(userId) {
  * @returns {Promise<Object>} The limits object
  */
 export async function getTrialLimits(userId) {
-  const supabase = await createClient()
+  const supabase = createClient()
   
   const { data: profile } = await supabase
     .from('user_profiles')

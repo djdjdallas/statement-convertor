@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { createClient as createAdminClient } from '@/lib/supabase-admin';
+import { createAdminClient } from '@/lib/supabase-admin';
 import { google } from 'googleapis';
 import crypto from 'crypto';
 
