@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import GoogleDriveIntegration from '@/components/GoogleDriveIntegration';
+import XeroConnectionStatus from '@/components/xero/XeroConnectionStatus';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
@@ -139,6 +140,9 @@ export default function SettingsPage() {
           {/* Integrations Tab */}
           <TabsContent value="integrations">
             <div className="space-y-6">
+              {/* Xero Integration */}
+              <XeroConnectionStatus />
+              
               {/* Google Drive Integration */}
               <GoogleDriveIntegration />
 
