@@ -16,15 +16,22 @@ import {
   Download,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Building,
+  Zap,
+  Link as LinkIcon
 } from 'lucide-react'
 import Link from 'next/link'
+import { Checkbox } from '@/components/ui/checkbox.jsx'
+import { toast } from '@/hooks/use-toast'
 
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [processing, setProcessing] = useState(false)
   const [userProfile, setUserProfile] = useState(null)
   const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
+  const [xeroConnections, setXeroConnections] = useState([])
+  const [autoSendToXero, setAutoSendToXero] = useState(false)
   const { user } = useAuth()
   const router = useRouter()
   const supabase = createClient()
@@ -66,6 +73,17 @@ export default function UploadPage() {
       }
     } catch (err) {
       console.log('Could not check Google Drive status')
+    }
+
+    // Check Xero connections
+    try {
+      const xeroResponse = await fetch('/api/xero/connections')
+      if (xeroResponse.ok) {
+        const { connections } = await xeroResponse.json()
+        setXeroConnections(connections?.filter(c => c.is_active) || [])
+      }
+    } catch (err) {
+      console.log('Could not check Xero connection status')
     }
   }
 
@@ -228,6 +246,15 @@ export default function UploadPage() {
                 bankType: result.data.bankType
               } : f)
             )
+
+            // Auto-send to Xero if enabled
+            if (autoSendToXero && xeroConnections.length > 0) {
+              // TODO: Implement actual Xero export
+              toast({
+                title: "Xero Export",
+                description: `File ${file.name} ready for Xero import. Use Bulk Import from the dashboard.`
+              })
+            }
           } else {
             throw new Error(result.error || 'Processing failed')
           }
@@ -326,6 +353,12 @@ export default function UploadPage() {
                   Google Connected
                 </Badge>
               )}
+              {xeroConnections.length > 0 && (
+                <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
+                  <Building className="w-3 h-3 mr-1" />
+                  Xero Connected
+                </Badge>
+              )}
               {userProfile && (
                 <Badge 
                   variant="outline" 
@@ -395,6 +428,49 @@ export default function UploadPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Xero Integration Options */}
+        {xeroConnections.length > 0 && (
+          <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white rounded-lg shadow-md">
+                    <Building className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle>Xero Integration</CardTitle>
+                    <CardDescription>
+                      Connected to {xeroConnections.length} organization{xeroConnections.length !== 1 ? 's' : ''}
+                    </CardDescription>
+                  </div>
+                </div>
+                <Badge variant="default" className="bg-green-600">
+                  <LinkIcon className="h-3 w-3 mr-1" />
+                  Connected
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-3">
+                <Checkbox 
+                  id="auto-xero" 
+                  checked={autoSendToXero}
+                  onCheckedChange={setAutoSendToXero}
+                />
+                <label 
+                  htmlFor="auto-xero" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  Automatically prepare files for Xero import after processing
+                </label>
+              </div>
+              <p className="text-sm text-gray-600 mt-2 ml-6">
+                Files will be marked for bulk import to Xero. You can review and complete the import from the dashboard.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* File Uploader */}
         <FileUploader

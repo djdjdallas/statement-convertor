@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -33,23 +32,39 @@ export async function DELETE(request) {
   try {
     const url = new URL(request.url);
     const tenantId = url.searchParams.get('tenantId');
+    const hardDelete = url.searchParams.get('hard') === 'true';
     
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user || !tenantId) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
     }
 
-    const { error } = await supabase
-      .from('xero_connections')
-      .update({ is_active: false, updated_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-      .eq('tenant_id', tenantId);
+    if (hardDelete) {
+      // Completely remove the connection
+      const { error } = await supabase
+        .from('xero_connections')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('tenant_id', tenantId);
 
-    if (error) {
-      console.error('Failed to disconnect:', error);
-      return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
+      if (error) {
+        console.error('Failed to delete connection:', error);
+        return NextResponse.json({ error: 'Failed to delete connection' }, { status: 500 });
+      }
+    } else {
+      // Soft delete - just mark as inactive
+      const { error } = await supabase
+        .from('xero_connections')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('tenant_id', tenantId);
+
+      if (error) {
+        console.error('Failed to disconnect:', error);
+        return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
+      }
     }
 
     return NextResponse.json({ success: true });

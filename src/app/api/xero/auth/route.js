@@ -1,20 +1,27 @@
 import { NextResponse } from 'next/server';
 import { XeroService } from '@/lib/xero/xero-service';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const xeroService = new XeroService();
     const state = `${user.id}_${Date.now()}`;
-    const authUrl = await xeroService.getAuthUrl(state);
+    
+    const xeroService = new XeroService(state);
+    
+    console.log('Xero environment check:', {
+      clientId: !!process.env.XERO_CLIENT_ID,
+      clientSecret: !!process.env.XERO_CLIENT_SECRET,
+      redirectUri: process.env.XERO_REDIRECT_URI
+    });
+    
+    const authUrl = await xeroService.getAuthUrl();
 
     // Store state for validation
     const { error } = await supabase

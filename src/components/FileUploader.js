@@ -1,21 +1,26 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Upload, 
   FileText, 
   AlertCircle, 
   CheckCircle, 
   X,
-  Loader2
+  Loader2,
+  Users
 } from 'lucide-react'
 import { getMaxFileSize } from '@/lib/subscription-tiers'
 import GoogleDrivePicker from '@/components/GoogleDrivePicker'
 import { toast } from '@/hooks/use-toast'
+import { ClientService } from '@/lib/clients/client-service'
+import { useAuth } from '@/contexts/AuthContext'
+import { createClient } from '@/lib/supabase/client'
 
 export default function FileUploader({ 
   onFileUpload, 
@@ -23,14 +28,46 @@ export default function FileUploader({
   uploadedFiles = [],
   maxFiles = 5,
   userTier = 'free',
-  disabled = false 
+  disabled = false,
+  selectedClient = null,
+  onClientChange = null,
+  showClientSelector = false 
 }) {
   const [uploadProgress, setUploadProgress] = useState({})
   const [errors, setErrors] = useState({})
   const [isImportingFromDrive, setIsImportingFromDrive] = useState(false)
   const [importingFiles, setImportingFiles] = useState(new Set())
+  const [clients, setClients] = useState([])
+  const [isAccountingFirm, setIsAccountingFirm] = useState(false)
+  const { user } = useAuth()
+  const supabase = createClient()
 
   const maxFileSize = getMaxFileSize(userTier)
+
+  useEffect(() => {
+    async function loadClients() {
+      if (!user || !showClientSelector) return
+      
+      try {
+        const clientService = new ClientService()
+        const userClients = await clientService.getClients(user.id)
+        setClients(userClients)
+        
+        // Check if user is an accounting firm
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('is_accounting_firm')
+          .eq('id', user.id)
+          .single()
+        
+        setIsAccountingFirm(profile?.is_accounting_firm || false)
+      } catch (error) {
+        console.error('Failed to load clients:', error)
+      }
+    }
+
+    loadClients()
+  }, [user, showClientSelector, supabase])
 
   const onDrop = useCallback(async (acceptedFiles, rejectedFiles) => {
     // Handle rejected files
@@ -295,6 +332,40 @@ export default function FileUploader({
 
   return (
     <div className="space-y-6">
+      {/* Client Selection */}
+      {showClientSelector && isAccountingFirm && clients.length > 0 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <Users className="h-5 w-5 text-gray-600" />
+              <div className="flex-1">
+                <label className="text-sm font-medium mb-2 block">
+                  Assign to Client (Optional)
+                </label>
+                <Select value={selectedClient || ''} onValueChange={onClientChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client or leave blank for general use" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No specific client</SelectItem>
+                    {clients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.name}
+                        {client.industry && (
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({client.industry})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Dropzone */}
       <Card>
         <CardContent className="p-6">

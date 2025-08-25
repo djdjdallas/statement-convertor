@@ -28,9 +28,9 @@ export default function SettingsPage() {
   const fetchProfile = async () => {
     try {
       const { data: profileData, error } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('id', user.id)
         .single();
 
       if (error && error.code !== 'PGRST116') {

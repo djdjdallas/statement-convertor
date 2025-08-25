@@ -34,8 +34,14 @@ import {
   Settings,
   MessageCircle,
   Sheet,
-  Sparkles
+  Sparkles,
+  Building,
+  Zap,
+  Link as LinkIcon,
+  Import,
+  Send
 } from 'lucide-react'
+import BulkImportDialog from '@/components/xero/BulkImportDialog'
 
 export default function DashboardPage() {
   const [files, setFiles] = useState([])
@@ -48,6 +54,8 @@ export default function DashboardPage() {
   })
   const [loading, setLoading] = useState(true)
   const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
+  const [xeroConnections, setXeroConnections] = useState([])
+  const [showBulkImport, setShowBulkImport] = useState(false)
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const { user, signOut, loading: authLoading } = useAuth()
   const router = useRouter()
@@ -133,6 +141,17 @@ export default function DashboardPage() {
         .order('created_at', { ascending: false })
 
       setFiles(filesData || [])
+
+      // Check Xero connections
+      try {
+        const xeroResponse = await fetch('/api/xero/connections')
+        if (xeroResponse.ok) {
+          const { connections } = await xeroResponse.json()
+          setXeroConnections(connections?.filter(c => c.is_active) || [])
+        }
+      } catch (err) {
+        console.log('Could not check Xero connection status')
+      }
 
       // Fetch usage statistics using the efficient stored function
       const { data: monthlyUsage, error: usageError } = await supabase
@@ -490,6 +509,52 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Xero Connection Status */}
+        {xeroConnections.length > 0 && (
+          <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white rounded-lg shadow-md">
+                    <Building className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle>Xero Integration</CardTitle>
+                    <CardDescription>
+                      Connected to {xeroConnections.length} organization{xeroConnections.length !== 1 ? 's' : ''}
+                    </CardDescription>
+                  </div>
+                </div>
+                <Badge variant="default" className="bg-green-600">
+                  <LinkIcon className="h-3 w-3 mr-1" />
+                  Connected
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => setShowBulkImport(true)}
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Bulk Import to Xero
+                </Button>
+                <Link href="/settings">
+                  <Button variant="outline" className="w-full border-green-300 hover:bg-green-50">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Manage Connection
+                  </Button>
+                </Link>
+                <Button variant="outline" className="border-green-300 hover:bg-green-50" disabled>
+                  <Import className="h-4 w-4 mr-2" />
+                  Import from Xero (Coming Soon)
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Modern Quick Actions with Bento Box Design */}
         <Card className="mb-12 bg-white/70 backdrop-blur-sm border-white/30 shadow-xl">
           <CardHeader className="pb-6">
@@ -752,12 +817,31 @@ export default function DashboardPage() {
                       </Badge>
                       
                       {file.processing_status === 'completed' && (
-                        <Link href={`/preview/${file.id}`}>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View
-                          </Button>
-                        </Link>
+                        <>
+                          <Link href={`/preview/${file.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-2" />
+                              View
+                            </Button>
+                          </Link>
+                          {xeroConnections.length > 0 && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="border-green-300 hover:bg-green-50"
+                              onClick={() => {
+                                // TODO: Implement individual file export to Xero
+                                toast({
+                                  title: "Export to Xero",
+                                  description: "Individual file export coming soon. Use Bulk Import for now."
+                                })
+                              }}
+                            >
+                              <Send className="h-4 w-4 mr-2" />
+                              Xero
+                            </Button>
+                          )}
+                        </>
                       )}
                       
                       <Button
@@ -800,6 +884,16 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Bulk Import Dialog */}
+        <BulkImportDialog
+          isOpen={showBulkImport}
+          onClose={() => {
+            setShowBulkImport(false)
+            fetchDashboardData() // Refresh data after closing
+          }}
+          availableFiles={files.filter(f => f.processing_status === 'completed' && !f.xero_import_id)}
+        />
       </div>
     </div>
   )

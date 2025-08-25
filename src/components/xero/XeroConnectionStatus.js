@@ -45,6 +45,7 @@ export default function XeroConnectionStatus() {
   const fetchConnections = async () => {
     try {
       const response = await fetch('/api/xero/connections');
+      
       if (response.ok) {
         const data = await response.json();
         setConnections(data.connections || []);
@@ -67,17 +68,20 @@ export default function XeroConnectionStatus() {
     setConnecting(true);
     try {
       const response = await fetch('/api/xero/auth');
+      
       if (response.ok) {
         const { authUrl } = await response.json();
         window.location.href = authUrl;
       } else {
-        throw new Error('Failed to initiate connection');
+        const errorData = await response.json();
+        console.error('Xero auth API error:', errorData);
+        throw new Error(errorData.error || 'Failed to initiate connection');
       }
     } catch (error) {
       console.error('Failed to initiate Xero connection:', error);
       toast({
         title: 'Error',
-        description: 'Failed to connect to Xero. Please try again.',
+        description: error.message || 'Failed to connect to Xero. Please try again.',
         variant: 'destructive',
       });
       setConnecting(false);
@@ -87,7 +91,7 @@ export default function XeroConnectionStatus() {
   const disconnectTenant = async (tenantId, tenantName) => {
     try {
       const response = await fetch(`/api/xero/connections?tenantId=${tenantId}`, { 
-        method: 'DELETE' 
+        method: 'DELETE'
       });
       
       if (response.ok) {
@@ -176,13 +180,25 @@ export default function XeroConnectionStatus() {
                   <Badge variant={connection.is_active ? 'default' : 'secondary'}>
                     {connection.is_active ? 'Connected' : 'Disconnected'}
                   </Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => disconnectTenant(connection.tenant_id, connection.tenant_name)}
-                  >
-                    Disconnect
-                  </Button>
+                  {connection.is_active ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => disconnectTenant(connection.tenant_id, connection.tenant_name)}
+                    >
+                      Disconnect
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={initiateConnection}
+                      disabled={connecting}
+                    >
+                      {connecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Reconnect
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

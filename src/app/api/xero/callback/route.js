@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { XeroService } from '@/lib/xero/xero-service';
 import { encrypt } from '@/lib/encryption';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request) {
   try {
@@ -14,7 +13,7 @@ export async function GET(request) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?xero_error=missing_params`);
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = await createClient();
     
     // Validate state and get user
     const { data: stateRecord, error: stateError } = await supabase
@@ -31,31 +30,57 @@ export async function GET(request) {
     }
 
     // Exchange code for tokens
-    const xeroService = new XeroService();
-    const { tokenSet, tenants } = await xeroService.handleCallback(code);
+    const xeroService = new XeroService(state);
+    console.log('Exchanging code for tokens...');
+    // Pass the full callback URL to xero-node, not just the code
+    const callbackUrl = request.url;
+    const { tokenSet, tenants } = await xeroService.handleCallback(callbackUrl);
+    console.log('Token exchange successful, tenants:', tenants);
 
     // Store connection for each tenant
     for (const tenant of tenants) {
-      const { error: upsertError } = await supabase
+      // First check if connection exists
+      const { data: existingConnection } = await supabase
         .from('xero_connections')
-        .upsert({
-          user_id: stateRecord.user_id,
-          tenant_id: tenant.tenantId,
-          tenant_name: tenant.tenantName,
-          tenant_type: tenant.tenantType,
-          access_token: encrypt(tokenSet.access_token),
-          refresh_token: encrypt(tokenSet.refresh_token),
-          token_expires_at: new Date(Date.now() + tokenSet.expires_in * 1000).toISOString(),
-          id_token: tokenSet.id_token ? encrypt(tokenSet.id_token) : null,
-          scopes: tokenSet.scope?.split(' ') || [],
-          is_active: true,
-          updated_at: new Date().toISOString()
-        })
-        .select()
+        .select('id')
+        .eq('user_id', stateRecord.user_id)
+        .eq('tenant_id', tenant.tenantId)
         .single();
 
-      if (upsertError) {
-        console.error('Failed to store Xero connection:', upsertError);
+      const connectionData = {
+        user_id: stateRecord.user_id,
+        tenant_id: tenant.tenantId,
+        tenant_name: tenant.tenantName,
+        tenant_type: tenant.tenantType,
+        access_token: encrypt(tokenSet.access_token),
+        refresh_token: encrypt(tokenSet.refresh_token),
+        token_expires_at: new Date(Date.now() + tokenSet.expires_in * 1000).toISOString(),
+        id_token: tokenSet.id_token ? encrypt(tokenSet.id_token) : null,
+        scopes: tokenSet.scope?.split(' ') || [],
+        is_active: true,
+        updated_at: new Date().toISOString()
+      };
+
+      let result;
+      if (existingConnection) {
+        // Update existing connection
+        result = await supabase
+          .from('xero_connections')
+          .update(connectionData)
+          .eq('id', existingConnection.id)
+          .select()
+          .single();
+      } else {
+        // Insert new connection
+        result = await supabase
+          .from('xero_connections')
+          .insert(connectionData)
+          .select()
+          .single();
+      }
+
+      if (result.error) {
+        console.error('Failed to store Xero connection:', result.error);
       }
     }
 
