@@ -54,6 +54,32 @@ export default function BulkImportDialog({ isOpen, onClose, availableFiles = [] 
             const { job } = await response.json()
             setJobProgress(job.progress)
             
+            // Check if any files failed due to token expiration
+            if (job.bulk_import_files) {
+              const tokenExpiredFiles = job.bulk_import_files.filter(
+                f => f.error_message?.includes('Xero session expired') || 
+                    f.error_message?.includes('Refresh token has expired')
+              )
+              
+              if (tokenExpiredFiles.length > 0) {
+                clearInterval(pollInterval)
+                toast({
+                  title: 'Xero Session Expired',
+                  description: 'Your Xero session expired during the import. Please reconnect your Xero account and retry.',
+                  variant: 'destructive',
+                  action: (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => window.location.href = '/settings?tab=integrations'}
+                    >
+                      Go to Settings
+                    </Button>
+                  )
+                })
+              }
+            }
+            
             // Stop polling if job is complete
             if (job.status === 'completed' || job.status === 'failed') {
               clearInterval(pollInterval)
@@ -114,11 +140,30 @@ export default function BulkImportDialog({ isOpen, onClose, availableFiles = [] 
       } else {
         const error = await response.json()
         console.error('Failed to fetch bank accounts:', error)
-        toast({
-          title: 'Error',
-          description: error.error || 'Failed to fetch bank accounts',
-          variant: 'destructive'
-        })
+        
+        // Check if it's a token expiration error
+        if (error.code === 'XERO_TOKEN_EXPIRED' || error.requiresReconnect) {
+          toast({
+            title: 'Xero Session Expired',
+            description: 'Your Xero session has expired. Please reconnect your Xero account in Settings.',
+            variant: 'destructive',
+            action: (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.location.href = '/settings?tab=integrations'}
+              >
+                Go to Settings
+              </Button>
+            )
+          })
+        } else {
+          toast({
+            title: 'Error',
+            description: error.error || 'Failed to fetch bank accounts',
+            variant: 'destructive'
+          })
+        }
       }
     } catch (error) {
       console.error('Failed to fetch bank accounts:', error)
@@ -408,7 +453,7 @@ export default function BulkImportDialog({ isOpen, onClose, availableFiles = [] 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5" />
-            Bulk Import to Xero
+            Bulk Export to Xero
           </DialogTitle>
           <DialogDescription>
             Step {step} of 3: {

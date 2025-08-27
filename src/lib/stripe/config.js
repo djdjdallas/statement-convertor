@@ -21,6 +21,7 @@ export const STRIPE_PRODUCTS = {
       '500 conversions/month',
       'Advanced AI recognition',
       'Google Sheets integration',
+      'Xero integration (single file export)',
       'Bulk processing (up to 10 files)',
       'Transaction categorization',
       'Priority support',
@@ -53,6 +54,7 @@ export const STRIPE_PRODUCTS = {
     features: [
       '2000 conversions/month',
       'Everything in Professional',
+      'Bulk export to Xero (multiple files)',
       'White-label options',
       'Team collaboration (5 users)',
       'Advanced API (1000 calls/month)',
@@ -78,6 +80,8 @@ export const STRIPE_PRODUCTS = {
     features: [
       'Unlimited conversions',
       'Unlimited users',
+      'Unlimited Xero organizations',
+      'Custom Xero field mapping',
       'SLA guarantees',
       'Custom development',
       'On-premise option',

@@ -11,6 +11,7 @@ import {
   CheckCircle,
   Smartphone,
   Cloud,
+  Building,
 } from "lucide-react";
 
 const features = [
@@ -37,6 +38,12 @@ const features = [
     title: "Google Workspace Integration",
     description:
       "Seamlessly work with your financial data across Google's productivity suite. Export directly to Google Sheets and Drive.",
+  },
+  {
+    icon: Building,
+    title: "Xero Integration",
+    description:
+      "Export transactions directly to Xero with automatic categorization and bank account matching. Bulk export multiple files at once.",
   },
   {
     icon: CheckCircle,

@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import FileUploader from '@/components/FileUploader'
 import { useAuth } from '@/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
+import { useUserProfile } from '@/hooks/useUserProfile'
+import { hasXeroAccess } from '@/lib/subscription-tiers'
 import { 
   ArrowLeft, 
   FileText, 
@@ -33,8 +35,12 @@ export default function UploadPage() {
   const [xeroConnections, setXeroConnections] = useState([])
   const [autoSendToXero, setAutoSendToXero] = useState(false)
   const { user } = useAuth()
+  const { profile: userProfileFromHook, subscriptionTier } = useUserProfile()
   const router = useRouter()
   const supabase = createClient()
+  
+  // Check if user has Xero access
+  const userHasXeroAccess = hasXeroAccess(subscriptionTier)
 
   useEffect(() => {
     if (!user) {
@@ -247,8 +253,8 @@ export default function UploadPage() {
               } : f)
             )
 
-            // Auto-send to Xero if enabled
-            if (autoSendToXero && xeroConnections.length > 0) {
+            // Auto-send to Xero if enabled and user has access
+            if (autoSendToXero && xeroConnections.length > 0 && userHasXeroAccess) {
               // TODO: Implement actual Xero export
               toast({
                 title: "Xero Export",
@@ -353,7 +359,7 @@ export default function UploadPage() {
                   Google Connected
                 </Badge>
               )}
-              {xeroConnections.length > 0 && (
+              {xeroConnections.length > 0 && userHasXeroAccess && (
                 <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
                   <Building className="w-3 h-3 mr-1" />
                   Xero Connected
@@ -431,45 +437,94 @@ export default function UploadPage() {
 
         {/* Xero Integration Options */}
         {xeroConnections.length > 0 && (
-          <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg shadow-md">
-                    <Building className="h-6 w-6 text-green-600" />
+          userHasXeroAccess ? (
+            <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-lg shadow-md">
+                      <Building className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <CardTitle>Xero Integration</CardTitle>
+                      <CardDescription>
+                        Connected to {xeroConnections.length} organization{xeroConnections.length !== 1 ? 's' : ''}
+                      </CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle>Xero Integration</CardTitle>
-                    <CardDescription>
-                      Connected to {xeroConnections.length} organization{xeroConnections.length !== 1 ? 's' : ''}
-                    </CardDescription>
-                  </div>
+                  <Badge variant="default" className="bg-green-600">
+                    <LinkIcon className="h-3 w-3 mr-1" />
+                    Connected
+                  </Badge>
                 </div>
-                <Badge variant="default" className="bg-green-600">
-                  <LinkIcon className="h-3 w-3 mr-1" />
-                  Connected
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-3">
-                <Checkbox 
-                  id="auto-xero" 
-                  checked={autoSendToXero}
-                  onCheckedChange={setAutoSendToXero}
-                />
-                <label 
-                  htmlFor="auto-xero" 
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  Automatically prepare files for Xero import after processing
-                </label>
-              </div>
-              <p className="text-sm text-gray-600 mt-2 ml-6">
-                Files will be marked for bulk import to Xero. You can review and complete the import from the dashboard.
-              </p>
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="auto-xero" 
+                    checked={autoSendToXero}
+                    onCheckedChange={setAutoSendToXero}
+                  />
+                  <label 
+                    htmlFor="auto-xero" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    Automatically prepare files for Xero export after processing
+                  </label>
+                </div>
+                <p className="text-sm text-gray-600 mt-2 ml-6">
+                  Files will be marked for bulk export to Xero. You can review and complete the export from the dashboard.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="mb-8 border-gray-200">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <Building className="h-6 w-6 text-gray-400" />
+                    </div>
+                    <div>
+                      <CardTitle>Xero Integration</CardTitle>
+                      <CardDescription>
+                        Professional feature - Upgrade to use Xero integration
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Badge variant="secondary">Pro</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="opacity-50">
+                      <Checkbox 
+                        id="auto-xero" 
+                        checked={false}
+                        disabled={true}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">
+                        Automatically prepare files for Xero export
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Available on Professional plans and above
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => router.push('/pricing')}
+                  >
+                    Upgrade
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )
         )}
 
         {/* File Uploader */}

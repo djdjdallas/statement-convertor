@@ -132,9 +132,20 @@ export async function GET(req) {
   } catch (error) {
     console.error('Get accounts error:', error)
     
+    // Check for refresh token expired error
+    if (error.message?.includes('Refresh token has expired')) {
+      return NextResponse.json({ 
+        error: 'Xero session expired. Please reconnect your Xero account.',
+        code: 'XERO_TOKEN_EXPIRED',
+        requiresReconnect: true
+      }, { status: 401 })
+    }
+    
     if (error.response?.statusCode === 401) {
       return NextResponse.json({ 
-        error: 'Xero authentication failed. Please reconnect your Xero account.' 
+        error: 'Xero authentication failed. Please reconnect your Xero account.',
+        code: 'XERO_AUTH_FAILED',
+        requiresReconnect: true
       }, { status: 401 })
     }
 

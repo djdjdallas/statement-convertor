@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
-import { SUBSCRIPTION_TIERS, checkUsageLimit } from '@/lib/subscription-tiers'
+import { SUBSCRIPTION_TIERS, checkUsageLimit, hasXeroAccess, hasBulkXeroExport } from '@/lib/subscription-tiers'
 import SubscriptionCard from '@/components/SubscriptionCard'
 import CheckoutSuccess from '@/components/CheckoutSuccess'
 import TrialStatusBanner from '@/components/TrialStatusBanner'
@@ -510,7 +510,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Xero Connection Status */}
-        {xeroConnections.length > 0 && (
+        {xeroConnections.length > 0 && hasXeroAccess(userTier) && (
           <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -533,13 +533,39 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button 
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => setShowBulkImport(true)}
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Bulk Import to Xero
-                </Button>
+                {hasBulkXeroExport(userTier) ? (
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => setShowBulkImport(true)}
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Bulk Export to Xero
+                  </Button>
+                ) : (
+                  <Button 
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                    onClick={() => {
+                      toast({
+                        title: "Business Plan Required",
+                        description: "Bulk export to Xero is available on Business plans and above. Upgrade to export multiple files at once.",
+                        variant: "default",
+                        action: (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => router.push('/pricing')}
+                          >
+                            View Plans
+                          </Button>
+                        )
+                      })
+                    }}
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Bulk Export to Xero
+                    <Badge className="ml-2" variant="secondary">Business</Badge>
+                  </Button>
+                )}
                 <Link href="/settings">
                   <Button variant="outline" className="w-full border-green-300 hover:bg-green-50">
                     <Settings className="h-4 w-4 mr-2" />

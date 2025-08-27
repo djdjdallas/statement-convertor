@@ -18,7 +18,9 @@ export const SUBSCRIPTION_TIERS = {
       exportFormats: ['csv'],
       apiAccess: false,
       bulkUploadLimit: 1,
-      teamMembers: 1
+      teamMembers: 1,
+      xeroAccess: false,
+      bulkXeroExport: false
     }
   },
   professional: {
@@ -35,7 +37,9 @@ export const SUBSCRIPTION_TIERS = {
       apiAccess: true,
       apiCallsPerMonth: STRIPE_PRODUCTS.professional.limits.apiCallsPerMonth,
       bulkUploadLimit: STRIPE_PRODUCTS.professional.limits.bulkUploadLimit,
-      teamMembers: STRIPE_PRODUCTS.professional.limits.teamMembers
+      teamMembers: STRIPE_PRODUCTS.professional.limits.teamMembers,
+      xeroAccess: true,
+      bulkXeroExport: false
     }
   },
   business: {
@@ -52,7 +56,9 @@ export const SUBSCRIPTION_TIERS = {
       apiAccess: true,
       apiCallsPerMonth: STRIPE_PRODUCTS.business.limits.apiCallsPerMonth,
       bulkUploadLimit: STRIPE_PRODUCTS.business.limits.bulkUploadLimit,
-      teamMembers: STRIPE_PRODUCTS.business.limits.teamMembers
+      teamMembers: STRIPE_PRODUCTS.business.limits.teamMembers,
+      xeroAccess: true,
+      bulkXeroExport: true
     }
   },
   enterprise: {
@@ -67,7 +73,10 @@ export const SUBSCRIPTION_TIERS = {
       apiAccess: true,
       apiCallsPerMonth: -1, // unlimited
       bulkUploadLimit: -1, // unlimited
-      teamMembers: -1 // unlimited
+      teamMembers: -1, // unlimited
+      xeroAccess: true,
+      bulkXeroExport: true,
+      xeroOrganizations: -1 // unlimited
     }
   }
 }
@@ -133,4 +142,22 @@ export function getPriceId(tierName, billingPeriod = 'monthly') {
   }
   
   return tier.monthlyPriceId || tier.stripePriceId
+}
+
+// Helper to check Xero access
+export function hasXeroAccess(tierName) {
+  const limits = getTierLimits(tierName)
+  return limits.xeroAccess === true
+}
+
+// Helper to check bulk Xero export access
+export function hasBulkXeroExport(tierName) {
+  const limits = getTierLimits(tierName)
+  return limits.bulkXeroExport === true
+}
+
+// Helper to get Xero organization limit
+export function getXeroOrganizationLimit(tierName) {
+  const limits = getTierLimits(tierName)
+  return limits.xeroOrganizations || 1
 }

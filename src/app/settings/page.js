@@ -11,6 +11,8 @@ import GoogleDriveIntegration from '@/components/GoogleDriveIntegration';
 import XeroConnectionStatus from '@/components/xero/XeroConnectionStatus';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { hasXeroAccess } from '@/lib/subscription-tiers';
+import { toast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -141,7 +143,36 @@ export default function SettingsPage() {
           <TabsContent value="integrations">
             <div className="space-y-6">
               {/* Xero Integration */}
-              <XeroConnectionStatus />
+              {hasXeroAccess(profile?.subscription_tier || 'free') ? (
+                <XeroConnectionStatus />
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="#13B5EA">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 1.97-1.97-1.97a.75.75 0 10-1.06 1.06l1.97 1.97-1.97 1.97a.75.75 0 101.06 1.06l1.97-1.97 1.97 1.97a.75.75 0 101.06-1.06l-1.97-1.97 1.97-1.97a.75.75 0 10-1.06-1.06zm-11.788 0a.75.75 0 100 1.5h3a.75.75 0 100-1.5h-3zm0 3.5a.75.75 0 100 1.5h3a.75.75 0 100-1.5h-3z"/>
+                      </svg>
+                      Xero Integration
+                    </CardTitle>
+                    <CardDescription>
+                      Connect Statement Desk to Xero for seamless accounting workflow
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 mb-4">
+                        Xero integration is available on Professional plans and above
+                      </p>
+                      <Button 
+                        onClick={() => router.push('/pricing')}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Upgrade to Professional
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               
               {/* Google Drive Integration */}
               <GoogleDriveIntegration />

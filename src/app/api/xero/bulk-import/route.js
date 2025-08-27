@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { BulkImportService } from '@/lib/xero/bulk-import-service'
 import { createClient } from '@/lib/supabase/server'
+import { hasBulkXeroExport } from '@/lib/subscription-tiers'
 
 export async function POST(request) {
   try {
@@ -9,6 +10,19 @@ export async function POST(request) {
     
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check user's subscription tier for bulk export access
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('subscription_tier')
+      .eq('id', user.id)
+      .single()
+
+    if (!hasBulkXeroExport(profile?.subscription_tier || 'free')) {
+      return NextResponse.json({ 
+        error: 'Bulk export to Xero requires a Business subscription or higher' 
+      }, { status: 403 })
     }
 
     const jobData = await request.json()

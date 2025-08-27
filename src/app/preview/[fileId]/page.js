@@ -11,6 +11,8 @@ import AIInsights from '@/components/AIInsights'
 import FinancialChat from '@/components/chat/FinancialChat'
 import { useAuth } from '@/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
+import { useUserProfile } from '@/hooks/useUserProfile'
+import { hasXeroAccess } from '@/lib/subscription-tiers'
 import { ArrowLeft, Download, Loader2, Brain, MessageCircle, Building, Zap } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -20,6 +22,7 @@ export default function PreviewPage() {
   const { fileId } = useParams()
   const router = useRouter()
   const { user } = useAuth()
+  const { profile, subscriptionTier } = useUserProfile()
   const [fileInfo, setFileInfo] = useState(null)
   const [transactions, setTransactions] = useState([])
   const [aiInsights, setAiInsights] = useState(null)
@@ -28,6 +31,9 @@ export default function PreviewPage() {
   const [exporting, setExporting] = useState({ csv: false, xlsx: false })
   const [activeTab, setActiveTab] = useState('data')
   const supabase = createClient()
+  
+  // Check if user has Xero access
+  const userHasXeroAccess = hasXeroAccess(subscriptionTier)
 
   useEffect(() => {
     if (!user) {
@@ -119,6 +125,27 @@ export default function PreviewPage() {
       if (response.ok) {
         const { accounts } = await response.json()
         setBankAccounts(accounts || [])
+      } else {
+        const error = await response.json()
+        
+        // Check if it's a token expiration error
+        if (error.code === 'XERO_TOKEN_EXPIRED' || error.requiresReconnect) {
+          toast({
+            title: 'Xero Session Expired',
+            description: 'Your Xero session has expired. Please reconnect your Xero account in Settings.',
+            variant: 'destructive',
+            action: (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => router.push('/settings?tab=integrations')}
+              >
+                Go to Settings
+              </Button>
+            )
+          })
+          setShowXeroExport(false)
+        }
       }
     } catch (error) {
       console.error('Failed to fetch bank accounts:', error)
@@ -169,11 +196,31 @@ export default function PreviewPage() {
 
     } catch (error) {
       console.error('Xero export error:', error)
-      toast({
-        title: 'Export Failed',
-        description: error.message || 'Failed to export to Xero. Please try again.',
-        variant: 'destructive'
-      })
+      
+      // Check if it's a token expiration error
+      if (error.message?.includes('Xero session expired') || 
+          error.message?.includes('authentication failed')) {
+        toast({
+          title: 'Xero Session Expired',
+          description: 'Your Xero session has expired. Please reconnect your Xero account in Settings.',
+          variant: 'destructive',
+          action: (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => router.push('/settings?tab=integrations')}
+            >
+              Go to Settings
+            </Button>
+          )
+        })
+      } else {
+        toast({
+          title: 'Export Failed',
+          description: error.message || 'Failed to export to Xero. Please try again.',
+          variant: 'destructive'
+        })
+      }
     } finally {
       setExporting(prev => ({ ...prev, xero: false }))
     }
@@ -360,20 +407,47 @@ export default function PreviewPage() {
               </Button>
               
               {xeroConnections.length > 0 && !fileInfo?.xero_import_id && (
-                <Button
-                  onClick={() => setShowXeroExport(true)}
-                  variant="outline"
-                  className="border-green-300 hover:bg-green-50"
-                >
-                  <Building className="h-4 w-4 mr-2" />
-                  Export to Xero
-                </Button>
+                userHasXeroAccess ? (
+                  <Button
+                    onClick={() => setShowXeroExport(true)}
+                    variant="outline"
+                    className="border-green-300 hover:bg-green-50"
+                  >
+                    <Building className="h-4 w-4 mr-2" />
+                    Export to Xero
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      toast({
+                        title: "Premium Feature",
+                        description: "Xero export is available on Professional plans and above. Upgrade to export directly to Xero.",
+                        variant: "default",
+                        action: (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => router.push('/pricing')}
+                          >
+                            View Plans
+                          </Button>
+                        )
+                      })
+                    }}
+                    variant="outline"
+                    className="border-gray-300"
+                  >
+                    <Building className="h-4 w-4 mr-2" />
+                    Export to Xero
+                    <Badge className="ml-2" variant="secondary">Pro</Badge>
+                  </Button>
+                )
               )}
               
               {fileInfo?.xero_import_id && (
                 <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50 px-3 py-2">
                   <Zap className="h-4 w-4 mr-1" />
-                  Imported to Xero
+                  Exported to Xero
                 </Badge>
               )}
             </div>
@@ -508,7 +582,7 @@ export default function PreviewPage() {
                 Export to Xero
               </DialogTitle>
               <DialogDescription>
-                Select the Xero organization and bank account to import these transactions
+                Select the Xero organization and bank account to export these transactions
               </DialogDescription>
             </DialogHeader>
             
@@ -559,7 +633,7 @@ export default function PreviewPage() {
               
               <div className="bg-blue-50 p-4 rounded-lg">
                 <p className="text-sm text-blue-700">
-                  <strong>{transactions.length} transactions</strong> will be imported to Xero.
+                  <strong>{transactions.length} transactions</strong> will be exported to Xero.
                   Each transaction will be matched to the bank account and categorized automatically.
                 </p>
               </div>

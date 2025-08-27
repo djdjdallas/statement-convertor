@@ -124,6 +124,9 @@ export class XeroImportService {
     } catch (error) {
       console.error('Import service error:', error)
       
+      // Check if this is a refresh token error
+      const isTokenExpired = error.message?.includes('Refresh token has expired')
+      
       // Record failed import if jobId provided
       if (options.jobId) {
         await this.supabase
@@ -135,8 +138,17 @@ export class XeroImportService {
             bank_account_id: bankAccountId,
             status: 'failed',
             error_message: error.message,
+            error_code: isTokenExpired ? 'XERO_TOKEN_EXPIRED' : null,
             bulk_job_id: options.jobId
           })
+      }
+
+      // Re-throw with enhanced error info
+      if (isTokenExpired) {
+        const tokenError = new Error('Xero session expired. Please reconnect your Xero account.')
+        tokenError.code = 'XERO_TOKEN_EXPIRED'
+        tokenError.requiresReconnect = true
+        throw tokenError
       }
 
       throw error

@@ -10,11 +10,11 @@ export default function Hero() {
         <div className="px-4 py-12 sm:px-6 sm:py-16 lg:col-span-7 lg:px-0 lg:py-24 xl:col-span-6">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
             Convert PDF Bank Statements to 
-            <span className="text-blue-600"> Excel & CSV</span>
+            <span className="text-blue-600"> Excel, CSV & Xero</span>
           </h1>
           <p className="mt-6 text-xl text-gray-500">
             Transform your PDF bank statements into organized Excel and CSV files in seconds. 
-            Export directly to Google Sheets. Secure, accurate, and designed for professionals who value their time.
+            Export directly to Google Sheets and Xero. Secure, accurate, and designed for professionals who value their time.
           </p>
           
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -109,7 +109,7 @@ export default function Hero() {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-900">3. Download or Export</h4>
-                      <p className="text-sm text-gray-500">Get Excel, CSV, or export to Google Sheets</p>
+                      <p className="text-sm text-gray-500">Get Excel, CSV, or export to Google Sheets & Xero</p>
                     </div>
                   </div>
                 </div>

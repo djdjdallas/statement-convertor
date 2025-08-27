@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { XeroService } from '@/lib/xero/xero-service'
+import { hasXeroAccess } from '@/lib/subscription-tiers'
 
 export async function POST(req) {
   try {
@@ -11,6 +12,19 @@ export async function POST(req) {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check user's subscription tier
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('subscription_tier')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!hasXeroAccess(profile?.subscription_tier || 'free')) {
+      return NextResponse.json({ 
+        error: 'Xero export requires a Professional subscription or higher' 
+      }, { status: 403 })
     }
 
     const { fileId, tenantId, bankAccountId } = await req.json()
@@ -126,10 +140,21 @@ export async function POST(req) {
   } catch (error) {
     console.error('Xero export error:', error)
     
+    // Check for refresh token expired error
+    if (error.message?.includes('Refresh token has expired') || error.code === 'XERO_TOKEN_EXPIRED') {
+      return NextResponse.json({ 
+        error: 'Xero session expired. Please reconnect your Xero account.',
+        code: 'XERO_TOKEN_EXPIRED',
+        requiresReconnect: true
+      }, { status: 401 })
+    }
+    
     // Handle specific Xero errors
     if (error.response?.statusCode === 401) {
       return NextResponse.json({ 
-        error: 'Xero authentication failed. Please reconnect your Xero account.' 
+        error: 'Xero authentication failed. Please reconnect your Xero account.',
+        code: 'XERO_AUTH_FAILED',
+        requiresReconnect: true
       }, { status: 401 })
     }
     
