@@ -276,148 +276,173 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Modern Header */}
-        <div className="mb-12">
-          <div className="flex items-center space-x-4 mb-6">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-200">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
+      {/* Unified Header with Glass Morphism */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-xl shadow-lg">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">Statement Desk</span>
+              </Link>
+              <Badge 
+                variant="outline" 
+                className={`capitalize px-3 py-1 text-xs font-medium border ${
+                  (userProfile?.subscription_tier || 'free') === 'premium' 
+                    ? 'border-purple-500 text-purple-700 bg-purple-50' 
+                    : (userProfile?.subscription_tier || 'free') === 'basic'
+                    ? 'border-blue-500 text-blue-700 bg-blue-50'
+                    : 'border-gray-300 text-gray-600 bg-gray-50'
+                }`}
+              >
+                {userProfile?.subscription_tier || 'free'}
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/chat">
+                <Button variant="ghost" size="sm" className="hover:bg-white/60">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  AI Chat
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm" className="hover:bg-white/60">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+            </div>
           </div>
-          
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-white/30 shadow-xl">
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Welcome Section with Glass Effect */}
+        <div className="mb-12">
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/30 shadow-xl">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-blue-800 bg-clip-text text-transparent flex items-center">
-                  <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3 rounded-xl shadow-lg mr-4">
-                    <Brain className="h-8 w-8 text-white" />
-                  </div>
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-700 via-blue-700 to-indigo-700 bg-clip-text text-transparent mb-4">
                   AI Financial Analytics
-                  <TrendingUp className="h-8 w-8 ml-3 text-green-500" />
                 </h1>
-                <p className="text-gray-600 mt-3 text-lg">
+                <p className="text-gray-600 text-lg max-w-2xl">
                   Advanced insights and forecasting powered by artificial intelligence
                 </p>
-                <div className="flex items-center space-x-4 mt-4">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <FileText className="h-4 w-4 mr-1" />
+                <div className="flex items-center space-x-6 mt-6">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <FileText className="h-4 w-4 mr-2 text-blue-600" />
                     {stats.totalFiles} files analyzed
                   </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Calendar className="h-4 w-4 mr-1" />
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Calendar className="h-4 w-4 mr-2 text-indigo-600" />
                     {stats.dateRange ? `${formatDate(stats.dateRange.from)} - ${formatDate(stats.dateRange.to)}` : 'No date range'}
                   </div>
+                  {stats.aiEnhanced > 0 && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Brain className="h-4 w-4 mr-2 text-purple-600" />
+                      {stats.aiEnhanced} AI enhanced
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div className="mt-6 lg:mt-0 flex flex-col space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Badge 
-                    variant="outline" 
-                    className={`capitalize px-3 py-1 font-medium border-2 ${
-                      (userProfile?.subscription_tier || 'free') === 'premium' 
-                        ? 'border-purple-500 text-purple-700 bg-purple-50' 
-                        : (userProfile?.subscription_tier || 'free') === 'basic'
-                        ? 'border-blue-500 text-blue-700 bg-blue-50'
-                        : 'border-gray-300 text-gray-600 bg-gray-50'
-                    }`}
-                  >
-                    ✨ {userProfile?.subscription_tier || 'free'} Plan
-                  </Badge>
-                  {stats.aiEnhanced > 0 && (
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 shadow-lg">
-                      <Brain className="h-3 w-3 mr-1" />
-                      AI Enhanced ({stats.aiEnhanced} files)
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex space-x-2">
-                  <Link href="/chat">
-                    <Button variant="outline" className="border-2 border-orange-200 hover:bg-orange-50 transition-all duration-300">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      AI Chat
-                    </Button>
-                  </Link>
+              <div className="mt-6 lg:mt-0">
+                <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-1 rounded-2xl shadow-xl">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4">
+                    <BarChart3 className="h-16 w-16 text-transparent bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text" style={{fill: 'url(#gradient-analytics)'}} />
+                    <svg width="0" height="0">
+                      <defs>
+                        <linearGradient id="gradient-analytics" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#9333ea" />
+                          <stop offset="100%" stopColor="#2563eb" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Overview Stats */}
+        {/* Stats Cards with Glass Effect and Animations */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <FileText className="h-8 w-8 text-blue-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Files Analyzed</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalFiles}</p>
-                </div>
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Files Analyzed</p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent mt-1">
+                  {stats.totalFiles}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg hover:scale-110 transition-transform duration-300">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <BarChart3 className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Transactions</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalTransactions.toLocaleString()}</p>
-                </div>
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Transactions</p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-green-700 to-emerald-700 bg-clip-text text-transparent mt-1">
+                  {stats.totalTransactions.toLocaleString()}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-xl shadow-lg hover:scale-110 transition-transform duration-300">
+                <DollarSign className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Brain className="h-8 w-8 text-purple-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">AI Enhanced</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.aiEnhanced}</p>
-                </div>
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">AI Enhanced</p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent mt-1">
+                  {stats.aiEnhanced}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-3 rounded-xl shadow-lg hover:scale-110 transition-transform duration-300">
+                <Brain className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Calendar className="h-8 w-8 text-orange-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Date Range</p>
-                  <p className="text-sm font-bold text-gray-900">
-                    {stats.dateRange ? (
-                      <>
-                        {formatDate(stats.dateRange.from)}
-                        <br />
-                        <span className="text-xs text-gray-500">to {formatDate(stats.dateRange.to)}</span>
-                      </>
-                    ) : (
-                      'N/A'
-                    )}
-                  </p>
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Date Range</p>
+                <div className="text-sm font-bold text-gray-900 mt-1">
+                  {stats.dateRange ? (
+                    <>
+                      <span className="block">{formatDate(stats.dateRange.from)}</span>
+                      <span className="text-xs text-gray-500">to {formatDate(stats.dateRange.to)}</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-400">N/A</span>
+                  )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-gradient-to-r from-orange-500 to-red-600 p-3 rounded-xl shadow-lg hover:scale-110 transition-transform duration-300">
+                <Calendar className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs with Glass Effect */}
         <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg p-2">
+            <nav className="flex space-x-2">
               <button
                 onClick={() => setActiveTab('forecast')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm flex items-center ${
+                className={`py-3 px-6 rounded-lg font-medium text-sm flex items-center transition-all duration-200 ${
                   activeTab === 'forecast'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
                 }`}
               >
                 <TrendingUp className="h-4 w-4 mr-2" />
@@ -426,10 +451,10 @@ export default function AnalyticsPage() {
               
               <button
                 onClick={() => setActiveTab('budget')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm flex items-center ${
+                className={`py-3 px-6 rounded-lg font-medium text-sm flex items-center transition-all duration-200 ${
                   activeTab === 'budget'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
                 }`}
               >
                 <Target className="h-4 w-4 mr-2" />
@@ -438,10 +463,10 @@ export default function AnalyticsPage() {
               
               <button
                 onClick={() => setActiveTab('chat')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm flex items-center ${
+                className={`py-3 px-6 rounded-lg font-medium text-sm flex items-center transition-all duration-200 ${
                   activeTab === 'chat'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
                 }`}
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
@@ -451,52 +476,61 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'forecast' && (
-          <CashFlowForecast 
-            transactions={transactions}
-            onRefresh={fetchAnalyticsData}
-          />
-        )}
+        {/* Tab Content with Glass Container */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/30 shadow-xl">
+          {activeTab === 'forecast' && (
+            <div className="p-6">
+              <CashFlowForecast 
+                transactions={transactions}
+                onRefresh={fetchAnalyticsData}
+              />
+            </div>
+          )}
 
-        {activeTab === 'budget' && (
-          <BudgetRecommendations 
-            transactions={transactions}
-            userProfile={userProfile}
-          />
-        )}
+          {activeTab === 'budget' && (
+            <div className="p-6">
+              <BudgetRecommendations 
+                transactions={transactions}
+                userProfile={userProfile}
+              />
+            </div>
+          )}
 
-        {activeTab === 'chat' && (
-          <div className="h-[600px]">
-            <FinancialChat 
-              transactions={transactions}
-              userProfile={userProfile}
-              className="h-full"
-            />
-          </div>
-        )}
-
-        {/* Upgrade Prompt for Free Users */}
-        {userProfile?.subscription_tier === 'free' && (
-          <Card className="mt-8 border-blue-200 bg-blue-50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-blue-900 mb-1">
-                    Unlock Advanced Analytics
-                  </h3>
-                  <p className="text-sm text-blue-700">
-                    Upgrade to get unlimited AI insights, extended forecasts, and premium recommendations
-                  </p>
-                </div>
-                <Link href="/pricing">
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    Upgrade Now
-                  </Button>
-                </Link>
+          {activeTab === 'chat' && (
+            <div className="p-6">
+              <div className="h-[600px]">
+                <FinancialChat 
+                  transactions={transactions}
+                  userProfile={userProfile}
+                  className="h-full"
+                />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
+        </div>
+
+        {/* Upgrade Prompt for Free Users with Glass Effect */}
+        {userProfile?.subscription_tier === 'free' && (
+          <div className="mt-8 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-xl border border-white/30 shadow-xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2 flex items-center text-lg">
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-lg shadow-md mr-3">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
+                  Unlock Advanced Analytics
+                </h3>
+                <p className="text-gray-600">
+                  Upgrade to get unlimited AI insights, extended forecasts, and premium recommendations
+                </p>
+              </div>
+              <Link href="/pricing">
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-6">
+                  Upgrade Now
+                </Button>
+              </Link>
+            </div>
+          </div>
         )}
       </div>
     </div>
