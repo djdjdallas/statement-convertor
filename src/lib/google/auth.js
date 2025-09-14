@@ -1,5 +1,7 @@
+// DEPRECATED: This file is being replaced by unified-oauth.js
+// Please use @/lib/google/unified-oauth instead
+
 import { google } from 'googleapis'
-import { OAuth2Client } from 'google-auth-library'
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/utils/supabase/server'
 import { 
@@ -9,14 +11,11 @@ import {
   handleTokenRefresh 
 } from './error-handler'
 import { tokenService } from './token-service'
+import { createOAuth2Client as createUnifiedOAuth2Client } from './unified-oauth'
 
-// Initialize OAuth2 client
+// Initialize OAuth2 client - now uses unified implementation
 export function createOAuth2Client() {
-  return new OAuth2Client(
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
-  )
+  return createUnifiedOAuth2Client()
 }
 
 // Get valid access token for a user

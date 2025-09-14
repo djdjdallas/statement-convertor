@@ -22,15 +22,11 @@ export const ADMIN_SCOPES = [
   'https://www.googleapis.com/auth/admin.reports.audit.readonly'
 ]
 
+// DEPRECATED: Use unified-oauth.js instead
 // Initialize OAuth2 client with proper redirect URI
 export function createOAuth2Client(redirectUri = null) {
-  const defaultRedirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
-  
-  return new OAuth2Client(
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    redirectUri || defaultRedirectUri
-  )
+  const { createOAuth2Client: createUnified } = require('./unified-oauth')
+  return createUnified(redirectUri)
 }
 
 // Create service account client for domain-wide delegation

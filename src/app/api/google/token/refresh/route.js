@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase-admin';
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
-);
+import { 
+  refreshAccessToken,
+  createOAuth2Client 
+} from '@/lib/google/unified-oauth';
 
 export async function POST(request) {
   try {
@@ -77,12 +74,9 @@ export async function POST(request) {
       );
     }
 
-    oauth2Client.setCredentials({
-      refresh_token: tokenData.refresh_token
-    });
-
     try {
-      const { credentials } = await oauth2Client.refreshAccessToken();
+      // Use unified OAuth to refresh the token
+      const credentials = await refreshAccessToken(tokenData.refresh_token);
       
       if (!credentials.access_token) {
         throw new Error('No access token in refresh response');

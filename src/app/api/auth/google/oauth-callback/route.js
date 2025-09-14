@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { OAuth2Client } from 'google-auth-library';
+import { 
+  getTokensFromCode, 
+  getUserInfo,
+  getOAuthCallbackUrl 
+} from '@/lib/google/unified-oauth';
 
 export async function GET(request) {
   try {
@@ -25,32 +29,19 @@ export async function GET(request) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=Unauthorized`);
     }
     
-    // Create OAuth2 client
-    const oauth2Client = new OAuth2Client(
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
-    );
-    
-    // Exchange code for tokens
-    const { tokens } = await oauth2Client.getToken(code);
+    // Exchange code for tokens using unified OAuth
+    const tokens = await getTokensFromCode(code);
     
     console.log('Got tokens from Google:', {
       hasAccessToken: !!tokens.access_token,
       hasRefreshToken: !!tokens.refresh_token,
       expiryDate: tokens.expiry_date,
-      scope: tokens.scope
+      scope: tokens.scope,
+      redirectUri: getOAuthCallbackUrl() // Log for debugging
     });
     
-    // Get user info from Google
-    oauth2Client.setCredentials(tokens);
-    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`,
-      },
-    });
-    
-    const userInfo = await response.json();
+    // Get user info from Google using unified OAuth
+    const userInfo = await getUserInfo(tokens.access_token);
     
     // Store the tokens
     const expiresAt = new Date(tokens.expiry_date);
