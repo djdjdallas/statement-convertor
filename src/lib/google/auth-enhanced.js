@@ -24,7 +24,7 @@ export const ADMIN_SCOPES = [
 
 // Initialize OAuth2 client with proper redirect URI
 export function createOAuth2Client(redirectUri = null) {
-  const defaultRedirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/callback`
+  const defaultRedirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
   
   return new OAuth2Client(
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,

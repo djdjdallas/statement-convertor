@@ -15,7 +15,7 @@ export function createOAuth2Client() {
   return new OAuth2Client(
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
   )
 }
 

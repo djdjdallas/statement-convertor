@@ -2,24 +2,38 @@ import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 
 export const oauth2Client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`
 );
 
 export const SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile',
-  'https://www.googleapis.com/auth/drive.file'
+  'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/spreadsheets'
 ];
 
 export function getAuthUrl(state) {
-  return oauth2Client.generateAuthUrl({
+  if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+    throw new Error('NEXT_PUBLIC_GOOGLE_CLIENT_ID is not configured');
+  }
+  
+  if (!process.env.NEXT_PUBLIC_APP_URL) {
+    throw new Error('NEXT_PUBLIC_APP_URL is not configured');
+  }
+  
+  const params = new URLSearchParams({
+    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`,
+    response_type: 'code',
+    scope: SCOPES.join(' '),
     access_type: 'offline',
-    scope: SCOPES,
-    state: state,
-    prompt: 'consent'
+    prompt: 'consent',
+    state: state
   });
+  
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
 export async function getTokensFromCode(code) {
@@ -110,4 +124,12 @@ export async function listDriveFiles(accessToken, query = {}) {
   
   const response = await drive.files.list(params);
   return response.data;
+}
+
+/**
+ * Get the OAuth callback URL for the current environment
+ * @returns {string} - The callback URL
+ */
+export function getOAuthCallbackUrl() {
+  return `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`;
 }

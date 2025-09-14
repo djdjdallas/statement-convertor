@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createApiRouteClient } from '@/lib/supabase/api-route';
-import { getAuthUrl } from '@/lib/google-oauth';
 import crypto from 'crypto';
 
 export async function GET(request) {
@@ -43,8 +42,18 @@ export async function GET(request) {
       }
     }
     
-    // Generate the Google OAuth URL
-    const authUrl = getAuthUrl(state);
+    // Build OAuth URL directly here for consistency
+    const params = new URLSearchParams({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`,
+      response_type: 'code',
+      scope: 'email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+      access_type: 'offline',
+      prompt: 'consent',
+      state: state
+    });
+    
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
     
     return NextResponse.json({ authUrl });
   } catch (error) {
