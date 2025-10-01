@@ -29,8 +29,7 @@ describe('Google OAuth Flow', () => {
       expect(mockOAuth2Client.generateAuthUrl).toHaveBeenCalledWith({
         access_type: 'offline',
         scope: expect.arrayContaining([
-          'https://www.googleapis.com/auth/drive.file',
-          'https://www.googleapis.com/auth/spreadsheets'
+          'https://www.googleapis.com/auth/drive.file'
         ]),
         state: expect.any(String),
         prompt: 'consent'

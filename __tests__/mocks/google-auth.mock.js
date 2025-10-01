@@ -7,7 +7,7 @@ export const mockOAuth2Client = {
       refresh_token: 'mock-refresh-token',
       expiry_date: Date.now() + 3600000,
       token_type: 'Bearer',
-      scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets'
+      scope: 'https://www.googleapis.com/auth/drive.file'
     }
   }),
   setCredentials: jest.fn(),
@@ -55,14 +55,14 @@ export const mockWorkspaceDomainVerification = {
     domain: 'example.com',
     verified: true,
     adminConsent: true,
-    scopes: ['drive.file', 'spreadsheets'],
+    scopes: ['drive.file'],
     installationType: 'domain'
   },
   individual: {
     domain: null,
     verified: true,
     adminConsent: false,
-    scopes: ['drive.file', 'spreadsheets'],
+    scopes: ['drive.file'],
     installationType: 'individual'
   },
   pendingConsent: {
@@ -88,14 +88,14 @@ export const mockTokenScenarios = {
     refresh_token: 'valid-refresh-token',
     expiry_date: Date.now() + 3600000,
     token_type: 'Bearer',
-    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets'
+    scope: 'https://www.googleapis.com/auth/drive.file'
   },
   expired: {
     access_token: 'expired-access-token',
     refresh_token: 'expired-refresh-token',
     expiry_date: Date.now() - 3600000,
     token_type: 'Bearer',
-    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets'
+    scope: 'https://www.googleapis.com/auth/drive.file'
   },
   noRefreshToken: {
     access_token: 'no-refresh-access-token',

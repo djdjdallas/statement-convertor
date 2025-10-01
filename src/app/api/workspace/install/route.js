@@ -136,7 +136,6 @@ export async function POST(request) {
           delegation_enabled: true,
           scopes: [
             'https://www.googleapis.com/auth/drive.file',
-            'https://www.googleapis.com/auth/spreadsheets',
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile'
           ],
@@ -401,8 +400,7 @@ function getSetupInstructions(installationType, domain) {
           title: 'Add OAuth Scopes',
           description: 'Add the required OAuth scopes for Statement Desk',
           scopes: [
-            'https://www.googleapis.com/auth/drive.file',
-            'https://www.googleapis.com/auth/spreadsheets'
+            'https://www.googleapis.com/auth/drive.file'
           ]
         },
         {

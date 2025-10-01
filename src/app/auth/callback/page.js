@@ -49,7 +49,7 @@ function AuthCallbackContent() {
           p_access_token: providerToken,
           p_refresh_token: providerRefreshToken,
           p_expires_at: expiresAt.toISOString(),
-          p_scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets'],
+          p_scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file'],
           p_google_email: email,
           p_google_name: name,
           p_google_picture: picture,

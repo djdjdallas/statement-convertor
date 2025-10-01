@@ -20,7 +20,7 @@ export async function GET(request) {
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/oauth-callback`,
       response_type: 'code',
-      scope: 'email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+      scope: 'email profile https://www.googleapis.com/auth/drive.file',
       access_type: 'offline',
       prompt: 'consent',
       state: user.id // Pass user ID in state

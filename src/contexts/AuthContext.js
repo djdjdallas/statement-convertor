@@ -114,12 +114,12 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     const supabase = createClient()
     if (!supabase) return { data: null, error: new Error('Supabase not initialized') }
-    
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+        scopes: 'email profile https://www.googleapis.com/auth/drive.file',
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -132,17 +132,17 @@ export const AuthProvider = ({ children }) => {
   const linkGoogleAccount = async () => {
     const supabase = createClient()
     if (!supabase) return { data: null, error: new Error('Supabase not initialized') }
-    
+
     // For linking, we need to ensure the user is already authenticated
     if (!user) {
       return { data: null, error: new Error('User must be authenticated to link Google account') }
     }
-    
+
     const { data, error } = await supabase.auth.linkIdentity({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback?link=true`,
-        scopes: 'email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+        scopes: 'email profile https://www.googleapis.com/auth/drive.file',
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

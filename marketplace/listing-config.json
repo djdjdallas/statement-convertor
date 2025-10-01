@@ -178,10 +178,6 @@
         "reason": "Required to access and process PDF bank statements stored in Google Drive"
       },
       {
-        "scope": "https://www.googleapis.com/auth/spreadsheets",
-        "reason": "Required to create and update Google Sheets with processed transaction data"
-      },
-      {
         "scope": "https://www.googleapis.com/auth/userinfo.email",
         "reason": "Required to identify users and provide personalized service"
       },

@@ -268,17 +268,15 @@ describe('Workspace Installation', () => {
   describe('Permission Scopes', () => {
     it('should request appropriate scopes for domain installation', async () => {
       const generateAuthUrl = (installationType) => {
-        const scopes = installationType === 'domain' 
+        const scopes = installationType === 'domain'
           ? [
               'https://www.googleapis.com/auth/drive.file',
-              'https://www.googleapis.com/auth/spreadsheets',
               'https://www.googleapis.com/auth/admin.directory.user.readonly'
             ]
           : [
-              'https://www.googleapis.com/auth/drive.file',
-              'https://www.googleapis.com/auth/spreadsheets'
+              'https://www.googleapis.com/auth/drive.file'
             ]
-        
+
         return { scopes }
       }
 

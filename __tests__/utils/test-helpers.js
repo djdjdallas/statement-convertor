@@ -89,7 +89,7 @@ export function createMockGoogleTokens(overrides = {}) {
     refresh_token: 'mock-refresh-token',
     expiry_date: Date.now() + 3600000,
     token_type: 'Bearer',
-    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+    scope: 'https://www.googleapis.com/auth/drive.file',
     ...overrides
   }
 }

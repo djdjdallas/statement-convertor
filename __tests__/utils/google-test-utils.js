@@ -44,7 +44,7 @@ export class GoogleTestUtils {
     const {
       userId = 'test-user-id',
       expiresIn = 3600, // 1 hour
-      scopes = ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets'],
+      scopes = ['https://www.googleapis.com/auth/drive.file'],
       includeRefreshToken = true
     } = options
 
