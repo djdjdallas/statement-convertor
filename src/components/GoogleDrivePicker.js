@@ -269,8 +269,26 @@ export default function GoogleDrivePicker({
       const picker = pickerBuilder.build()
       console.log('Picker built, showing...')
 
+      // Ensure picker appears (Google Picker creates a modal with specific z-index)
       picker.setVisible(true)
       console.log('Picker visibility set to true')
+
+      // Add a timeout to check if picker appeared
+      setTimeout(() => {
+        const pickerDialog = document.querySelector('.picker-dialog, .picker, [role="dialog"]')
+        if (pickerDialog) {
+          console.log('✅ Picker dialog found in DOM:', pickerDialog)
+          // Ensure it's on top
+          pickerDialog.style.zIndex = '999999'
+        } else {
+          console.error('❌ Picker dialog NOT found in DOM - might be blocked by popup blocker or CSP')
+          toast({
+            title: 'Picker May Be Blocked',
+            description: 'If you don\'t see the picker, please check your popup blocker settings.',
+            variant: 'destructive'
+          })
+        }
+      }, 500)
     } catch (error) {
       console.error('Error opening picker:', error)
       toast({

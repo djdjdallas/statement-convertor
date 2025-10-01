@@ -110,12 +110,19 @@ export const securityConfig = {
       ],
       mediaSrc: ["'self'"],
       objectSrc: ["'none'"],
-      childSrc: ["'self'", 'https://accounts.google.com'],
+      childSrc: [
+        "'self'",
+        'https://accounts.google.com',
+        'https://docs.google.com',
+        'https://drive.google.com',
+        'https://*.google.com'
+      ],
       frameSrc: [
         "'self'",
         'https://accounts.google.com',
         'https://docs.google.com',
         'https://drive.google.com',
+        'https://*.google.com',
         'https://script.google.com',
         'https://js.stripe.com',
         'https://hooks.stripe.com'
@@ -134,7 +141,7 @@ export const securityConfig = {
     'X-Content-Type-Options': 'nosniff',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Permissions-Policy': 'camera=*, microphone=(), geolocation=()', // Allow camera for Google Picker
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
   },
 
