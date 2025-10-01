@@ -8,13 +8,16 @@ export const metadata = {
 
 import { AuthProvider } from '@/contexts/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
+import AnalyticsProvider from '@/components/AnalyticsProvider'
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
         <AuthProvider>
-          {children}
+          <AnalyticsProvider>
+            {children}
+          </AnalyticsProvider>
           <Toaster />
         </AuthProvider>
       </body>

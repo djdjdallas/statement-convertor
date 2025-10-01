@@ -16,6 +16,7 @@ import { Loader2, Eye, EyeOff, Check, Sparkles } from 'lucide-react'
 import GoogleSignInButton from '@/components/GoogleSignInButton'
 import SocialAuthDivider from '@/components/SocialAuthDivider'
 import { Badge } from '@/components/ui/badge'
+import analyticsService from '@/lib/analytics/analytics-service'
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -80,6 +81,14 @@ function SignUpContent() {
         setError(error.message)
         return
       }
+
+      // Track signup conversion event
+      analyticsService.trackConversion('user_signup', {
+        plan: plan,
+        trial: trial,
+        intended_tier: intendedTier,
+        signup_method: 'email'
+      })
 
       setSuccess(true)
     } catch (error) {

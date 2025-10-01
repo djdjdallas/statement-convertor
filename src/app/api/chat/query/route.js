@@ -61,6 +61,24 @@ export async function POST(request) {
       }
     })
 
+    // Track analytics event
+    await supabase.from('analytics_events').insert({
+      user_id: user.id,
+      session_id: 'server_chat',
+      visitor_id: user.id,
+      event_name: 'ai_chat_query',
+      event_category: 'feature_usage',
+      event_label: result.intent || 'general',
+      event_value: transactions.length,
+      page_path: '/api/chat/query',
+      metadata: {
+        intent: result.intent,
+        transaction_count: transactions.length,
+        conversation_id: conversationId || 'default',
+        has_data: result.data ? true : false
+      }
+    })
+
     return NextResponse.json({
       success: true,
       response: result.response,

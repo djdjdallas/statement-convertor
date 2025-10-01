@@ -254,6 +254,25 @@ export async function POST(request) {
           }
         })
 
+        // Track analytics event (use service role for server-side tracking)
+        await supabase.from('analytics_events').insert({
+          user_id: user.id,
+          session_id: 'server_export',
+          visitor_id: user.id,
+          event_name: format === 'sheets' ? 'export_google_sheets' : `export_${format}`,
+          event_category: 'conversion',
+          event_label: 'Google Drive export',
+          event_value: transactions.length,
+          page_path: '/api/export',
+          metadata: {
+            file_id: fileId,
+            format: format,
+            destination: 'google_drive',
+            transaction_count: transactions.length,
+            drive_file_id: uploadResult.id
+          }
+        })
+
         // Return Drive upload result
         return NextResponse.json({
           success: true,
@@ -306,6 +325,24 @@ export async function POST(request) {
           destination: 'local',
           transaction_count: transactions.length,
           export_id: exportRecord?.id
+        }
+      })
+
+      // Track analytics event
+      await supabase.from('analytics_events').insert({
+        user_id: user.id,
+        session_id: 'server_export',
+        visitor_id: user.id,
+        event_name: `export_${format}`,
+        event_category: 'conversion',
+        event_label: 'Local download',
+        event_value: transactions.length,
+        page_path: '/api/export',
+        metadata: {
+          file_id: fileId,
+          format: format,
+          destination: 'local',
+          transaction_count: transactions.length
         }
       })
 

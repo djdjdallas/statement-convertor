@@ -26,6 +26,7 @@ import {
 import Link from 'next/link'
 import { Checkbox } from '@/components/ui/checkbox.jsx'
 import { toast } from '@/hooks/use-toast'
+import analyticsService from '@/lib/analytics/analytics-service'
 
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState([])
@@ -181,6 +182,13 @@ export default function UploadPage() {
         }
       })
 
+      // Track analytics event
+      analyticsService.trackEvent('pdf_upload', 'conversion', 'File uploaded', file.size, {
+        filename: file.name,
+        file_size: file.size,
+        file_id: fileId
+      })
+
       return newFile
     } catch (error) {
       console.error('File upload error:', error)
@@ -244,14 +252,21 @@ export default function UploadPage() {
           }
 
           if (result.success) {
-            setUploadedFiles(prev => 
-              prev.map(f => f.id === file.id ? { 
-                ...f, 
+            setUploadedFiles(prev =>
+              prev.map(f => f.id === file.id ? {
+                ...f,
                 status: 'completed',
                 transactionCount: result.data.transactionCount,
                 bankType: result.data.bankType
               } : f)
             )
+
+            // Track processing completion event
+            analyticsService.trackEvent('pdf_processed', 'feature_usage', 'File processed successfully', result.data.transactionCount, {
+              file_id: file.id,
+              transaction_count: result.data.transactionCount,
+              bank_type: result.data.bankType
+            })
 
             // Auto-send to Xero if enabled and user has access
             if (autoSendToXero && xeroConnections.length > 0 && userHasXeroAccess) {
