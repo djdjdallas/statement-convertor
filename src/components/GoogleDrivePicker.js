@@ -229,7 +229,17 @@ export default function GoogleDrivePicker({
       return
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY
+    // Try multiple ways to get the API key (webpack config might be blocking process.env)
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY ||
+                   (typeof window !== 'undefined' && window.ENV?.NEXT_PUBLIC_GOOGLE_API_KEY) ||
+                   'AIzaSyBaYuZugtGye92Fgq5ufB9alGTtqAlATVE' // Fallback to hardcoded key for production
+
+    console.log('API Key check:', {
+      fromProcessEnv: !!process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+      fromWindow: !!(typeof window !== 'undefined' && window.ENV?.NEXT_PUBLIC_GOOGLE_API_KEY),
+      finalKey: apiKey ? 'Present (' + apiKey.substring(0, 15) + '...)' : 'Missing'
+    })
+
     if (!apiKey) {
       console.error('Google API key not configured')
       toast({
