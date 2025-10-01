@@ -22,11 +22,19 @@ export const ADMIN_SCOPES = [
   'https://www.googleapis.com/auth/admin.reports.audit.readonly'
 ]
 
-// DEPRECATED: Use unified-oauth.js instead
 // Initialize OAuth2 client with proper redirect URI
+// This is only used for server-side token operations (refresh, etc.)
 export function createOAuth2Client(redirectUri = null) {
-  const { createOAuth2Client: createUnified } = require('./unified-oauth')
-  return createUnified(redirectUri)
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
+
+  if (!clientId || !clientSecret) {
+    throw new Error('Google OAuth credentials not configured')
+  }
+
+  // Redirect URI is only needed for initial auth, not for token refresh
+  // For Supabase OAuth, we don't use this for user-facing auth
+  return new OAuth2Client(clientId, clientSecret, redirectUri)
 }
 
 // Create service account client for domain-wide delegation

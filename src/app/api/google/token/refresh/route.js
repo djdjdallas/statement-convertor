@@ -1,10 +1,23 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase-admin';
-import { 
-  refreshAccessToken,
-  createOAuth2Client 
-} from '@/lib/google/unified-oauth';
+import { OAuth2Client } from 'google-auth-library';
+
+// Helper function to refresh access token
+async function refreshAccessToken(refreshToken) {
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error('Google OAuth credentials not configured');
+  }
+
+  const oauth2Client = new OAuth2Client(clientId, clientSecret);
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+  const { credentials } = await oauth2Client.refreshAccessToken();
+  return credentials;
+}
 
 export async function POST(request) {
   try {

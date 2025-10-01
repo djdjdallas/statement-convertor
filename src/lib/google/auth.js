@@ -1,21 +1,26 @@
-// DEPRECATED: This file is being replaced by unified-oauth.js
-// Please use @/lib/google/unified-oauth instead
-
 import { google } from 'googleapis'
+import { OAuth2Client } from 'google-auth-library'
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/utils/supabase/server'
-import { 
-  withGoogleErrorHandling, 
+import {
+  withGoogleErrorHandling,
   GOOGLE_ERROR_CODES,
   createErrorResponse,
-  handleTokenRefresh 
+  handleTokenRefresh
 } from './error-handler'
 import { tokenService } from './token-service'
-import { createOAuth2Client as createUnifiedOAuth2Client } from './unified-oauth'
 
-// Initialize OAuth2 client - now uses unified implementation
+// Initialize OAuth2 client for server-side token operations
+// Note: User-facing auth is handled by Supabase OAuth
 export function createOAuth2Client() {
-  return createUnifiedOAuth2Client()
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
+
+  if (!clientId || !clientSecret) {
+    throw new Error('Google OAuth credentials not configured')
+  }
+
+  return new OAuth2Client(clientId, clientSecret)
 }
 
 // Get valid access token for a user

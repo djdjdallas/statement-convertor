@@ -1,6 +1,5 @@
 import crypto from 'crypto'
 import { google } from 'googleapis'
-// DEPRECATED: Migrating to unified-oauth.js
 import { OAuth2Client } from 'google-auth-library'
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/utils/supabase/server'
@@ -80,9 +79,16 @@ export function createOAuth2Client(options = {}) {
     return auth
   }
 
-  // Standard OAuth2 flow - use unified implementation
-  const { createOAuth2Client } = require('./unified-oauth')
-  return createOAuth2Client(options.redirectUri)
+  // Standard OAuth2 flow - for server-side token operations
+  // Note: User-facing auth is handled by Supabase OAuth
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
+
+  if (!clientId || !clientSecret) {
+    throw new Error('Google OAuth credentials not configured')
+  }
+
+  return new OAuth2Client(clientId, clientSecret, options.redirectUri)
 }
 
 /**
