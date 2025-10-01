@@ -139,25 +139,7 @@ export default function GoogleDrivePicker({
 
           // Only try to get token if Google is connected
           if (linkData.linked) {
-            const tokenResponse = await fetch('/api/google/auth/token', {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-
-            if (tokenResponse.ok) {
-              const tokenData = await tokenResponse.json()
-              console.log('Access token retrieved:', tokenData.accessToken ? 'Present' : 'Missing')
-              if (tokenData.accessToken) {
-                setAccessToken(tokenData.accessToken)
-              } else {
-                console.error('Token data missing access token:', tokenData)
-              }
-            } else {
-              const errorData = await tokenResponse.json()
-              console.error('Failed to get access token:', errorData)
-            }
+            await refreshAccessToken()
           }
         } else {
           console.error('Failed to check Google connection status:', linkResponse.status)
@@ -172,7 +154,39 @@ export default function GoogleDrivePicker({
     checkGoogleConnection()
   }, [user])
 
-  const handleOpenPicker = (e) => {
+  // Function to refresh access token
+  const refreshAccessToken = async () => {
+    try {
+      const tokenResponse = await fetch('/api/google/auth/token', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache', // Force fresh token
+        },
+      })
+
+      if (tokenResponse.ok) {
+        const tokenData = await tokenResponse.json()
+        console.log('Access token retrieved:', tokenData.accessToken ? 'Present' : 'Missing')
+        if (tokenData.accessToken) {
+          setAccessToken(tokenData.accessToken)
+          return tokenData.accessToken
+        } else {
+          console.error('Token data missing access token:', tokenData)
+          return null
+        }
+      } else {
+        const errorData = await tokenResponse.json()
+        console.error('Failed to get access token:', errorData)
+        return null
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error)
+      return null
+    }
+  }
+
+  const handleOpenPicker = async (e) => {
     // Prevent the click from propagating to parent elements (like Dropzone)
     if (e) {
       e.stopPropagation()
@@ -219,15 +233,21 @@ export default function GoogleDrivePicker({
       return
     }
 
-    if (!accessToken) {
-      console.error('Access token missing')
+    // Refresh token right before opening picker to ensure it's fresh
+    console.log('Refreshing access token before opening picker...')
+    const freshToken = await refreshAccessToken()
+
+    if (!freshToken) {
+      console.error('Failed to get fresh access token')
       toast({
-        title: 'Not Connected to Google Drive',
-        description: 'Please reconnect your Google account in Settings.',
+        title: 'Authentication Error',
+        description: 'Failed to refresh your Google access token. Please reconnect your account in Settings.',
         variant: 'destructive'
       })
       return
     }
+
+    console.log('Using fresh access token:', freshToken.substring(0, 20) + '...')
 
     // Try multiple ways to get the API key (webpack config might be blocking process.env)
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY ||
@@ -267,7 +287,7 @@ export default function GoogleDrivePicker({
 
       const pickerBuilder = new window.google.picker.PickerBuilder()
         .addView(view)
-        .setOAuthToken(accessToken)
+        .setOAuthToken(freshToken) // Use the freshly refreshed token
         .setDeveloperKey(apiKey)
         .setCallback(pickerCallback)
         .setTitle('Select a file from Google Drive')
