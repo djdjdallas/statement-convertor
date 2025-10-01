@@ -27,19 +27,78 @@ export default function GoogleDrivePicker({
   // Load Google Picker API
   useEffect(() => {
     const loadPickerApi = async () => {
-      if (window.gapi) {
+      // Check if both gapi and google.picker are already loaded
+      if (window.gapi && window.google?.picker) {
+        console.log('Google Picker API already loaded')
         setPickerApiLoaded(true)
         return
       }
 
+      // Check if script is already loading
+      const existingScript = document.querySelector('script[src*="apis.google.com/js/api.js"]')
+      if (existingScript) {
+        console.log('Google API script already exists, waiting for load...')
+        // Wait for it to load
+        existingScript.addEventListener('load', () => {
+          if (window.gapi) {
+            window.gapi.load('picker', {
+              callback: () => {
+                console.log('Google Picker loaded successfully')
+                setPickerApiLoaded(true)
+              },
+              onerror: () => {
+                console.error('Failed to load picker library')
+                toast({
+                  title: 'Failed to load Google Picker',
+                  description: 'Could not load Google Drive picker library. Please refresh and try again.',
+                  variant: 'destructive'
+                })
+                setIsInitializing(false)
+              }
+            })
+          }
+        })
+        return
+      }
+
+      console.log('Loading Google API script...')
       const script = document.createElement('script')
       script.src = GOOGLE_DRIVE_PICKER_API
+      script.async = true
+      script.defer = true
+
       script.onload = () => {
-        window.gapi.load('picker', () => {
-          setPickerApiLoaded(true)
+        console.log('Google API script loaded, loading picker library...')
+        if (!window.gapi) {
+          console.error('gapi not available after script load')
+          toast({
+            title: 'Failed to load Google Picker',
+            description: 'Google API not available. Please refresh and try again.',
+            variant: 'destructive'
+          })
+          setIsInitializing(false)
+          return
+        }
+
+        window.gapi.load('picker', {
+          callback: () => {
+            console.log('Google Picker loaded successfully')
+            setPickerApiLoaded(true)
+          },
+          onerror: () => {
+            console.error('Failed to load picker library')
+            toast({
+              title: 'Failed to load Google Picker',
+              description: 'Could not load Google Drive picker library. Please refresh and try again.',
+              variant: 'destructive'
+            })
+            setIsInitializing(false)
+          }
         })
       }
-      script.onerror = () => {
+
+      script.onerror = (error) => {
+        console.error('Failed to load Google API script:', error)
         toast({
           title: 'Failed to load Google Picker',
           description: 'Could not load Google Drive picker. Please refresh the page and try again.',
@@ -47,6 +106,7 @@ export default function GoogleDrivePicker({
         })
         setIsInitializing(false)
       }
+
       document.body.appendChild(script)
     }
 
@@ -56,9 +116,14 @@ export default function GoogleDrivePicker({
   // Check Google connection status and get access token
   useEffect(() => {
     const checkGoogleConnection = async () => {
-      if (!user) return
+      if (!user) {
+        setIsInitializing(false)
+        return
+      }
 
       try {
+        console.log('Checking Google connection for user:', user.id)
+
         // First check if Google is connected
         const linkResponse = await fetch('/api/auth/google/link', {
           method: 'GET',
@@ -69,8 +134,9 @@ export default function GoogleDrivePicker({
 
         if (linkResponse.ok) {
           const linkData = await linkResponse.json()
+          console.log('Google connection status:', linkData)
           setIsGoogleConnected(linkData.linked)
-          
+
           // Only try to get token if Google is connected
           if (linkData.linked) {
             const tokenResponse = await fetch('/api/google/auth/token', {
@@ -82,9 +148,19 @@ export default function GoogleDrivePicker({
 
             if (tokenResponse.ok) {
               const tokenData = await tokenResponse.json()
-              setAccessToken(tokenData.accessToken)
+              console.log('Access token retrieved:', tokenData.accessToken ? 'Present' : 'Missing')
+              if (tokenData.accessToken) {
+                setAccessToken(tokenData.accessToken)
+              } else {
+                console.error('Token data missing access token:', tokenData)
+              }
+            } else {
+              const errorData = await tokenResponse.json()
+              console.error('Failed to get access token:', errorData)
             }
           }
+        } else {
+          console.error('Failed to check Google connection status:', linkResponse.status)
         }
       } catch (error) {
         console.error('Error checking Google connection:', error)
@@ -102,9 +178,25 @@ export default function GoogleDrivePicker({
       e.stopPropagation()
       e.preventDefault()
     }
+
+    console.log('=== Opening Google Picker ===')
+    console.log('Google connected:', isGoogleConnected)
+    console.log('Picker API loaded:', pickerApiLoaded)
+    console.log('Access token present:', !!accessToken)
+    console.log('API key present:', !!process.env.NEXT_PUBLIC_GOOGLE_API_KEY)
+    console.log('window.google available:', !!window.google)
+    console.log('window.google.picker available:', !!window.google?.picker)
+
     if (!isGoogleConnected) {
+      toast({
+        title: 'Google Account Not Connected',
+        description: 'Please connect your Google account in Settings first.',
+        variant: 'destructive'
+      })
       // Redirect to settings page to connect Google
-      window.location.href = '/settings?tab=integrations'
+      setTimeout(() => {
+        window.location.href = '/settings?tab=integrations'
+      }, 2000)
       return
     }
 
@@ -116,11 +208,33 @@ export default function GoogleDrivePicker({
       })
       return
     }
-    
+
+    if (!window.google || !window.google.picker) {
+      console.error('Google Picker API not available:', { google: !!window.google, picker: !!window.google?.picker })
+      toast({
+        title: 'Google Picker Not Available',
+        description: 'The Google Picker API did not load correctly. Please refresh the page.',
+        variant: 'destructive'
+      })
+      return
+    }
+
     if (!accessToken) {
+      console.error('Access token missing')
       toast({
         title: 'Not Connected to Google Drive',
-        description: 'Please connect your Google account first in Settings.',
+        description: 'Please reconnect your Google account in Settings.',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY
+    if (!apiKey) {
+      console.error('Google API key not configured')
+      toast({
+        title: 'Configuration Error',
+        description: 'Google API key is not configured. Please contact support.',
         variant: 'destructive'
       })
       return
@@ -129,28 +243,29 @@ export default function GoogleDrivePicker({
     setIsLoading(true)
 
     try {
+      console.log('Creating picker view...')
       const view = new window.google.picker.DocsView(window.google.picker.ViewId.DOCS)
       view.setMimeTypes(acceptedMimeTypes.join(','))
 
+      console.log('Building picker...')
       const pickerBuilder = new window.google.picker.PickerBuilder()
         .addView(view)
         .setOAuthToken(accessToken)
+        .setDeveloperKey(apiKey)
         .setCallback(pickerCallback)
-        .setTitle('Select a file')
-      
-      // Only set developer key if it's defined
-      if (process.env.NEXT_PUBLIC_GOOGLE_API_KEY) {
-        pickerBuilder.setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_API_KEY)
-      }
-      
+        .setTitle('Select a file from Google Drive')
+        .setOrigin(window.location.origin)
+
       const picker = pickerBuilder.build()
+      console.log('Picker built, showing...')
 
       picker.setVisible(true)
+      console.log('Picker visibility set to true')
     } catch (error) {
       console.error('Error opening picker:', error)
       toast({
         title: 'Failed to Open Picker',
-        description: 'Could not open Google Drive picker. Please try again.',
+        description: `Could not open Google Drive picker: ${error.message}`,
         variant: 'destructive'
       })
       setIsLoading(false)

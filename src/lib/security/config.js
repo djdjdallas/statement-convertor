@@ -115,6 +115,7 @@ export const securityConfig = {
         "'self'",
         'https://accounts.google.com',
         'https://docs.google.com',
+        'https://drive.google.com',
         'https://script.google.com',
         'https://js.stripe.com',
         'https://hooks.stripe.com'
