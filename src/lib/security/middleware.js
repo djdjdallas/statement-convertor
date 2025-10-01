@@ -40,14 +40,28 @@ export async function securityMiddleware(request) {
 function applySecurityHeaders(response, request) {
   const url = new URL(request.url)
 
-  // Basic security headers
+  // Special handling for upload page (Google Picker needs relaxed CSP)
+  if (url.pathname.includes('/upload')) {
+    // Apply minimal headers for Google Picker compatibility
+    response.headers.set('X-Content-Type-Options', 'nosniff')
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+    response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none')
+    response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin')
+
+    // Relaxed CSP for Google Picker
+    const relaxedCSP = generateCSPHeader({
+      ...securityConfig.csp.directives,
+      frameSrc: ["'self'", 'https://*.google.com', 'https://*.gstatic.com'],
+      childSrc: ["'self'", 'https://*.google.com', 'https://*.gstatic.com'],
+    })
+    response.headers.set('Content-Security-Policy', relaxedCSP)
+    return
+  }
+
+  // Basic security headers for other pages
   Object.entries(securityConfig.headers).forEach(([key, value]) => {
     if (value) {
-      // Don't set X-Frame-Options for Google Picker pages
-      if (key === 'X-Frame-Options' && url.pathname.includes('/upload')) {
-        // Allow Google Picker to embed content
-        return
-      }
       response.headers.set(key, value)
     }
   })
@@ -65,12 +79,6 @@ function applySecurityHeaders(response, request) {
   if (request.headers.get('referer')?.includes('google.com')) {
     response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless')
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
-  }
-
-  // Allow cross-origin for Google Picker
-  if (url.pathname.includes('/upload')) {
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
-    response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin')
   }
 }
 

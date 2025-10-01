@@ -258,6 +258,13 @@ export default function GoogleDrivePicker({
       view.setMimeTypes(acceptedMimeTypes.join(','))
 
       console.log('Building picker...')
+      console.log('Picker configuration:', {
+        apiKey: apiKey.substring(0, 20) + '...',
+        accessToken: accessToken.substring(0, 20) + '...',
+        origin: window.location.origin,
+        mimeTypes: acceptedMimeTypes.join(',')
+      })
+
       const pickerBuilder = new window.google.picker.PickerBuilder()
         .addView(view)
         .setOAuthToken(accessToken)
@@ -269,17 +276,43 @@ export default function GoogleDrivePicker({
       const picker = pickerBuilder.build()
       console.log('Picker built, showing...')
 
+      // Listen for picker errors
+      window.addEventListener('error', (e) => {
+        if (e.message && e.message.includes('picker')) {
+          console.error('Picker error detected:', e.message)
+        }
+      }, { once: true })
+
       // Ensure picker appears (Google Picker creates a modal with specific z-index)
       picker.setVisible(true)
       console.log('Picker visibility set to true')
 
       // Add a timeout to check if picker appeared
       setTimeout(() => {
-        const pickerDialog = document.querySelector('.picker-dialog, .picker, [role="dialog"]')
+        const pickerDialog = document.querySelector('.picker-dialog, .picker, [role="dialog"], iframe.picker')
         if (pickerDialog) {
           console.log('✅ Picker dialog found in DOM:', pickerDialog)
           // Ensure it's on top
           pickerDialog.style.zIndex = '999999'
+
+          // Check if iframe has loaded content
+          const iframeSrc = pickerDialog.src || pickerDialog.getAttribute('src')
+          console.log('Picker iframe src:', iframeSrc)
+
+          if (!iframeSrc || iframeSrc === 'about:blank') {
+            console.error('⚠️ Picker iframe stuck at about:blank - likely API key issue')
+            console.error('Possible causes:')
+            console.error('1. Google Picker API not enabled in Google Cloud Console')
+            console.error('2. API key invalid or restricted')
+            console.error('3. Domain not authorized for this API key')
+            console.error('4. Check Google Cloud Console: https://console.cloud.google.com/apis/library/picker.googleapis.com')
+
+            toast({
+              title: 'Picker Loading Issue',
+              description: 'The Google Picker may not be properly configured. Please check the console for details.',
+              variant: 'destructive'
+            })
+          }
         } else {
           console.error('❌ Picker dialog NOT found in DOM - might be blocked by popup blocker or CSP')
           toast({
@@ -288,7 +321,7 @@ export default function GoogleDrivePicker({
             variant: 'destructive'
           })
         }
-      }, 500)
+      }, 1000)
     } catch (error) {
       console.error('Error opening picker:', error)
       toast({
@@ -301,7 +334,19 @@ export default function GoogleDrivePicker({
   }
 
   const pickerCallback = (data) => {
+    console.log('Picker callback triggered:', {
+      action: data.action,
+      viewToken: data[window.google.picker.Response.VIEW_TOKEN],
+      docs: data.docs?.length || 0
+    })
+
     setIsLoading(false)
+
+    // Log all actions for debugging
+    if (data.action === window.google.picker.Action.CANCEL) {
+      console.log('User cancelled picker')
+      return
+    }
 
     if (data.action === window.google.picker.Action.PICKED) {
       const fileCount = data.docs.length
