@@ -280,21 +280,23 @@ export default function GoogleDrivePicker({
       console.log('Building picker...')
       console.log('Picker configuration:', {
         apiKey: apiKey.substring(0, 20) + '...',
-        accessToken: accessToken.substring(0, 20) + '...',
+        freshToken: freshToken.substring(0, 20) + '...',
         origin: window.location.origin,
-        mimeTypes: acceptedMimeTypes.join(',')
+        mimeTypes: acceptedMimeTypes.join(','),
+        multipleSelection
       })
 
-      const pickerBuilder = new window.google.picker.PickerBuilder()
+      // Build picker using same pattern as working test-picker
+      const picker = new window.google.picker.PickerBuilder()
         .addView(view)
-        .setOAuthToken(freshToken) // Use the freshly refreshed token
+        .setOAuthToken(freshToken)
         .setDeveloperKey(apiKey)
         .setCallback(pickerCallback)
         .setTitle('Select a file from Google Drive')
         .setOrigin(window.location.origin)
+        .build()
 
-      const picker = pickerBuilder.build()
-      console.log('Picker built, showing...')
+      console.log('Picker built successfully, showing...')
 
       // Listen for picker errors
       window.addEventListener('error', (e) => {
@@ -354,21 +356,30 @@ export default function GoogleDrivePicker({
   }
 
   const pickerCallback = (data) => {
-    console.log('Picker callback triggered:', {
-      action: data.action,
+    const action = data.action
+    console.log(`📞 Picker callback: action=${action}`, {
+      action,
       viewToken: data[window.google.picker.Response.VIEW_TOKEN],
       docs: data.docs?.length || 0
     })
 
-    setIsLoading(false)
+    // Handle LOADED action (picker initialized successfully)
+    if (action === window.google.picker.Action.LOADED) {
+      console.log('✅ Picker loaded successfully')
+      return
+    }
 
-    // Log all actions for debugging
-    if (data.action === window.google.picker.Action.CANCEL) {
+    // Stop loading indicator for user actions
+    if (action === window.google.picker.Action.CANCEL || action === window.google.picker.Action.PICKED) {
+      setIsLoading(false)
+    }
+
+    if (action === window.google.picker.Action.CANCEL) {
       console.log('User cancelled picker')
       return
     }
 
-    if (data.action === window.google.picker.Action.PICKED) {
+    if (action === window.google.picker.Action.PICKED) {
       const fileCount = data.docs.length
       toast({
         title: 'File Selected',
