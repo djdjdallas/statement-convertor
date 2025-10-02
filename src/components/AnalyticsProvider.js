@@ -10,11 +10,11 @@
 
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import analyticsService from '@/lib/analytics/analytics-service'
 
-export default function AnalyticsProvider({ children }) {
+function AnalyticsTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -36,6 +36,16 @@ export default function AnalyticsProvider({ children }) {
     trackPageView()
   }, [pathname, searchParams]) // Re-run when pathname or search params change
 
-  // Just render children - this is a wrapper component
-  return <>{children}</>
+  return null
+}
+
+export default function AnalyticsProvider({ children }) {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <AnalyticsTracker />
+      </Suspense>
+      {children}
+    </>
+  )
 }
