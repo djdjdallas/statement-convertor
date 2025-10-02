@@ -193,155 +193,71 @@ export default function GoogleDrivePicker({
       e.preventDefault()
     }
 
-    console.log('=== Opening Google Picker ===')
-    console.log('Google connected:', isGoogleConnected)
-    console.log('Picker API loaded:', pickerApiLoaded)
-    console.log('Access token present:', !!accessToken)
-    console.log('API key present:', !!process.env.NEXT_PUBLIC_GOOGLE_API_KEY)
-    console.log('window.google available:', !!window.google)
-    console.log('window.google.picker available:', !!window.google?.picker)
+    console.log('🔍 Starting Google Picker...')
 
-    if (!isGoogleConnected) {
-      toast({
-        title: 'Google Account Not Connected',
-        description: 'Please connect your Google account in Settings first.',
-        variant: 'destructive'
-      })
-      // Redirect to settings page to connect Google
-      setTimeout(() => {
-        window.location.href = '/settings?tab=integrations'
-      }, 2000)
-      return
-    }
+    // EXACT COPY FROM TEST-PICKER - Use hardcoded API key
+    const apiKey = 'AIzaSyBaYuZugtGye92Fgq5ufB9alGTtqAlATVE'
+    console.log(`API Key: ${apiKey.substring(0, 20)}...`)
 
-    if (!pickerApiLoaded) {
-      toast({
-        title: 'Google Picker Not Ready',
-        description: 'The Google Drive picker is still loading. Please try again in a moment.',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    if (!window.google || !window.google.picker) {
-      console.error('Google Picker API not available:', { google: !!window.google, picker: !!window.google?.picker })
-      toast({
-        title: 'Google Picker Not Available',
-        description: 'The Google Picker API did not load correctly. Please refresh the page.',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    // Refresh token right before opening picker to ensure it's fresh
-    console.log('Refreshing access token before opening picker...')
-    const freshToken = await refreshAccessToken()
-
-    if (!freshToken) {
-      console.error('Failed to get fresh access token')
-      toast({
-        title: 'Authentication Error',
-        description: 'Failed to refresh your Google access token. Please reconnect your account in Settings.',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    console.log('Using fresh access token:', freshToken.substring(0, 20) + '...')
-
-    // Try multiple ways to get the API key (webpack config might be blocking process.env)
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY ||
-                   (typeof window !== 'undefined' && window.ENV?.NEXT_PUBLIC_GOOGLE_API_KEY) ||
-                   'AIzaSyBaYuZugtGye92Fgq5ufB9alGTtqAlATVE' // Fallback to hardcoded key for production
-
-    console.log('API Key check:', {
-      fromProcessEnv: !!process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
-      fromWindow: !!(typeof window !== 'undefined' && window.ENV?.NEXT_PUBLIC_GOOGLE_API_KEY),
-      finalKey: apiKey ? 'Present (' + apiKey.substring(0, 15) + '...)' : 'Missing'
-    })
-
-    if (!apiKey) {
-      console.error('Google API key not configured')
-      toast({
-        title: 'Configuration Error',
-        description: 'Google API key is not configured. Please contact support.',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    setIsLoading(true)
-
+    // EXACT COPY FROM TEST-PICKER - Get access token
     try {
-      console.log('Creating picker view...')
+      const tokenResponse = await fetch('/api/google/auth/token')
+      if (!tokenResponse.ok) {
+        console.log(`❌ Failed to get access token: ${tokenResponse.status}`)
+        toast({
+          title: 'Authentication Error',
+          description: 'Failed to get access token.',
+          variant: 'destructive'
+        })
+        return
+      }
+      const { accessToken } = await tokenResponse.json()
+      console.log(`✅ Access token retrieved: ${accessToken.substring(0, 20)}...`)
+
+      // EXACT COPY FROM TEST-PICKER - Build picker
+      console.log('🔨 Building picker...')
       const view = new window.google.picker.DocsView(window.google.picker.ViewId.DOCS)
       view.setMimeTypes(acceptedMimeTypes.join(','))
 
-      console.log('Building picker...')
-      console.log('Picker configuration:', {
-        apiKey: apiKey.substring(0, 20) + '...',
-        freshToken: freshToken.substring(0, 20) + '...',
-        origin: window.location.origin,
-        mimeTypes: acceptedMimeTypes.join(','),
-        multipleSelection
-      })
-
-      // Build picker using same pattern as working test-picker
       const picker = new window.google.picker.PickerBuilder()
         .addView(view)
-        .setOAuthToken(freshToken)
+        .setOAuthToken(accessToken)
         .setDeveloperKey(apiKey)
-        .setCallback(pickerCallback)
+        .setCallback((data) => {
+          console.log(`📞 Picker callback: action=${data.action}`)
+          pickerCallback(data)
+        })
         .setTitle('Select a file from Google Drive')
         .setOrigin(window.location.origin)
         .build()
 
-      console.log('Picker built successfully, showing...')
-
-      // Listen for picker errors
-      window.addEventListener('error', (e) => {
-        if (e.message && e.message.includes('picker')) {
-          console.error('Picker error detected:', e.message)
-        }
-      }, { once: true })
-
-      // Ensure picker appears (Google Picker creates a modal with specific z-index)
+      console.log('✅ Picker built successfully')
+      console.log('👁️ Setting picker visible...')
       picker.setVisible(true)
-      console.log('Picker visibility set to true')
 
-      // Add a timeout to check if picker appeared
+      // EXACT COPY FROM TEST-PICKER - Check iframe after 1 second
       setTimeout(() => {
-        const pickerDialog = document.querySelector('.picker-dialog, .picker, [role="dialog"], iframe.picker')
-        if (pickerDialog) {
-          console.log('✅ Picker dialog found in DOM:', pickerDialog)
-          // Ensure it's on top
-          pickerDialog.style.zIndex = '999999'
+        const iframe = document.querySelector('iframe.picker')
+        if (iframe) {
+          const src = iframe.src || iframe.getAttribute('src')
+          console.log(`📱 Picker iframe found: src=${src}`)
 
-          // Check if iframe has loaded content
-          const iframeSrc = pickerDialog.src || pickerDialog.getAttribute('src')
-          console.log('Picker iframe src:', iframeSrc)
-
-          if (!iframeSrc || iframeSrc === 'about:blank') {
-            console.error('⚠️ Picker iframe stuck at about:blank - likely API key issue')
-            console.error('Possible causes:')
-            console.error('1. Google Picker API not enabled in Google Cloud Console')
-            console.error('2. API key invalid or restricted')
-            console.error('3. Domain not authorized for this API key')
-            console.error('4. Check Google Cloud Console: https://console.cloud.google.com/apis/library/picker.googleapis.com')
+          if (src === 'about:blank') {
+            console.log('⚠️ ISSUE: Iframe stuck at about:blank')
+            console.log('Possible causes:')
+            console.log('1. API key restrictions blocking request')
+            console.log('2. Domain not authorized in API key settings')
+            console.log('3. Drive API not enabled for this API key')
+            console.log('4. OAuth scope missing drive.file permission')
 
             toast({
               title: 'Picker Loading Issue',
-              description: 'The Google Picker may not be properly configured. Please check the console for details.',
+              description: 'Check console for details.',
               variant: 'destructive'
             })
           }
         } else {
-          console.error('❌ Picker dialog NOT found in DOM - might be blocked by popup blocker or CSP')
-          toast({
-            title: 'Picker May Be Blocked',
-            description: 'If you don\'t see the picker, please check your popup blocker settings.',
-            variant: 'destructive'
-          })
+          console.log('❌ Picker iframe not found in DOM')
         }
       }, 1000)
     } catch (error) {
