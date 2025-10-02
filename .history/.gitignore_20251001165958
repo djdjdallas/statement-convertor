@@ -42,3 +42,19 @@ next-env.d.ts
 
 # supabase
 /database
+/docs
+/scripts
+/supabase
+
+GOOGLE_WORKSPACE_IMPLEMENTATION.md 
+GOOGLE_WORKSPACE_INTEGRATION.md
+STRIPE_SETUP.md
+.env.google.example
+.env.example
+XERO_IMPORT_GUIDE.md
+marketplace/DEPLOYMENT_GUIDE.md
+marketplace/SUBMISSION_CHECKLIST.md
+marketplace/TEST_ACCOUNTS.md
+marketplace/QUICK_START.md
+
+.md*
