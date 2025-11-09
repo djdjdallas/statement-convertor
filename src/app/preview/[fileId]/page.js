@@ -28,10 +28,15 @@ export default function PreviewPage() {
   const [aiInsights, setAiInsights] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [exporting, setExporting] = useState({ csv: false, xlsx: false })
+  const [exporting, setExporting] = useState({ csv: false, xlsx: false, xero: false })
   const [activeTab, setActiveTab] = useState('data')
+  const [xeroConnections, setXeroConnections] = useState([])
+  const [showXeroExport, setShowXeroExport] = useState(false)
+  const [selectedTenant, setSelectedTenant] = useState('')
+  const [selectedBankAccount, setSelectedBankAccount] = useState('')
+  const [bankAccounts, setBankAccounts] = useState([])
   const supabase = createClient()
-  
+
   // Check if user has Xero access
   const userHasXeroAccess = hasXeroAccess(subscriptionTier)
 
@@ -40,11 +45,16 @@ export default function PreviewPage() {
       router.push('/auth/signin')
       return
     }
-    
+
     if (fileId) {
       fetchFileInfo()
     }
-  }, [user, fileId, router])
+
+    // Fetch Xero connections if user has access
+    if (userHasXeroAccess) {
+      fetchXeroConnections()
+    }
+  }, [user, fileId, router, userHasXeroAccess])
 
   const fetchFileInfo = async () => {
     try {
