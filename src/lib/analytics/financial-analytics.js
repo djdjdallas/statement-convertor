@@ -335,7 +335,16 @@ Provide a JSON response with:
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const forecast = JSON.parse(response.content[0].text)
+      // Extract JSON from Claude's response, handling markdown code blocks
+      let responseText = response.content[0].text
+
+      // Remove markdown code blocks if present (```json ... ``` or ``` ... ```)
+      const jsonMatch = responseText.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/)
+      if (jsonMatch) {
+        responseText = jsonMatch[1].trim()
+      }
+
+      const forecast = JSON.parse(responseText)
       return forecast
     } catch (error) {
       console.error('AI forecast generation error:', error)

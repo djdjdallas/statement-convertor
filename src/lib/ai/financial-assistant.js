@@ -219,7 +219,16 @@ Be specific with numbers, dates, and actionable insights. Keep the tone friendly
         messages: [{ role: 'user', content: prompt }]
       })
 
-      const result = JSON.parse(response.content[0].text)
+      // Extract JSON from Claude's response, handling markdown code blocks
+      let responseText = response.content[0].text
+
+      // Remove markdown code blocks if present (```json ... ``` or ``` ... ```)
+      const jsonMatch = responseText.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/)
+      if (jsonMatch) {
+        responseText = jsonMatch[1].trim()
+      }
+
+      const result = JSON.parse(responseText)
       return result
 
     } catch (error) {
