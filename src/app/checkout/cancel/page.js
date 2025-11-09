@@ -36,7 +36,7 @@ export default function CheckoutCancelPage() {
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Review our pricing plans and features</li>
-                <li>• Start with a 14-day free trial</li>
+                <li>• Start with a 7-day free trial</li>
                 <li>• Contact support if you have questions</li>
               </ul>
             </div>

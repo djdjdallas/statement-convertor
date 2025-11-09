@@ -57,7 +57,7 @@ export default function TrialExpiredModal({ isOpen, onClose, userProfile }) {
       { text: 'CSV & Excel export', included: true },
       { text: 'Advanced AI recognition', included: true },
       { text: 'Google Sheets integration', included: true },
-      { text: 'API access (100 calls/month)', included: true },
+      { text: 'AI transaction categorization', included: true },
       { text: 'Priority support', included: true },
       { text: 'Bulk processing', included: true }
     ],
@@ -65,9 +65,9 @@ export default function TrialExpiredModal({ isOpen, onClose, userProfile }) {
       { text: '2000 conversions per month', included: true },
       { text: 'All export formats', included: true },
       { text: 'Everything in Professional', included: true },
-      { text: 'Team collaboration (5 users)', included: true },
-      { text: 'Advanced API (1000 calls)', included: true },
-      { text: 'White-label options', included: true },
+      { text: 'AI cash flow forecasting', included: true },
+      { text: 'AI budget recommendations', included: true },
+      { text: 'Financial assistant chatbot', included: true },
       { text: 'Dedicated support', included: true }
     ]
   }
@@ -78,7 +78,7 @@ export default function TrialExpiredModal({ isOpen, onClose, userProfile }) {
         <DialogHeader>
           <DialogTitle className="text-2xl">Your Trial Has Ended</DialogTitle>
           <DialogDescription className="text-base">
-            We hope you enjoyed your 14-day trial! Choose how you'd like to continue.
+            We hope you enjoyed your 7-day trial! Choose how you'd like to continue.
           </DialogDescription>
         </DialogHeader>
 

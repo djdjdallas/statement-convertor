@@ -23,13 +23,12 @@ export const STRIPE_PRODUCTS = {
       'Google Sheets integration',
       'Xero integration (single file export)',
       'Bulk processing (up to 10 files)',
-      'Transaction categorization',
-      'Priority support',
-      'API access (100 calls/month)'
+      'AI transaction categorization',
+      'Merchant name normalization',
+      'Priority support'
     ],
     limits: {
       conversionsPerMonth: 500,
-      apiCallsPerMonth: 100,
       bulkUploadLimit: 10,
       teamMembers: 1
     }
@@ -55,18 +54,17 @@ export const STRIPE_PRODUCTS = {
       '2000 conversions/month',
       'Everything in Professional',
       'Bulk export to Xero (multiple files)',
-      'White-label options',
-      'Team collaboration (5 users)',
-      'Advanced API (1000 calls/month)',
-      'Custom integrations',
+      'AI cash flow forecasting',
+      'AI budget recommendations',
+      'Spending trend analysis',
+      'Financial assistant chatbot',
       'Dedicated support',
       'Training session included'
     ],
     limits: {
       conversionsPerMonth: 2000,
-      apiCallsPerMonth: 1000,
       bulkUploadLimit: 50,
-      teamMembers: 5
+      teamMembers: 1
     }
   },
 

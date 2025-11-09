@@ -76,6 +76,14 @@ export async function POST(request) {
       )
     }
 
+    // Determine trial period based on tier
+    // Professional gets 7-day trial, Business gets no trial
+    let trialPeriodDays = null
+    if (tier === 'professional' || tier === 'basic') {
+      trialPeriodDays = 7
+    }
+    // business tier gets no trial (null)
+
     // Create checkout session with trial period
     const { session, error: sessionError } = await createCheckoutSession({
       userId: user.id,
@@ -83,7 +91,7 @@ export async function POST(request) {
       priceId,
       successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
       cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
-      trialPeriodDays: 14 // 14-day free trial
+      trialPeriodDays
     })
 
     if (sessionError) {

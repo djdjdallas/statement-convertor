@@ -16,7 +16,6 @@ export const SUBSCRIPTION_TIERS = {
       monthlyConversions: 10,
       maxFileSize: 10 * 1024 * 1024, // 10MB
       exportFormats: ['csv'],
-      apiAccess: false,
       bulkUploadLimit: 1,
       teamMembers: 1,
       xeroAccess: false,
@@ -34,8 +33,6 @@ export const SUBSCRIPTION_TIERS = {
       monthlyConversions: STRIPE_PRODUCTS.professional.limits.conversionsPerMonth,
       maxFileSize: 50 * 1024 * 1024, // 50MB
       exportFormats: ['csv', 'xlsx'],
-      apiAccess: true,
-      apiCallsPerMonth: STRIPE_PRODUCTS.professional.limits.apiCallsPerMonth,
       bulkUploadLimit: STRIPE_PRODUCTS.professional.limits.bulkUploadLimit,
       teamMembers: STRIPE_PRODUCTS.professional.limits.teamMembers,
       xeroAccess: true,
@@ -53,8 +50,6 @@ export const SUBSCRIPTION_TIERS = {
       monthlyConversions: STRIPE_PRODUCTS.business.limits.conversionsPerMonth,
       maxFileSize: 100 * 1024 * 1024, // 100MB
       exportFormats: ['csv', 'xlsx', 'json'],
-      apiAccess: true,
-      apiCallsPerMonth: STRIPE_PRODUCTS.business.limits.apiCallsPerMonth,
       bulkUploadLimit: STRIPE_PRODUCTS.business.limits.bulkUploadLimit,
       teamMembers: STRIPE_PRODUCTS.business.limits.teamMembers,
       xeroAccess: true,
@@ -70,8 +65,6 @@ export const SUBSCRIPTION_TIERS = {
       monthlyConversions: -1, // unlimited
       maxFileSize: 500 * 1024 * 1024, // 500MB
       exportFormats: ['csv', 'xlsx', 'json', 'xml'],
-      apiAccess: true,
-      apiCallsPerMonth: -1, // unlimited
       bulkUploadLimit: -1, // unlimited
       teamMembers: -1, // unlimited
       xeroAccess: true,
@@ -103,14 +96,6 @@ export function checkUsageLimit(tierName, currentUsage) {
   return currentUsage < limits.monthlyConversions
 }
 
-export function checkApiUsageLimit(tierName, currentApiCalls) {
-  const limits = getTierLimits(tierName)
-  
-  if (!limits.apiAccess) return false
-  if (limits.apiCallsPerMonth === -1) return true // unlimited
-  
-  return currentApiCalls < limits.apiCallsPerMonth
-}
 
 export function getMaxFileSize(tierName) {
   return getTierLimits(tierName).maxFileSize

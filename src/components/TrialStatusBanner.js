@@ -23,7 +23,7 @@ export default function TrialStatusBanner({ userProfile, userSubscription }) {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
       
       setDaysRemaining(Math.max(0, diffDays))
-      setProgress(((14 - diffDays) / 14) * 100)
+      setProgress(((7 - diffDays) / 7) * 100)
     }
   }, [userProfile])
 
@@ -90,7 +90,7 @@ export default function TrialStatusBanner({ userProfile, userSubscription }) {
               </p>
               <div className="mt-2 flex items-center gap-2">
                 <Progress value={progress} className="w-32 h-2" />
-                <span className="text-xs text-gray-500">Day {14 - daysRemaining} of 14</span>
+                <span className="text-xs text-gray-500">Day {7 - daysRemaining} of 7</span>
               </div>
             </div>
           </div>

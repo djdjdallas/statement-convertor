@@ -38,8 +38,11 @@ export default function Pricing() {
       // Redirect to signup with appropriate plan parameters
       if (tierId === "free") {
         window.location.href = "/auth/signup?plan=free";
-      } else {
+      } else if (tierId === "professional") {
         window.location.href = `/auth/signup?plan=trial&tier=${tierId}&trial=true`;
+      } else {
+        // Business plan - no trial, direct signup
+        window.location.href = `/auth/signup?plan=${tierId}`;
       }
       return;
     }
@@ -80,7 +83,7 @@ export default function Pricing() {
             Choose the right plan for you
           </p>
           <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            Start with our 14-day free trial. No credit card required.
+            Try Professional free for 7 days. No credit card required.
           </p>
         </div>
 
@@ -173,15 +176,22 @@ export default function Pricing() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   {!user ? (
-                    tier.id === "free" ? "Start Free" : "Start 14-Day Trial"
+                    tier.id === "free" ? "Start Free" :
+                    tier.id === "professional" ? "Start 7-Day Trial" :
+                    "Subscribe Now"
                   ) : (
                     tier.id === "free" ? "Go to Dashboard" : "Upgrade Now"
                   )}
                 </Button>
 
-                {tier.id !== "free" && (
+                {tier.id === "professional" && (
                   <p className="text-center text-sm text-gray-500 mt-3">
-                    14-day free trial • Cancel anytime
+                    7-day free trial • Cancel anytime
+                  </p>
+                )}
+                {tier.id === "business" && (
+                  <p className="text-center text-sm text-gray-500 mt-3">
+                    Cancel anytime
                   </p>
                 )}
               </CardContent>
@@ -250,7 +260,7 @@ export default function Pricing() {
                 Do you offer a free trial?
               </h5>
               <p className="text-sm text-gray-600">
-                Yes! All paid plans include a 14-day free trial. No credit card
+                Yes! The Professional plan includes a 7-day free trial. No credit card
                 required to start.
               </p>
             </div>

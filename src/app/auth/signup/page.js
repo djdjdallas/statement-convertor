@@ -61,11 +61,12 @@ function SignUpContent() {
       setError('')
       
       // Calculate trial dates if this is a trial signup
+      // Professional plan gets 7-day trial, Business gets no trial
       const trialData = trial ? {
         signup_intent: 'trial',
         intended_tier: intendedTier,
         trial_start_date: new Date().toISOString(),
-        trial_end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() // 14 days from now
+        trial_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
       } : {
         signup_intent: 'free'
       }
@@ -157,7 +158,7 @@ function SignUpContent() {
             <CardTitle>
               {trial ? (
                 <>
-                  Start your 14-day free trial
+                  Start your 7-day free trial
                   <Badge variant="secondary" className="ml-2">
                     <Sparkles className="w-3 h-3 mr-1" />
                     No credit card required
@@ -170,12 +171,12 @@ function SignUpContent() {
             <CardDescription>
               {trial ? (
                 <>
-                  Experience all {intendedTier === 'business' ? 'Business' : 'Professional'} features free for 14 days.
+                  Experience all {intendedTier === 'business' ? 'Business' : 'Professional'} features free for 7 days.
                   <span className="block mt-1 text-xs">
                     • {intendedTier === 'business' ? '2000' : '500'} conversions/month
                     • Advanced AI recognition
                     • Priority support
-                    • {intendedTier === 'business' ? 'Team collaboration' : 'API access'}
+                    • {intendedTier === 'business' ? 'AI budget recommendations' : 'AI transaction categorization'}
                   </span>
                 </>
               ) : (

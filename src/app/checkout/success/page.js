@@ -69,7 +69,7 @@ export default function CheckoutSuccessPage() {
             <h3 className="font-medium text-gray-900 mb-2">What's included in your plan:</h3>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>✓ All features unlocked for your subscription tier</li>
-              <li>✓ 14-day free trial period (cancel anytime)</li>
+              <li>✓ 7-day free trial period (cancel anytime)</li>
               <li>✓ Access to priority support</li>
               <li>✓ Monthly usage limits based on your plan</li>
             </ul>
