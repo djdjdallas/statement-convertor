@@ -78,10 +78,21 @@ export class EnhancedBankStatementParser {
       const pdfData = await pdfParser(pdfBuffer)
       const text = pdfData.text
       const numPages = pdfData.numpages || 1
-      
+
       console.log('Extracted text length:', text.length)
       console.log('Number of pages:', numPages)
-      
+
+      // Check if PDF is scanned/image-based (very little text extracted)
+      const minTextLength = numPages * 50 // At least 50 chars per page expected
+      if (text.length < minTextLength) {
+        console.error('PDF appears to be scanned/image-based. Extracted text:', text.length, 'chars from', numPages, 'pages')
+        throw new Error(
+          'This PDF appears to be a scanned document (image-based). ' +
+          'Please upload a text-based PDF or use a bank statement that has selectable text. ' +
+          'Tip: Open the PDF and try to select text with your cursor. If you can\'t select text, it\'s scanned.'
+        )
+      }
+
       // Detect bank type using traditional method
       const bankType = this.detectBankType(text)
       console.log('Detected bank type:', bankType)
