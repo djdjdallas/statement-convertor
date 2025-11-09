@@ -1,5 +1,6 @@
 // Use pdf-parse for reliable PDF text extraction (Node.js compatible)
 import { claudeAI } from './ai/claude-service.js'
+import { performPDFOCR, isOCRAvailable, estimateOCRCost } from './pdf-ocr.js'
 
 // Lazy load pdf-parse to avoid initialization issues
 let pdfParse;
@@ -76,7 +77,7 @@ export class EnhancedBankStatementParser {
       
       // Parse PDF and extract text
       const pdfData = await pdfParser(pdfBuffer)
-      const text = pdfData.text
+      let text = pdfData.text // Use 'let' to allow OCR text replacement
       const numPages = pdfData.numpages || 1
 
       console.log('Extracted text length:', text.length)
@@ -84,13 +85,57 @@ export class EnhancedBankStatementParser {
 
       // Check if PDF is scanned/image-based (very little text extracted)
       const minTextLength = numPages * 50 // At least 50 chars per page expected
-      if (text.length < minTextLength) {
-        console.error('PDF appears to be scanned/image-based. Extracted text:', text.length, 'chars from', numPages, 'pages')
-        throw new Error(
-          'This PDF appears to be a scanned document (image-based). ' +
-          'Please upload a text-based PDF or use a bank statement that has selectable text. ' +
-          'Tip: Open the PDF and try to select text with your cursor. If you can\'t select text, it\'s scanned.'
-        )
+      const isScannedPDF = text.length < minTextLength
+
+      if (isScannedPDF) {
+        console.warn('PDF appears to be scanned/image-based. Extracted text:', text.length, 'chars from', numPages, 'pages')
+
+        // Check if OCR is available as fallback
+        if (isOCRAvailable()) {
+          console.log('🔍 OCR is available. Attempting to extract text from scanned PDF...')
+
+          // Estimate cost for user transparency
+          const costEstimate = estimateOCRCost(numPages)
+          console.log(`💰 OCR Cost Estimate: $${costEstimate.estimatedCost} for ${costEstimate.pages} pages`)
+
+          try {
+            // Perform OCR on the PDF
+            const ocrText = await performPDFOCR(pdfBuffer, {
+              maxPages: 20, // Limit for cost control
+              onProgress: (page, total) => {
+                console.log(`OCR Progress: ${page}/${total} pages processed`)
+              }
+            })
+
+            console.log('✅ OCR successful! Extracted', ocrText.length, 'characters')
+
+            // Use OCR text instead of original text
+            text = ocrText
+
+            // Verify we got meaningful text
+            if (text.length < minTextLength) {
+              throw new Error('OCR completed but extracted insufficient text. The PDF may be too low quality or have no readable text.')
+            }
+
+          } catch (ocrError) {
+            console.error('❌ OCR failed:', ocrError)
+            throw new Error(
+              `This is a scanned PDF and OCR failed: ${ocrError.message}. ` +
+              'Please try uploading a clearer scan or a text-based PDF.'
+            )
+          }
+
+        } else {
+          // OCR not available - provide helpful error
+          console.error('❌ OCR not available. PDF cannot be processed.')
+          throw new Error(
+            'This PDF appears to be a scanned document (image-based), but OCR is not configured. ' +
+            'Please either: \n' +
+            '1. Upload a text-based PDF (download directly from your bank\'s website), OR\n' +
+            '2. Contact support to enable OCR processing for scanned PDFs.\n\n' +
+            'Tip: Open the PDF and try to select text with your cursor. If you can\'t select text, it\'s scanned.'
+          )
+        }
       }
 
       // Detect bank type using traditional method
