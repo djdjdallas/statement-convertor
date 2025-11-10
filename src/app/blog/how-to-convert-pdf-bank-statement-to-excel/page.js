@@ -1,6 +1,6 @@
 'use client';
 
-import { generateBlogMetadata, generateBlogJsonLd } from '@/components/blog/SEOHead';
+import { generateBlogJsonLd } from '@/components/blog/SEOHead';
 import BlogLayout from '@/components/blog/BlogLayout';
 import ComparisonTable from '@/components/blog/ComparisonTable';
 import CTASection from '@/components/blog/CTASection';
@@ -8,37 +8,6 @@ import ProConsList from '@/components/blog/ProConsList';
 import FAQSection from '@/components/blog/FAQSection';
 import CodeBlock from '@/components/blog/CodeBlock';
 import Link from 'next/link';
-
-// SEO Metadata
-export const metadata = generateBlogMetadata({
-  title: 'How to Convert PDF Bank Statement to Excel (5 Easy Methods - 2025)',
-  description: 'Learn 5 methods to convert PDF bank statements to Excel, from free tools to AI-powered converters. Save 4-8 hours monthly with our step-by-step guide.',
-  keywords: [
-    'how to convert PDF bank statement to excel',
-    'bank statement converter',
-    'PDF to Excel',
-    'convert statement to spreadsheet',
-    'bank statement parser',
-    'PDF bank statement to CSV',
-    'financial data extraction',
-    'bank statement OCR',
-    'automated bank statement conversion',
-    'AI bank statement converter'
-  ],
-  canonicalUrl: 'https://statementdesk.com/blog/how-to-convert-pdf-bank-statement-to-excel',
-  publishedTime: '2025-01-15T10:00:00Z',
-  modifiedTime: '2025-01-15T10:00:00Z',
-  author: {
-    name: 'Statement Desk Team',
-    url: 'https://statementdesk.com'
-  },
-  image: {
-    url: '/blog/convert-pdf-bank-statement-to-excel-og.jpg',
-    width: 1200,
-    height: 630,
-    alt: 'How to Convert PDF Bank Statement to Excel - Complete Guide'
-  }
-});
 
 export default function HowToConvertPDFBankStatementToExcel() {
   // JSON-LD structured data

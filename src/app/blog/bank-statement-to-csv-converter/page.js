@@ -1,6 +1,6 @@
 'use client';
 
-import { generateBlogMetadata, generateBlogJsonLd } from '@/components/blog/SEOHead';
+import { generateBlogJsonLd } from '@/components/blog/SEOHead';
 import BlogLayout from '@/components/blog/BlogLayout';
 import ComparisonTable from '@/components/blog/ComparisonTable';
 import CTASection from '@/components/blog/CTASection';
@@ -8,37 +8,6 @@ import ProConsList from '@/components/blog/ProConsList';
 import FAQSection from '@/components/blog/FAQSection';
 import CodeBlock from '@/components/blog/CodeBlock';
 import Link from 'next/link';
-
-// SEO Metadata
-export const metadata = generateBlogMetadata({
-  title: 'Bank Statement to CSV Converter: Complete Guide (2025)',
-  description: 'Convert bank statements to CSV format for easy import into QuickBooks, Xero, and Excel. Step-by-step guide with free and paid options.',
-  keywords: [
-    'bank statement to CSV',
-    'convert statement to CSV',
-    'CSV converter',
-    'bank CSV export',
-    'statement parser CSV',
-    'PDF to CSV converter',
-    'QuickBooks CSV import',
-    'Xero CSV import',
-    'bank statement CSV format',
-    'CSV file converter'
-  ],
-  canonicalUrl: 'https://statementdesk.com/blog/bank-statement-to-csv-converter',
-  publishedTime: '2025-01-14T10:00:00Z',
-  modifiedTime: '2025-01-15T10:00:00Z',
-  author: {
-    name: 'Statement Desk Team',
-    url: 'https://statementdesk.com'
-  },
-  image: {
-    url: '/blog/bank-statement-to-csv-og.jpg',
-    width: 1200,
-    height: 630,
-    alt: 'Bank Statement to CSV Converter Guide'
-  }
-});
 
 export default function BankStatementToCSVConverter() {
   // JSON-LD structured data

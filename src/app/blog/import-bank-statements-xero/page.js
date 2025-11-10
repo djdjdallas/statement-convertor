@@ -1,6 +1,6 @@
 'use client';
 
-import { generateBlogMetadata, generateBlogJsonLd } from '@/components/blog/SEOHead';
+import { generateBlogJsonLd } from '@/components/blog/SEOHead';
 import BlogLayout from '@/components/blog/BlogLayout';
 import ComparisonTable from '@/components/blog/ComparisonTable';
 import CTASection from '@/components/blog/CTASection';
@@ -8,37 +8,6 @@ import ProConsList from '@/components/blog/ProConsList';
 import FAQSection from '@/components/blog/FAQSection';
 import CodeBlock from '@/components/blog/CodeBlock';
 import Link from 'next/link';
-
-// SEO Metadata
-export const metadata = generateBlogMetadata({
-  title: 'How to Import Bank Statements into Xero (3 Easy Methods - 2025)',
-  description: 'Import bank statements into Xero in 3 easy steps. Complete guide with CSV formatting, bank feeds, and automated conversion options.',
-  keywords: [
-    'import bank statements into xero',
-    'xero bank statement import',
-    'xero csv import',
-    'xero bank feed',
-    'import csv to xero',
-    'xero statement format',
-    'xero bank reconciliation',
-    'upload statement to xero',
-    'xero import transactions',
-    'xero bank statement csv'
-  ],
-  canonicalUrl: 'https://statementdesk.com/blog/import-bank-statements-xero',
-  publishedTime: '2025-01-15T10:00:00Z',
-  modifiedTime: '2025-01-15T10:00:00Z',
-  author: {
-    name: 'Statement Desk Team',
-    url: 'https://statementdesk.com'
-  },
-  image: {
-    url: '/blog/import-bank-statements-xero-og.jpg',
-    width: 1200,
-    height: 630,
-    alt: 'How to Import Bank Statements into Xero Guide'
-  }
-});
 
 export default function ImportBankStatementsXero() {
   // JSON-LD structured data

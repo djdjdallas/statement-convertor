@@ -1,8 +1,8 @@
-import BlogLayout from '@/components/BlogLayout';
-import ComparisonTable from '@/components/ComparisonTable';
-import CTASection from '@/components/CTASection';
-import ProConsList from '@/components/ProConsList';
-import FAQSection from '@/components/FAQSection';
+import BlogLayout from '@/components/blog/BlogLayout';
+import ComparisonTable from '@/components/blog/ComparisonTable';
+import CTASection from '@/components/blog/CTASection';
+import ProConsList from '@/components/blog/ProConsList';
+import FAQSection from '@/components/blog/FAQSection';
 
 export const metadata = {
   title: 'Statement Desk vs Nanonets: Which is Better in 2025? (Detailed Comparison)',

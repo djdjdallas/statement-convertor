@@ -1,6 +1,6 @@
 'use client';
 
-import { generateBlogMetadata, generateBlogJsonLd } from '@/components/blog/SEOHead';
+import { generateBlogJsonLd } from '@/components/blog/SEOHead';
 import BlogLayout from '@/components/blog/BlogLayout';
 import ComparisonTable from '@/components/blog/ComparisonTable';
 import CTASection from '@/components/blog/CTASection';
@@ -8,37 +8,6 @@ import ProConsList from '@/components/blog/ProConsList';
 import FAQSection from '@/components/blog/FAQSection';
 import CodeBlock from '@/components/blog/CodeBlock';
 import Link from 'next/link';
-
-// SEO Metadata
-export const metadata = generateBlogMetadata({
-  title: 'How to Import Bank Statements into QuickBooks (3 Easy Methods - 2025)',
-  description: 'Step-by-step guide to import bank statements into QuickBooks. Learn 3 methods including CSV import, direct connection, and automated conversion.',
-  keywords: [
-    'import bank statements QuickBooks',
-    'QuickBooks CSV import',
-    'QuickBooks bank connection',
-    'how to import transactions QuickBooks',
-    'QuickBooks Online bank import',
-    'QuickBooks Desktop statements',
-    'bank statement to QuickBooks',
-    'QuickBooks banking features',
-    'automated bank connection QuickBooks',
-    'QuickBooks reconciliation'
-  ],
-  canonicalUrl: 'https://statementdesk.com/blog/import-bank-statements-quickbooks',
-  publishedTime: '2025-01-16T10:00:00Z',
-  modifiedTime: '2025-01-16T10:00:00Z',
-  author: {
-    name: 'Statement Desk Team',
-    url: 'https://statementdesk.com'
-  },
-  image: {
-    url: '/blog/import-quickbooks-og.jpg',
-    width: 1200,
-    height: 630,
-    alt: 'How to Import Bank Statements into QuickBooks Guide'
-  }
-});
 
 export default function ImportBankStatementsQuickBooks() {
   // JSON-LD structured data
