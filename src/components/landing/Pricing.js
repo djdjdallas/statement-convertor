@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Loader2 } from "lucide-react";
-import { SUBSCRIPTION_TIERS } from "@/lib/subscription-tiers";
+import { SUBSCRIPTION_TIERS, getMonthlyEquivalent } from "@/lib/subscription-tiers";
 import { redirectToCheckout } from "@/lib/stripe-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -23,15 +23,27 @@ export default function Pricing() {
 
   const tiers = Object.entries(SUBSCRIPTION_TIERS)
     .filter(([key]) => key !== 'enterprise') // Enterprise shown separately
-    .map(([key, tier]) => ({
-      id: key,
-      ...tier,
-      popular: key === "professional",
-      displayPrice: tier.price === 'Custom' ? 'Custom' : 
-        billingPeriod === 'yearly' && tier.price > 0 ? 
-          Math.floor(tier.price * 12 * 0.8) : // 20% discount on yearly
-          tier.price
-    }));
+    .map(([key, tier]) => {
+      // Calculate display price based on billing period
+      let displayPrice = tier.price;
+      let priceLabel = '/month';
+
+      if (tier.price === 'Custom') {
+        displayPrice = 'Custom';
+        priceLabel = '';
+      } else if (billingPeriod === 'yearly' && tier.yearlyPrice && tier.price > 0) {
+        displayPrice = tier.yearlyPrice;
+        priceLabel = '/year';
+      }
+
+      return {
+        id: key,
+        ...tier,
+        displayPrice,
+        priceLabel,
+        monthlyEquivalent: billingPeriod === 'yearly' ? getMonthlyEquivalent(key) : null
+      };
+    });
 
   const handleSubscribe = async (tierId) => {
     if (!user) {
@@ -40,9 +52,8 @@ export default function Pricing() {
         window.location.href = "/auth/signup?plan=free";
       } else if (tierId === "professional") {
         window.location.href = `/auth/signup?plan=trial&tier=${tierId}&trial=true`;
-      } else {
-        // Business plan - no trial, direct signup
-        window.location.href = `/auth/signup?plan=${tierId}`;
+      } else if (tierId === "business") {
+        window.location.href = `/auth/signup?plan=trial&tier=${tierId}&trial=true`;
       }
       return;
     }
@@ -69,7 +80,7 @@ export default function Pricing() {
   };
 
   const handleContactSales = () => {
-    window.location.href = "mailto:sales@statementconverter.com?subject=Enterprise%20Plan%20Inquiry";
+    window.location.href = "mailto:sales@statementdesk.com?subject=Enterprise%20Plan%20Inquiry";
   };
 
   return (
@@ -83,7 +94,7 @@ export default function Pricing() {
             Choose the right plan for you
           </p>
           <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            Try Professional free for 7 days. No credit card required.
+            Start with Professional for just $19/month. 7-day free trial, no credit card required.
           </p>
         </div>
 
@@ -109,7 +120,7 @@ export default function Pricing() {
               }`}
             >
               Yearly
-              <Badge className="ml-2 bg-green-100 text-green-800" variant="secondary">
+              <Badge className="ml-2 bg-green-100 text-green-800 hover:bg-green-100" variant="secondary">
                 Save 20%
               </Badge>
             </button>
@@ -121,7 +132,9 @@ export default function Pricing() {
             <Card
               key={tier.id}
               className={`relative ${
-                tier.popular ? "ring-2 ring-blue-500 shadow-xl" : "shadow-lg"
+                tier.popular
+                  ? "ring-2 ring-blue-500 shadow-xl scale-105"
+                  : "shadow-lg"
               }`}
             >
               {tier.popular && (
@@ -140,12 +153,17 @@ export default function Pricing() {
                   <span className="text-4xl font-bold text-gray-900">
                     ${typeof tier.displayPrice === 'number' ? tier.displayPrice : tier.displayPrice}
                   </span>
-                  {tier.price > 0 && (
+                  {tier.priceLabel && (
                     <span className="text-lg font-medium text-gray-500">
-                      /{billingPeriod === 'yearly' ? 'year' : 'month'}
+                      {tier.priceLabel}
                     </span>
                   )}
                 </div>
+                {tier.monthlyEquivalent && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    ${tier.monthlyEquivalent}/month billed annually
+                  </p>
+                )}
                 <CardDescription className="mt-2">
                   {tier.id === "free" && "Perfect for trying out our service"}
                   {tier.id === "professional" &&
@@ -178,20 +196,26 @@ export default function Pricing() {
                   {!user ? (
                     tier.id === "free" ? "Start Free" :
                     tier.id === "professional" ? "Start 7-Day Trial" :
+                    tier.id === "business" ? "Start 7-Day Trial" :
                     "Subscribe Now"
                   ) : (
                     tier.id === "free" ? "Go to Dashboard" : "Upgrade Now"
                   )}
                 </Button>
 
+                {tier.id === "free" && (
+                  <p className="text-center text-sm text-gray-500 mt-3">
+                    No credit card required
+                  </p>
+                )}
                 {tier.id === "professional" && (
                   <p className="text-center text-sm text-gray-500 mt-3">
-                    7-day free trial • Cancel anytime
+                    7-day free trial • No credit card required • Cancel anytime
                   </p>
                 )}
                 {tier.id === "business" && (
                   <p className="text-center text-sm text-gray-500 mt-3">
-                    Cancel anytime
+                    7-day free trial • Cancel anytime
                   </p>
                 )}
               </CardContent>
@@ -205,8 +229,11 @@ export default function Pricing() {
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
               Enterprise Plan
             </h3>
+            <p className="text-lg text-gray-600 mb-2">
+              <span className="text-2xl font-bold text-gray-900">Custom Pricing</span>
+            </p>
             <p className="text-lg text-gray-600 mb-6">
-              Need unlimited conversions, custom integrations, or on-premise deployment? 
+              Need unlimited conversions, custom integrations, or on-premise deployment?
               Our Enterprise plan is tailored to meet your organization's specific needs.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
@@ -221,6 +248,13 @@ export default function Pricing() {
               Contact Sales
             </Button>
           </div>
+        </div>
+
+        {/* Trust signals */}
+        <div className="mt-12 text-center">
+          <p className="text-sm text-gray-500">
+            Join 1,000+ users who trust Statement Desk with their financial data
+          </p>
         </div>
 
         <div className="mt-12 text-center">
@@ -260,8 +294,8 @@ export default function Pricing() {
                 Do you offer a free trial?
               </h5>
               <p className="text-sm text-gray-600">
-                Yes! The Professional plan includes a 7-day free trial. No credit card
-                required to start.
+                Yes! Both Professional and Business plans include a 7-day free trial.
+                No credit card required to start.
               </p>
             </div>
           </div>

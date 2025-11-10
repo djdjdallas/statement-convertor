@@ -394,8 +394,8 @@ export default function FileUploader({
                     or click to browse your computer
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       disabled={disabled}
                       onClick={(e) => {
                         // Let the dropzone handle the click
@@ -404,6 +404,10 @@ export default function FileUploader({
                     >
                       Choose Files
                     </Button>
+                    {/* Google Drive Import temporarily hidden due to API configuration issues */}
+                    {/* Export to Google Drive still works from the dashboard */}
+                    {/* Uncomment below to re-enable when Google Cloud Console is properly configured */}
+                    {/*
                     <div className="relative">
                       <GoogleDrivePicker
                         onFileSelect={handleGoogleDriveSelect}
@@ -419,6 +423,7 @@ export default function FileUploader({
                         </div>
                       )}
                     </div>
+                    */}
                   </div>
                 </div>
               )}

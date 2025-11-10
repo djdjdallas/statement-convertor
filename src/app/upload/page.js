@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -39,7 +39,10 @@ export default function UploadPage() {
   const { profile: userProfileFromHook, subscriptionTier } = useUserProfile()
   const router = useRouter()
   const supabase = createClient()
-  
+
+  // Ref for auto-scrolling to "Ready to Process" section
+  const readyToProcessRef = useRef(null)
+
   // Check if user has Xero access
   const userHasXeroAccess = hasXeroAccess(subscriptionTier)
 
@@ -50,6 +53,19 @@ export default function UploadPage() {
     }
     fetchUserProfile()
   }, [user, router])
+
+  // Auto-scroll to "Ready to Process" card when files are added
+  useEffect(() => {
+    if (uploadedFiles.length > 0 && readyToProcessRef.current) {
+      setTimeout(() => {
+        readyToProcessRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        })
+      }, 300) // Small delay to ensure DOM is updated
+    }
+  }, [uploadedFiles.length])
 
   const fetchUserProfile = async () => {
     try {
@@ -553,7 +569,7 @@ export default function UploadPage() {
 
         {/* Process Files Section */}
         {uploadedFiles.length > 0 && (
-          <Card className="mt-8 bg-white/70 backdrop-blur-sm border-white/30 shadow-xl">
+          <Card ref={readyToProcessRef} className="mt-8 bg-white/70 backdrop-blur-sm border-white/30 shadow-xl">
             <CardHeader>
               <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                 🚀 Ready to Process

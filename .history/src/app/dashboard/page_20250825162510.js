@@ -1,37 +1,26 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/contexts/AuthContext";
-import { createClient } from "@/lib/supabase/client";
-import {
-  SUBSCRIPTION_TIERS,
-  checkUsageLimit,
-  hasXeroAccess,
-  hasBulkXeroExport,
-} from "@/lib/subscription-tiers";
-import SubscriptionCard from "@/components/SubscriptionCard";
-import CheckoutSuccess from "@/components/CheckoutSuccess";
-import TrialStatusBanner from "@/components/TrialStatusBanner";
-import TrialExpiredModal from "@/components/TrialExpiredModal";
-import { toast } from "@/hooks/use-toast";
-import { getUserLimits } from "@/lib/trial-utils";
-import {
-  Upload,
-  FileText,
-  Download,
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
+import { useAuth } from '@/contexts/AuthContext'
+import { createClient } from '@/lib/supabase/client'
+import { SUBSCRIPTION_TIERS, checkUsageLimit, hasXeroAccess, hasBulkXeroExport } from '@/lib/subscription-tiers'
+import SubscriptionCard from '@/components/SubscriptionCard'
+import CheckoutSuccess from '@/components/CheckoutSuccess'
+import TrialStatusBanner from '@/components/TrialStatusBanner'
+import TrialExpiredModal from '@/components/TrialExpiredModal'
+import { toast } from '@/hooks/use-toast'
+import { getUserLimits } from '@/lib/trial-utils'
+import { 
+  Upload, 
+  FileText, 
+  Download, 
   Eye,
   Clock,
   CheckCircle,
@@ -50,258 +39,243 @@ import {
   Zap,
   Link as LinkIcon,
   Import,
-  Send,
-} from "lucide-react";
-import BulkImportDialog from "@/components/xero/BulkImportDialog";
+  Send
+} from 'lucide-react'
+import BulkImportDialog from '@/components/xero/BulkImportDialog'
 
 export default function DashboardPage() {
-  const [files, setFiles] = useState([]);
-  const [userProfile, setUserProfile] = useState(null);
+  const [files, setFiles] = useState([])
+  const [userProfile, setUserProfile] = useState(null)
   const [stats, setStats] = useState({
     thisMonth: 0,
     totalFiles: 0,
     totalTransactions: 0,
-    totalExports: 0,
-  });
-  const [loading, setLoading] = useState(true);
-  const [hasGoogleDrive, setHasGoogleDrive] = useState(false);
-  const [xeroConnections, setXeroConnections] = useState([]);
-  const [showBulkImport, setShowBulkImport] = useState(false);
-  const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false);
-  const { user, signOut, loading: authLoading } = useAuth();
-  const router = useRouter();
-  const supabase = createClient();
+    totalExports: 0
+  })
+  const [loading, setLoading] = useState(true)
+  const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
+  const [xeroConnections, setXeroConnections] = useState([])
+  const [showBulkImport, setShowBulkImport] = useState(false)
+  const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
+  const { user, signOut, loading: authLoading } = useAuth()
+  const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
-    console.log(
-      "Dashboard useEffect - user:",
-      user,
-      "authLoading:",
-      authLoading
-    );
-
+    console.log('Dashboard useEffect - user:', user, 'authLoading:', authLoading)
+    
     if (authLoading) {
-      console.log("Still loading authentication state...");
-      return;
+      console.log('Still loading authentication state...')
+      return
     }
 
     if (!user) {
-      console.log("No user found, redirecting to signin...");
-      router.replace("/auth/signin");
-      return;
+      console.log('No user found, redirecting to signin...')
+      router.replace('/auth/signin')
+      return
     }
-
-    console.log("User authenticated, fetching dashboard data...");
-    fetchDashboardData();
-
+    
+    console.log('User authenticated, fetching dashboard data...')
+    fetchDashboardData()
+    
     // Check for Google linking success
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("google_linked") === "true") {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('google_linked') === 'true') {
       toast({
         title: "Success!",
         description: "Your Google account has been linked successfully.",
-      });
+      })
       // Remove the parameter from URL
-      router.replace("/dashboard");
-    } else if (params.get("error")) {
+      router.replace('/dashboard')
+    } else if (params.get('error')) {
       toast({
         title: "Error",
-        description: params.get("error"),
-        variant: "destructive",
-      });
+        description: params.get('error'),
+        variant: "destructive"
+      })
       // Remove the parameter from URL
-      router.replace("/dashboard");
+      router.replace('/dashboard')
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router])
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
-
+      setLoading(true)
+      
       // Fetch user profile
       const { data: profile } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
 
-      setUserProfile(profile || { subscription_tier: "free" });
-
+      setUserProfile(profile || { subscription_tier: 'free' })
+      
       // Check if trial has expired
-      if (
-        profile?.signup_intent === "trial" &&
-        profile?.trial_end_date &&
-        new Date(profile.trial_end_date) < new Date() &&
-        (!profile?.subscription_tier || profile?.subscription_tier === "free")
-      ) {
-        setShowTrialExpiredModal(true);
+      if (profile?.signup_intent === 'trial' && 
+          profile?.trial_end_date && 
+          new Date(profile.trial_end_date) < new Date() &&
+          (!profile?.subscription_tier || profile?.subscription_tier === 'free')) {
+        setShowTrialExpiredModal(true)
       }
 
       // Check Google Drive connection
       try {
-        const response = await fetch("/api/auth/google/link");
+        const response = await fetch('/api/auth/google/link')
         if (response.ok) {
-          const data = await response.json();
-          setHasGoogleDrive(data.linked);
+          const data = await response.json()
+          setHasGoogleDrive(data.linked)
         }
       } catch (err) {
-        console.log("Could not check Google Drive status");
+        console.log('Could not check Google Drive status')
       }
 
       // Fetch files with transaction counts
       const { data: filesData } = await supabase
-        .from("files")
-        .select(
-          `
+        .from('files')
+        .select(`
           *,
           transactions(count)
-        `
-        )
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
-      setFiles(filesData || []);
+      setFiles(filesData || [])
 
       // Check Xero connections
       try {
-        const xeroResponse = await fetch("/api/xero/connections");
+        const xeroResponse = await fetch('/api/xero/connections')
         if (xeroResponse.ok) {
-          const { connections } = await xeroResponse.json();
-          setXeroConnections(connections?.filter((c) => c.is_active) || []);
+          const { connections } = await xeroResponse.json()
+          setXeroConnections(connections?.filter(c => c.is_active) || [])
         }
       } catch (err) {
-        console.log("Could not check Xero connection status");
+        console.log('Could not check Xero connection status')
       }
 
       // Fetch usage statistics using the efficient stored function
       const { data: monthlyUsage, error: usageError } = await supabase
-        .rpc("get_user_monthly_usage", { p_user_id: user.id })
-        .single();
-
+        .rpc('get_user_monthly_usage', { p_user_id: user.id })
+        .single()
+        
       if (usageError) {
-        console.error("Error fetching monthly usage:", usageError);
+        console.error('Error fetching monthly usage:', usageError)
       }
 
       const { data: exports } = await supabase
-        .from("file_exports")
-        .select("id")
-        .eq("user_id", user.id);
+        .from('file_exports')
+        .select('id')
+        .eq('user_id', user.id)
 
-      const totalTransactions =
-        filesData?.reduce(
-          (sum, file) => sum + (file.transactions?.[0]?.count || 0),
-          0
-        ) || 0;
+      const totalTransactions = filesData?.reduce((sum, file) => 
+        sum + (file.transactions?.[0]?.count || 0), 0) || 0
 
       setStats({
         thisMonth: monthlyUsage?.conversions_count || 0,
         totalFiles: filesData?.length || 0,
         totalTransactions,
-        totalExports: exports?.length || 0,
-      });
+        totalExports: exports?.length || 0
+      })
+
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error('Error fetching dashboard data:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleDeleteFile = async (fileId) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this file? This action cannot be undone."
-      )
-    ) {
-      return;
+    if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+      return
     }
 
     try {
       const { error } = await supabase
-        .from("files")
+        .from('files')
         .delete()
-        .eq("id", fileId)
-        .eq("user_id", user.id);
+        .eq('id', fileId)
+        .eq('user_id', user.id)
 
-      if (error) throw error;
+      if (error) throw error
 
       // Remove from local state
-      setFiles((prev) => prev.filter((file) => file.id !== fileId));
-
+      setFiles(prev => prev.filter(file => file.id !== fileId))
+      
       // Update stats
-      setStats((prev) => ({
+      setStats(prev => ({
         ...prev,
-        totalFiles: prev.totalFiles - 1,
-      }));
-
+        totalFiles: prev.totalFiles - 1
+      }))
+      
       // Show success toast
       toast({
-        title: "File Deleted",
-        description: "The file has been successfully deleted.",
-        variant: "success",
-      });
+        title: 'File Deleted',
+        description: 'The file has been successfully deleted.',
+        variant: 'success'
+      })
+
     } catch (error) {
-      console.error("Error deleting file:", error);
+      console.error('Error deleting file:', error)
       toast({
-        title: "Delete Failed",
-        description: "Failed to delete file. Please try again.",
-        variant: "destructive",
-      });
+        title: 'Delete Failed',
+        description: 'Failed to delete file. Please try again.',
+        variant: 'destructive'
+      })
     }
-  };
+  }
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "pending":
-        return <Clock className="h-4 w-4 text-yellow-600" />;
-      case "processing":
-        return <Clock className="h-4 w-4 text-blue-600" />;
-      case "completed":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "failed":
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-600" />
+      case 'processing':
+        return <Clock className="h-4 w-4 text-blue-600" />
+      case 'completed':
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'failed':
+        return <AlertCircle className="h-4 w-4 text-red-600" />
       default:
-        return <FileText className="h-4 w-4 text-gray-600" />;
+        return <FileText className="h-4 w-4 text-gray-600" />
     }
-  };
+  }
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "processing":
-        return "bg-blue-100 text-blue-800";
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'processing':
+        return 'bg-blue-100 text-blue-800'
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'failed':
+        return 'bg-red-100 text-red-800'
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
 
-  const userTier = userProfile?.subscription_tier || "free";
-  const tierInfo = getUserLimits(userProfile) || SUBSCRIPTION_TIERS[userTier];
-  const monthlyLimit =
-    tierInfo?.monthlyConversions || tierInfo?.limits?.monthlyConversions;
-  const canProcess = monthlyLimit === -1 || stats.thisMonth < monthlyLimit;
+  const userTier = userProfile?.subscription_tier || 'free'
+  const tierInfo = getUserLimits(userProfile) || SUBSCRIPTION_TIERS[userTier]
+  const monthlyLimit = tierInfo?.monthlyConversions || tierInfo?.limits?.monthlyConversions
+  const canProcess = monthlyLimit === -1 || stats.thisMonth < monthlyLimit
 
   if (authLoading) {
     return (
@@ -315,7 +289,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
@@ -329,7 +303,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   if (loading) {
@@ -344,7 +318,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -361,57 +335,39 @@ export default function DashboardPage() {
                 <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                   Statement Desk
                 </span>
-                <div className="text-xs text-gray-500 -mt-1">
-                  AI-Powered Analytics
-                </div>
+                <div className="text-xs text-gray-500 -mt-1">AI-Powered Analytics</div>
               </div>
             </div>
-
+            
             <div className="flex items-center space-x-3">
-              <Badge
-                variant="outline"
+              <Badge 
+                variant="outline" 
                 className={`capitalize px-3 py-1 font-medium border-2 ${
-                  userTier === "premium"
-                    ? "border-gradient-to-r from-purple-500 to-pink-500 text-purple-700 bg-purple-50"
-                    : userTier === "basic"
-                    ? "border-blue-500 text-blue-700 bg-blue-50"
-                    : "border-gray-300 text-gray-600 bg-gray-50"
+                  userTier === 'premium' 
+                    ? 'border-gradient-to-r from-purple-500 to-pink-500 text-purple-700 bg-purple-50' 
+                    : userTier === 'basic'
+                    ? 'border-blue-500 text-blue-700 bg-blue-50'
+                    : 'border-gray-300 text-gray-600 bg-gray-50'
                 }`}
               >
                 ✨ {userTier} Plan
               </Badge>
               {hasGoogleDrive && (
-                <Badge
-                  variant="outline"
-                  className="border-green-500 text-green-700 bg-green-50"
-                >
-                  <svg
-                    className="w-3 h-3 mr-1"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z" />
+                <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
+                  <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
                   </svg>
                   Google Connected
                 </Badge>
               )}
               <div className="flex items-center space-x-1">
                 <Link href="/settings">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="hover:bg-white/60 transition-all duration-200"
-                  >
+                  <Button variant="ghost" size="sm" className="hover:bg-white/60 transition-all duration-200">
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
                   </Button>
                 </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={signOut}
-                  className="hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-                >
+                <Button variant="ghost" size="sm" onClick={signOut} className="hover:bg-red-50 hover:text-red-600 transition-all duration-200">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
                 </Button>
@@ -424,16 +380,13 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Checkout Success Message */}
         <CheckoutSuccess />
-
+        
         {/* Trial Status Banner */}
-        <TrialStatusBanner
-          userProfile={userProfile}
-          userSubscription={userProfile}
-        />
-
+        <TrialStatusBanner userProfile={userProfile} userSubscription={userProfile} />
+        
         {/* Trial Expired Modal */}
-        <TrialExpiredModal
-          isOpen={showTrialExpiredModal}
+        <TrialExpiredModal 
+          isOpen={showTrialExpiredModal} 
           onClose={() => setShowTrialExpiredModal(false)}
           userProfile={userProfile}
         />
@@ -444,8 +397,7 @@ export default function DashboardPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between">
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent">
-                  Welcome back,{" "}
-                  {userProfile?.full_name || user.email?.split("@")[0]}! 👋
+                  Welcome back, {userProfile?.full_name || user.email?.split('@')[0]}! 👋
                 </h1>
                 <p className="text-gray-600 mt-3 text-lg">
                   Transform your financial data with AI-powered insights
@@ -459,10 +411,7 @@ export default function DashboardPage() {
                   </Button>
                 </Link>
                 <Link href="/chat">
-                  <Button
-                    variant="outline"
-                    className="border-2 border-indigo-200 hover:bg-indigo-50 transition-all duration-300"
-                  >
+                  <Button variant="outline" className="border-2 border-indigo-200 hover:bg-indigo-50 transition-all duration-300">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     AI Chat
                   </Button>
@@ -481,9 +430,7 @@ export default function DashboardPage() {
                   <BarChart3 className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4 flex-1">
-                  <p className="text-sm font-medium text-gray-600">
-                    This Month
-                  </p>
+                  <p className="text-sm font-medium text-gray-600">This Month</p>
                   <div className="flex items-center">
                     <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                       {stats.thisMonth}
@@ -496,13 +443,12 @@ export default function DashboardPage() {
                   </div>
                   {monthlyLimit !== -1 && (
                     <div className="mt-3">
-                      <Progress
-                        value={(stats.thisMonth / monthlyLimit) * 100}
+                      <Progress 
+                        value={(stats.thisMonth / monthlyLimit) * 100} 
                         className="h-2"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        {Math.round((stats.thisMonth / monthlyLimit) * 100)}%
-                        used
+                        {Math.round((stats.thisMonth / monthlyLimit) * 100)}% used
                       </p>
                     </div>
                   )}
@@ -518,15 +464,11 @@ export default function DashboardPage() {
                   <FileText className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Files
-                  </p>
+                  <p className="text-sm font-medium text-gray-600">Total Files</p>
                   <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                     {stats.totalFiles}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Successfully processed
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Successfully processed</p>
                 </div>
               </div>
             </CardContent>
@@ -539,15 +481,11 @@ export default function DashboardPage() {
                   <Calendar className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
-                    Transactions
-                  </p>
+                  <p className="text-sm font-medium text-gray-600">Transactions</p>
                   <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
                     {stats.totalTransactions.toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Extracted & analyzed
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Extracted & analyzed</p>
                 </div>
               </div>
             </CardContent>
@@ -564,9 +502,7 @@ export default function DashboardPage() {
                   <p className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                     {stats.totalExports}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Downloads completed
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Downloads completed</p>
                 </div>
               </div>
             </CardContent>
@@ -585,8 +521,7 @@ export default function DashboardPage() {
                   <div>
                     <CardTitle>Xero Integration</CardTitle>
                     <CardDescription>
-                      Connected to {xeroConnections.length} organization
-                      {xeroConnections.length !== 1 ? "s" : ""}
+                      Connected to {xeroConnections.length} organization{xeroConnections.length !== 1 ? 's' : ''}
                     </CardDescription>
                   </div>
                 </div>
@@ -599,7 +534,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {hasBulkXeroExport(userTier) ? (
-                  <Button
+                  <Button 
                     className="bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => setShowBulkImport(true)}
                   >
@@ -607,47 +542,37 @@ export default function DashboardPage() {
                     Bulk Export to Xero
                   </Button>
                 ) : (
-                  <Button
+                  <Button 
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
                     onClick={() => {
                       toast({
                         title: "Business Plan Required",
-                        description:
-                          "Bulk export to Xero is available on Business plans and above. Upgrade to export multiple files at once.",
+                        description: "Bulk export to Xero is available on Business plans and above. Upgrade to export multiple files at once.",
                         variant: "default",
                         action: (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.push("/pricing")}
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => router.push('/pricing')}
                           >
                             View Plans
                           </Button>
-                        ),
-                      });
+                        )
+                      })
                     }}
                   >
                     <Zap className="h-4 w-4 mr-2" />
                     Bulk Export to Xero
-                    <Badge className="ml-2" variant="secondary">
-                      Business
-                    </Badge>
+                    <Badge className="ml-2" variant="secondary">Business</Badge>
                   </Button>
                 )}
                 <Link href="/settings">
-                  <Button
-                    variant="outline"
-                    className="w-full border-green-300 hover:bg-green-50"
-                  >
+                  <Button variant="outline" className="w-full border-green-300 hover:bg-green-50">
                     <Settings className="h-4 w-4 mr-2" />
                     Manage Connection
                   </Button>
                 </Link>
-                <Button
-                  variant="outline"
-                  className="border-green-300 hover:bg-green-50"
-                  disabled
-                >
+                <Button variant="outline" className="border-green-300 hover:bg-green-50" disabled>
                   <Import className="h-4 w-4 mr-2" />
                   Import from Xero (Coming Soon)
                 </Button>
@@ -669,12 +594,12 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Link href="/upload">
-                <Button
+                <Button 
                   className={`w-full h-32 flex flex-col space-y-3 text-lg font-medium transition-all duration-300 hover:scale-105 ${
-                    canProcess
-                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-2xl"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                    canProcess 
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-2xl' 
+                      : 'bg-gray-300 cursor-not-allowed'
+                  }`} 
                   disabled={!canProcess}
                 >
                   <div className="bg-white/20 p-2 rounded-lg">
@@ -686,7 +611,7 @@ export default function DashboardPage() {
                   )}
                 </Button>
               </Link>
-
+              
               <Link href="#pricing">
                 <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-32">
                   <CardContent className="p-6 h-full">
@@ -698,15 +623,13 @@ export default function DashboardPage() {
                         <p className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                           Upgrade Plan
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Get unlimited access
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">Get unlimited access</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </Link>
-
+              
               <Link href="/analytics">
                 <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-32">
                   <CardContent className="p-6 h-full">
@@ -718,15 +641,13 @@ export default function DashboardPage() {
                         <p className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                           View Analytics
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          AI-powered insights
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">AI-powered insights</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </Link>
-
+              
               <Link href="/chat">
                 <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-32">
                   <CardContent className="p-6 h-full">
@@ -738,9 +659,7 @@ export default function DashboardPage() {
                         <p className="text-lg font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                           AI Assistant
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Ask about finances
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">Ask about finances</p>
                       </div>
                     </div>
                   </CardContent>
@@ -756,31 +675,17 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <div className="p-2 bg-white rounded-lg shadow-md">
-                  <svg
-                    className="w-6 h-6"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"
-                      fill="#4285F4"
-                    />
-                    <path d="M7.71 3.5h8.58L22.85 15H9.71z" fill="#34A853" />
-                    <path
-                      d="M1.15 15l6.56-11.5L14.27 15H1.15z"
-                      fill="#FBBC04"
-                    />
-                    <path
-                      d="M14.27 15l-6.56 7.5L1.15 15h13.12z"
-                      fill="#EA4335"
-                    />
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z" fill="#4285F4"/>
+                    <path d="M7.71 3.5h8.58L22.85 15H9.71z" fill="#34A853"/>
+                    <path d="M1.15 15l6.56-11.5L14.27 15H1.15z" fill="#FBBC04"/>
+                    <path d="M14.27 15l-6.56 7.5L1.15 15h13.12z" fill="#EA4335"/>
                   </svg>
                 </div>
                 Google Workspace Connected
               </CardTitle>
               <CardDescription>
-                Seamlessly work with your financial data across Google's
-                productivity suite
+                Seamlessly work with your financial data across Google's productivity suite
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -828,12 +733,12 @@ export default function DashboardPage() {
         {/* Subscription Management */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">
-            <SubscriptionCard
-              userProfile={userProfile}
-              monthlyUsage={stats.thisMonth}
+            <SubscriptionCard 
+              userProfile={userProfile} 
+              monthlyUsage={stats.thisMonth} 
             />
           </div>
-
+          
           <Card>
             <CardHeader>
               <CardTitle>Quick Tips</CardTitle>
@@ -841,33 +746,21 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4 text-sm">
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    Supported Banks
-                  </h4>
+                  <h4 className="font-medium text-gray-900 mb-1">Supported Banks</h4>
                   <p className="text-gray-600">
-                    We support statements from Chase, Bank of America, Wells
-                    Fargo, Citibank, and 200+ more banks.
+                    We support statements from Chase, Bank of America, Wells Fargo, Citibank, and 200+ more banks.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    File Formats
-                  </h4>
+                  <h4 className="font-medium text-gray-900 mb-1">File Formats</h4>
                   <p className="text-gray-600">
-                    Upload PDF files up to{" "}
-                    {userTier === "free"
-                      ? "10MB"
-                      : userTier === "basic"
-                      ? "50MB"
-                      : "100MB"}
-                    . Export as Excel or CSV.
+                    Upload PDF files up to {userTier === 'free' ? '10MB' : userTier === 'basic' ? '50MB' : '100MB'}. Export as Excel or CSV.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-900 mb-1">Security</h4>
                   <p className="text-gray-600">
-                    All files are automatically deleted after 7 days. We use
-                    bank-level encryption.
+                    All files are automatically deleted after 7 days. We use bank-level encryption.
                   </p>
                 </div>
               </div>
@@ -913,10 +806,7 @@ export default function DashboardPage() {
             ) : (
               <div className="space-y-4">
                 {files.map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
+                  <div key={file.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-4">
                       {getStatusIcon(file.processing_status)}
                       <div className="flex-1">
@@ -924,17 +814,10 @@ export default function DashboardPage() {
                           <h4 className="font-medium text-gray-900">
                             {file.original_filename}
                           </h4>
-                          {file.source === "google_drive" && (
-                            <Badge
-                              variant="outline"
-                              className="text-xs px-1.5 py-0 border-blue-300 text-blue-700 bg-blue-50"
-                            >
-                              <svg
-                                className="w-3 h-3 mr-0.5"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z" />
+                          {file.source === 'google_drive' && (
+                            <Badge variant="outline" className="text-xs px-1.5 py-0 border-blue-300 text-blue-700 bg-blue-50">
+                              <svg className="w-3 h-3 mr-0.5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.71 3.5L1.15 15l4.58 7.5h12.54l4.58-7.5L16.29 3.5z"/>
                               </svg>
                               Drive
                             </Badge>
@@ -947,21 +830,19 @@ export default function DashboardPage() {
                           {file.transactions?.[0]?.count && (
                             <>
                               <span>•</span>
-                              <span>
-                                {file.transactions[0].count} transactions
-                              </span>
+                              <span>{file.transactions[0].count} transactions</span>
                             </>
                           )}
                         </div>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-center space-x-3">
                       <Badge className={getStatusColor(file.processing_status)}>
                         {file.processing_status}
                       </Badge>
-
-                      {file.processing_status === "completed" && (
+                      
+                      {file.processing_status === 'completed' && (
                         <>
                           <Link href={`/preview/${file.id}`}>
                             <Button variant="outline" size="sm">
@@ -970,17 +851,16 @@ export default function DashboardPage() {
                             </Button>
                           </Link>
                           {xeroConnections.length > 0 && (
-                            <Button
-                              variant="outline"
+                            <Button 
+                              variant="outline" 
                               size="sm"
                               className="border-green-300 hover:bg-green-50"
                               onClick={() => {
                                 // TODO: Implement individual file export to Xero
                                 toast({
                                   title: "Export to Xero",
-                                  description:
-                                    "Individual file export coming soon. Use Bulk Import for now.",
-                                });
+                                  description: "Individual file export coming soon. Use Bulk Import for now."
+                                })
                               }}
                             >
                               <Send className="h-4 w-4 mr-2" />
@@ -989,7 +869,7 @@ export default function DashboardPage() {
                           )}
                         </>
                       )}
-
+                      
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1017,12 +897,13 @@ export default function DashboardPage() {
                     Monthly limit reached
                   </h3>
                   <p className="text-sm text-orange-700 mt-1">
-                    You've processed {stats.thisMonth} out of {monthlyLimit}{" "}
-                    files this month. Upgrade your plan to continue processing
-                    files.
+                    You've processed {stats.thisMonth} out of {monthlyLimit} files this month. 
+                    Upgrade your plan to continue processing files.
                   </p>
-                  <Link href="/pricing" className="inline-block mt-3">
-                    <Button size="sm">Upgrade Plan</Button>
+                  <Link href="#pricing" className="inline-block mt-3">
+                    <Button size="sm">
+                      Upgrade Plan
+                    </Button>
                   </Link>
                 </div>
               </div>
@@ -1034,14 +915,12 @@ export default function DashboardPage() {
         <BulkImportDialog
           isOpen={showBulkImport}
           onClose={() => {
-            setShowBulkImport(false);
-            fetchDashboardData(); // Refresh data after closing
+            setShowBulkImport(false)
+            fetchDashboardData() // Refresh data after closing
           }}
-          availableFiles={files.filter(
-            (f) => f.processing_status === "completed" && !f.xero_import_id
-          )}
+          availableFiles={files.filter(f => f.processing_status === 'completed' && !f.xero_import_id)}
         />
       </div>
     </div>
-  );
+  )
 }

@@ -1,19 +1,22 @@
 import { STRIPE_PRODUCTS } from './stripe/config'
 
+// Centralized Subscription Tiers Configuration
+// Updated: January 2025 - New market-validated pricing structure
+
 export const SUBSCRIPTION_TIERS = {
   free: {
     name: 'Free',
     price: 0,
     stripePriceId: null,
     features: [
-      '10 conversions per month',
+      '5 conversions per month', // UPDATED: Was 10, now 5
       'Files up to 10MB',
       'Basic CSV export',
       'Email support',
       'Basic AI recognition'
     ],
     limits: {
-      monthlyConversions: 10,
+      monthlyConversions: 5, // UPDATED: Was 10, now 5
       maxFileSize: 10 * 1024 * 1024, // 10MB
       exportFormats: ['csv'],
       bulkUploadLimit: 1,
@@ -24,42 +27,53 @@ export const SUBSCRIPTION_TIERS = {
   },
   professional: {
     name: 'Professional',
-    price: 49,
-    monthlyPriceId: STRIPE_PRODUCTS.professional.prices.monthly.id,
-    yearlyPriceId: STRIPE_PRODUCTS.professional.prices.yearly.id,
-    stripePriceId: STRIPE_PRODUCTS.professional.prices.monthly.id, // Default to monthly for backwards compatibility
+    price: 19, // UPDATED: Was 49, now 19
+    yearlyPrice: 182.40, // UPDATED: Was 470, now 182.40 (save 20%)
+    monthlyPriceId: 'price_1SRj6zCXTM9N40b8nYW5rOQ8', // NEW price ID
+    yearlyPriceId: 'price_1SRj74CXTM9N40b8lZq75u6Q', // NEW price ID
+    stripePriceId: 'price_1SRj6zCXTM9N40b8nYW5rOQ8', // Default to monthly
+    popular: true, // NEW: Mark as most popular tier
     features: STRIPE_PRODUCTS.professional.features,
     limits: {
-      monthlyConversions: STRIPE_PRODUCTS.professional.limits.conversionsPerMonth,
+      monthlyConversions: STRIPE_PRODUCTS.professional.limits.conversionsPerMonth, // 500
       maxFileSize: 50 * 1024 * 1024, // 50MB
       exportFormats: ['csv', 'xlsx'],
-      bulkUploadLimit: STRIPE_PRODUCTS.professional.limits.bulkUploadLimit,
-      teamMembers: STRIPE_PRODUCTS.professional.limits.teamMembers,
+      bulkUploadLimit: STRIPE_PRODUCTS.professional.limits.bulkUploadLimit, // 10
+      teamMembers: STRIPE_PRODUCTS.professional.limits.teamMembers, // 1
       xeroAccess: true,
       bulkXeroExport: false
+    },
+    trial: {
+      days: 7,
+      requiresCreditCard: true
     }
   },
   business: {
     name: 'Business',
-    price: 99,
+    price: 49, // UPDATED: Was 99, now 49
+    yearlyPrice: 470, // UPDATED: Was 950, now 470 (save 20%)
     monthlyPriceId: STRIPE_PRODUCTS.business.prices.monthly.id,
     yearlyPriceId: STRIPE_PRODUCTS.business.prices.yearly.id,
-    stripePriceId: STRIPE_PRODUCTS.business.prices.monthly.id, // Default to monthly for backwards compatibility
+    stripePriceId: STRIPE_PRODUCTS.business.prices.monthly.id,
     features: STRIPE_PRODUCTS.business.features,
     limits: {
-      monthlyConversions: STRIPE_PRODUCTS.business.limits.conversionsPerMonth,
+      monthlyConversions: STRIPE_PRODUCTS.business.limits.conversionsPerMonth, // 2000
       maxFileSize: 100 * 1024 * 1024, // 100MB
       exportFormats: ['csv', 'xlsx', 'json'],
-      bulkUploadLimit: STRIPE_PRODUCTS.business.limits.bulkUploadLimit,
-      teamMembers: STRIPE_PRODUCTS.business.limits.teamMembers,
+      bulkUploadLimit: STRIPE_PRODUCTS.business.limits.bulkUploadLimit, // 50
+      teamMembers: STRIPE_PRODUCTS.business.limits.teamMembers, // 5 - UPDATED: Multi-user access
       xeroAccess: true,
       bulkXeroExport: true
+    },
+    trial: {
+      days: 7,
+      requiresCreditCard: true
     }
   },
   enterprise: {
     name: 'Enterprise',
     price: 'Custom',
-    stripePriceId: null, // Custom pricing through sales
+    stripePriceId: null,
     features: STRIPE_PRODUCTS.enterprise.features,
     limits: {
       monthlyConversions: -1, // unlimited
@@ -70,7 +84,8 @@ export const SUBSCRIPTION_TIERS = {
       xeroAccess: true,
       bulkXeroExport: true,
       xeroOrganizations: -1 // unlimited
-    }
+    },
+    contactSales: true
   }
 }
 
@@ -84,15 +99,15 @@ export function getTierLimits(tierName) {
   // Check for legacy tier names
   if (tierName === 'basic') tierName = 'professional'
   if (tierName === 'premium') tierName = 'business'
-  
+
   return SUBSCRIPTION_TIERS[tierName]?.limits || SUBSCRIPTION_TIERS.free.limits
 }
 
 export function checkUsageLimit(tierName, currentUsage) {
   const limits = getTierLimits(tierName)
-  
+
   if (limits.monthlyConversions === -1) return true // unlimited
-  
+
   return currentUsage < limits.monthlyConversions
 }
 
@@ -116,16 +131,16 @@ export function getPriceId(tierName, billingPeriod = 'monthly') {
   // Check for legacy tier names
   if (tierName === 'basic') tierName = 'professional'
   if (tierName === 'premium') tierName = 'business'
-  
+
   const tier = SUBSCRIPTION_TIERS[tierName]
   if (!tier) return null
-  
+
   if (tierName === 'free' || tierName === 'enterprise') return null
-  
+
   if (billingPeriod === 'yearly' && tier.yearlyPriceId) {
     return tier.yearlyPriceId
   }
-  
+
   return tier.monthlyPriceId || tier.stripePriceId
 }
 
@@ -145,4 +160,24 @@ export function hasBulkXeroExport(tierName) {
 export function getXeroOrganizationLimit(tierName) {
   const limits = getTierLimits(tierName)
   return limits.xeroOrganizations || 1
+}
+
+// Helper to get monthly equivalent for yearly plans
+export function getMonthlyEquivalent(tierName) {
+  const tier = SUBSCRIPTION_TIERS[tierName]
+  if (!tier || !tier.yearlyPrice || typeof tier.yearlyPrice !== 'number') return null
+
+  return (tier.yearlyPrice / 12).toFixed(2)
+}
+
+// Helper to check if tier has trial period
+export function hasTrialPeriod(tierName) {
+  const tier = SUBSCRIPTION_TIERS[tierName]
+  return tier?.trial?.days > 0
+}
+
+// Helper to get trial days
+export function getTrialDays(tierName) {
+  const tier = SUBSCRIPTION_TIERS[tierName]
+  return tier?.trial?.days || 0
 }
