@@ -47,7 +47,7 @@ export default function Hero() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-sm text-gray-600">Trusted by 1,000+ professionals</p>
+                <p className="text-sm text-gray-600">Trusted by 200+ professionals</p>
               </div>
             </div>
           </div>

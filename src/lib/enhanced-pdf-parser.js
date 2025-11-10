@@ -233,22 +233,21 @@ export class EnhancedBankStatementParser {
   async enhanceTransactions(transactions) {
     try {
       console.log('Enhancing transactions with AI...')
-      
-      // Get AI categorization
-      const aiCategories = await claudeAI.categorizeTransactions(transactions)
-      
-      // Get merchant normalization
+
+      // Run all AI operations in parallel for better performance
       const merchantNames = transactions.map(t => t.description)
-      const normalizedMerchants = await claudeAI.normalizeMerchantNames(merchantNames)
-      
-      // Detect anomalies
-      const anomalies = await claudeAI.detectAnomalies(transactions)
-      
+
+      const [aiCategories, normalizedMerchants, anomalies] = await Promise.all([
+        claudeAI.categorizeTransactions(transactions),
+        claudeAI.normalizeMerchantNames(merchantNames),
+        claudeAI.detectAnomalies(transactions)
+      ])
+
       // Combine traditional and AI data
       const enhancedTransactions = transactions.map((transaction, index) => {
         const aiData = aiCategories[index] || {}
         const anomaly = anomalies.find(a => a.transactionIndex === index)
-        
+
         return {
           ...transaction,
           // Keep original category as fallback
@@ -267,7 +266,7 @@ export class EnhancedBankStatementParser {
           } : null
         }
       })
-      
+
       console.log('AI enhancement completed')
       return enhancedTransactions
     } catch (error) {

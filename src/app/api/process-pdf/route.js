@@ -3,6 +3,10 @@ import { createServerClient } from '@supabase/ssr'
 import { enhancedBankStatementParser } from '@/lib/enhanced-pdf-parser'
 import { checkUsageLimit, getTierLimits } from '@/lib/subscription-tiers'
 
+// Configure Vercel timeout (requires Pro plan)
+// Free: 10s, Hobby: 10s, Pro: 60s, Enterprise: 900s
+export const maxDuration = 300 // 5 minutes for Pro/Enterprise plans
+
 export async function POST(request) {
   try {
     console.log('PDF processing API called')

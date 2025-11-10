@@ -3,6 +3,9 @@ import { BulkImportService } from '@/lib/xero/bulk-import-service'
 import { createClient } from '@/lib/supabase/server'
 import { hasBulkXeroExport } from '@/lib/subscription-tiers'
 
+// Configure extended timeout for bulk operations
+export const maxDuration = 300 // 5 minutes for Pro/Enterprise plans
+
 export async function POST(request) {
   try {
     const supabase = await createClient()

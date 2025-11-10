@@ -15,7 +15,6 @@ const navigation = {
   company: [
     { name: 'About', href: '/about' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Careers', href: '/careers' },
   ],
   legal: [
     { name: 'Privacy', href: '/privacy' },
@@ -49,7 +48,7 @@ export default function Footer() {
                     </svg>
                   ))}
                 </div>
-                <span className="ml-2 text-sm text-gray-400">1,000+ users</span>
+                <span className="ml-2 text-sm text-gray-400">200+ users</span>
               </div>
             </div>
           </div>

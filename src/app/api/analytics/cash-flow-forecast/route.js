@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { financialAnalytics } from '@/lib/analytics/financial-analytics'
 
+// Configure extended timeout for AI analytics
+export const maxDuration = 300 // 5 minutes for Pro/Enterprise plans
+
 export async function POST(request) {
   try {
     const supabase = await createClient()

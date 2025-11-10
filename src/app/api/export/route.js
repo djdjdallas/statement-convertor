@@ -7,6 +7,9 @@ import { createSheetsService } from '@/lib/google/sheets-service'
 import { hasGoogleIntegration } from '@/lib/google/auth'
 import { createErrorResponse, GOOGLE_ERROR_CODES } from '@/lib/google/error-handler'
 
+// Configure extended timeout for large exports
+export const maxDuration = 300 // 5 minutes for Pro/Enterprise plans
+
 export async function POST(request) {
   try {
     const supabase = await createApiRouteClient()

@@ -29,15 +29,15 @@ async function getBlogPosts() {
   return posts
 }
 
-async function getCategories() {
-  const supabase = await createClient()
-  
-  const { data: categories } = await supabase
-    .from('blog_categories')
-    .select('*')
-    .order('name')
-
-  return categories || []
+function getCategories() {
+  // Hardcoded categories that match actual blog content
+  return [
+    { name: 'How-To Guides', slug: 'how-to-guides' },
+    { name: 'Tool Comparisons', slug: 'tool-comparisons' },
+    { name: 'Software Integrations', slug: 'integrations' },
+    { name: 'Product Alternatives', slug: 'alternatives' },
+    { name: 'OCR & Technology', slug: 'ocr-technology' }
+  ]
 }
 
 function formatDate(date) {
@@ -49,10 +49,8 @@ function formatDate(date) {
 }
 
 export default async function BlogPage() {
-  const [posts, categories] = await Promise.all([
-    getBlogPosts(),
-    getCategories()
-  ])
+  const posts = await getBlogPosts()
+  const categories = getCategories()
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

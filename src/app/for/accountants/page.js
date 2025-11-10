@@ -61,7 +61,7 @@ export default function AccountantsPage() {
               {/* Badge */}
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/30 backdrop-blur-sm border border-blue-400/30 text-sm font-medium mb-8">
                 <Award className="h-4 w-4 mr-2" />
-                Trusted by 1,000+ Accountants
+                Trusted by 200+ Accountants
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -548,7 +548,7 @@ export default function AccountantsPage() {
         <CTASection
           variant="inline"
           title="Ready to Reclaim 10-20 Hours Per Month?"
-          description="Join 1,000+ accountants who've eliminated manual data entry from their workflow. Start your 14-day free trial—no credit card required."
+          description="Join 200+ accountants who've eliminated manual data entry from their workflow. Start your 14-day free trial—no credit card required."
           buttonText="Start Free Trial"
           buttonLink="/auth/signup"
         />
@@ -821,7 +821,7 @@ export default function AccountantsPage() {
         {/* CTA Section 2 */}
         <CTASection
           variant="primary"
-          title="Join 1,000+ Accountants Who've Eliminated Manual Data Entry"
+          title="Join 200+ Accountants Who've Eliminated Manual Data Entry"
           description="Start your 14-day free trial. Process your first 20 statements free. See the time savings yourself."
           buttonText="Start Free Trial"
           buttonLink="/auth/signup"
@@ -1095,7 +1095,7 @@ export default function AccountantsPage() {
               Ready to Transform Your Accounting Practice?
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Join 1,000+ accountants who've reclaimed their time and grown their practices with Statement Desk
+              Join 200+ accountants who've reclaimed their time and grown their practices with Statement Desk
             </p>
 
             {/* Two-column CTA */}
@@ -1187,7 +1187,7 @@ export default function AccountantsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
-                <span>1,000+ accounting professionals</span>
+                <span>200+ accounting professionals</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-blue-600" />

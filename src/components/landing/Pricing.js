@@ -253,7 +253,7 @@ export default function Pricing() {
         {/* Trust signals */}
         <div className="mt-12 text-center">
           <p className="text-sm text-gray-500">
-            Join 1,000+ users who trust Statement Desk with their financial data
+            Join 200+ users who trust Statement Desk with their financial data
           </p>
         </div>
 
