@@ -26,23 +26,6 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { analyticsService } from '@/lib/analytics/analytics-service';
 
-// SEO Metadata
-export const metadata = {
-  title: 'Free PDF to Excel Converter for Bank Statements | Statement Desk',
-  description: 'Free PDF to Excel converter for bank statements. Upload your PDF and get formatted Excel in 30 seconds. No credit card required, 90%+ accuracy guaranteed.',
-  keywords: ['free PDF converter', 'PDF to Excel free', 'bank statement converter free', 'convert PDF online'],
-  canonical: 'https://statementdesk.com/tools/free-pdf-to-excel-converter',
-  openGraph: {
-    title: 'Free PDF to Excel Converter for Bank Statements | Statement Desk',
-    description: 'Free PDF to Excel converter for bank statements. Upload your PDF and get formatted Excel in 30 seconds. No credit card required.',
-    type: 'website',
-    url: 'https://statementdesk.com/tools/free-pdf-to-excel-converter'
-  },
-  alternates: {
-    canonical: 'https://statementdesk.com/tools/free-pdf-to-excel-converter'
-  }
-};
-
 export default function FreePDFToExcelConverter() {
   const router = useRouter();
   const [uploadState, setUploadState] = useState('idle'); // idle, uploading, processing, completed, error

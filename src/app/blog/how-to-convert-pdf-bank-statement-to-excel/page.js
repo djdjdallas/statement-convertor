@@ -916,7 +916,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           </p>
 
           <p>
-            <strong>Solution:</strong> Use Excel's Remove Duplicates feature (Data tab → Remove Duplicates → Select all columns). Or manually identify duplicates by sorting by date and amount, then visually scanning for matches. For more sophisticated detection, use Excel formulas to flag duplicates: =COUNTIFS($A$2:$A$100,A2,$B$2:$B$100,B2,$C$2:$C$100,C2)>1. AI-powered converters like Statement Desk automatically detect and flag duplicate transactions across all your uploads, even with slight date or amount variations (e.g., pending vs posted transactions).
+            <strong>Solution:</strong> Use Excel's Remove Duplicates feature (Data tab → Remove Duplicates → Select all columns). Or manually identify duplicates by sorting by date and amount, then visually scanning for matches. For more sophisticated detection, use Excel formulas to flag duplicates: =COUNTIFS($A$2:$A$100,A2,$B$2:$B$100,B2,$C$2:$C$100,C2){'>'}1. AI-powered converters like Statement Desk automatically detect and flag duplicate transactions across all your uploads, even with slight date or amount variations (e.g., pending vs posted transactions).
           </p>
 
           <h2 id="faq">Frequently Asked Questions</h2>

@@ -5,36 +5,8 @@ import ComparisonTable from '@/components/blog/ComparisonTable';
 import CTASection from '@/components/blog/CTASection';
 import ProConsList from '@/components/blog/ProConsList';
 import FAQSection from '@/components/blog/FAQSection';
-import { generateBlogMetadata, generateBlogJsonLd } from '@/components/blog/SEOHead';
+import { generateBlogJsonLd } from '@/components/blog/SEOHead';
 import Link from 'next/link';
-
-// Metadata for SEO
-export async function generateMetadata() {
-  return generateBlogMetadata({
-    title: '8 Best Bank Statement Converter Tools in 2025 (Tested & Compared)',
-    description: 'Compare the 8 best bank statement converter tools in 2025. We tested accuracy, speed, and features to help you choose the right PDF to Excel converter.',
-    keywords: [
-      'best bank statement converter',
-      'bank statement converter',
-      'PDF to Excel converter',
-      'statement parser',
-      'document converter',
-      'AI converter',
-      'bank statement to excel',
-      'financial document converter',
-      'automated statement processing'
-    ],
-    canonicalUrl: 'https://statementdesk.com/blog/best-bank-statement-converter-tools',
-    publishedTime: '2025-01-10T10:00:00Z',
-    modifiedTime: '2025-01-15T14:30:00Z',
-    image: {
-      url: '/blog/best-converter-tools-og.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'Best Bank Statement Converter Tools 2025 Comparison'
-    }
-  });
-}
 
 export default function BestBankStatementConverterToolsPage() {
   // JSON-LD structured data
