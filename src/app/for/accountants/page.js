@@ -19,7 +19,8 @@ import {
   BarChart3,
   Target,
   Award,
-  Building2
+  Building2,
+  X
 } from 'lucide-react';
 
 export const metadata = {
