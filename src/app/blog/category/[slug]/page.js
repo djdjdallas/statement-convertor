@@ -4,11 +4,6 @@ import { CalendarDays, Clock, ArrowRight, ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { notFound } from 'next/navigation'
 
-export const metadata = {
-  title: 'Blog Category - Statement Desk',
-  description: 'Browse blog posts by category',
-}
-
 // Map blog post slugs to categories
 const POST_CATEGORIES = {
   'how-to-convert-pdf-bank-statement-to-excel': 'how-to-guides',
