@@ -30,6 +30,30 @@ export default async function sitemap() {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/support`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/docs/google-workspace-setup`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
       url: `${baseUrl}/auth/signin`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -138,5 +162,19 @@ export default async function sitemap() {
     priority: 0.7,
   })) || []
 
-  return [...staticPages, ...blogPosts]
+  // Blog categories
+  const blogCategories = [
+    'how-to-guides',
+    'tool-comparisons',
+    'integrations',
+    'alternatives',
+    'ocr-technology'
+  ].map((category) => ({
+    url: `${baseUrl}/blog/category/${category}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.75,
+  }))
+
+  return [...staticPages, ...blogPosts, ...blogCategories]
 }
