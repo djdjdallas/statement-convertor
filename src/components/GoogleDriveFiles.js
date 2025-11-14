@@ -28,6 +28,7 @@ import { hasGoogleIntegration } from '@/lib/google/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import DeleteConfirmationModal from '@/components/DeleteConfirmationModal'
 
 export default function GoogleDriveFiles() {
   const { user } = useAuth()
@@ -40,6 +41,10 @@ export default function GoogleDriveFiles() {
   const [nextPageToken, setNextPageToken] = useState(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [deletingFileIds, setDeletingFileIds] = useState(new Set())
+  const [deleteModalState, setDeleteModalState] = useState({
+    isOpen: false,
+    isDeleting: false
+  })
 
   // Check Google integration and load files
   useEffect(() => {
@@ -146,14 +151,17 @@ export default function GoogleDriveFiles() {
     }
   }
 
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = () => {
     if (selectedFiles.length === 0) return
 
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${selectedFiles.length} file(s) from Google Drive?`
-    )
-    if (!confirmDelete) return
+    setDeleteModalState({
+      isOpen: true,
+      isDeleting: false
+    })
+  }
 
+  const confirmDeleteFiles = async () => {
+    setDeleteModalState(prev => ({ ...prev, isDeleting: true }))
     setIsDeleting(true)
     setError(null)
     setDeletingFileIds(new Set(selectedFiles))
@@ -172,7 +180,7 @@ export default function GoogleDriveFiles() {
       }
 
       const result = await response.json()
-      
+
       // Remove deleted files from the list
       setFiles(prev => prev.filter(file => !selectedFiles.includes(file.id)))
       setSelectedFiles([])
@@ -191,6 +199,12 @@ export default function GoogleDriveFiles() {
           variant: 'success'
         })
       }
+
+      // Close modal
+      setDeleteModalState({
+        isOpen: false,
+        isDeleting: false
+      })
     } catch (err) {
       console.error('Error deleting files:', err)
       setError(err.message)
@@ -199,6 +213,7 @@ export default function GoogleDriveFiles() {
         description: err.message || 'Could not delete files. Please try again.',
         variant: 'destructive'
       })
+      setDeleteModalState(prev => ({ ...prev, isDeleting: false }))
       setDeletingFileIds(new Set())
     } finally {
       setIsDeleting(false)
@@ -408,6 +423,21 @@ export default function GoogleDriveFiles() {
           </div>
         )}
       </CardContent>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalState.isOpen}
+        onClose={() => setDeleteModalState({
+          isOpen: false,
+          isDeleting: false
+        })}
+        onConfirm={confirmDeleteFiles}
+        title="Delete Google Drive Files"
+        description={`Are you sure you want to delete ${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''} from Google Drive? This action cannot be undone.`}
+        itemCount={selectedFiles.length}
+        isDeleting={deleteModalState.isDeleting}
+        variant="danger"
+      />
     </Card>
   )
 }

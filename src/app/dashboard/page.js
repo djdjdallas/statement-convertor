@@ -53,6 +53,7 @@ import {
   Send,
 } from "lucide-react";
 import BulkImportDialog from "@/components/xero/BulkImportDialog";
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
 
 export default function DashboardPage() {
   const [files, setFiles] = useState([]);
@@ -68,6 +69,11 @@ export default function DashboardPage() {
   const [xeroConnections, setXeroConnections] = useState([]);
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false);
+  const [deleteModalState, setDeleteModalState] = useState({
+    isOpen: false,
+    fileToDelete: null,
+    isDeleting: false
+  });
   const { user, signOut, loading: authLoading } = useAuth();
   const router = useRouter();
   const supabase = createClient();
@@ -206,26 +212,31 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDeleteFile = async (fileId) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this file? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
+  const handleDeleteFile = (file) => {
+    setDeleteModalState({
+      isOpen: true,
+      fileToDelete: file,
+      isDeleting: false
+    });
+  };
+
+  const confirmDeleteFile = async () => {
+    const fileToDelete = deleteModalState.fileToDelete;
+    if (!fileToDelete) return;
+
+    setDeleteModalState(prev => ({ ...prev, isDeleting: true }));
 
     try {
       const { error } = await supabase
         .from("files")
         .delete()
-        .eq("id", fileId)
+        .eq("id", fileToDelete.id)
         .eq("user_id", user.id);
 
       if (error) throw error;
 
       // Remove from local state
-      setFiles((prev) => prev.filter((file) => file.id !== fileId));
+      setFiles((prev) => prev.filter((file) => file.id !== fileToDelete.id));
 
       // Update stats
       setStats((prev) => ({
@@ -239,6 +250,13 @@ export default function DashboardPage() {
         description: "The file has been successfully deleted.",
         variant: "success",
       });
+
+      // Close modal
+      setDeleteModalState({
+        isOpen: false,
+        fileToDelete: null,
+        isDeleting: false
+      });
     } catch (error) {
       console.error("Error deleting file:", error);
       toast({
@@ -246,6 +264,7 @@ export default function DashboardPage() {
         description: "Failed to delete file. Please try again.",
         variant: "destructive",
       });
+      setDeleteModalState(prev => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -993,7 +1012,7 @@ export default function DashboardPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteFile(file.id)}
+                        onClick={() => handleDeleteFile(file)}
                         className="text-red-600 hover:text-red-800"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -1040,6 +1059,25 @@ export default function DashboardPage() {
           availableFiles={files.filter(
             (f) => f.processing_status === "completed" && !f.xero_import_id
           )}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={deleteModalState.isOpen}
+          onClose={() => setDeleteModalState({
+            isOpen: false,
+            fileToDelete: null,
+            isDeleting: false
+          })}
+          onConfirm={confirmDeleteFile}
+          title="Delete File"
+          itemName={deleteModalState.fileToDelete?.original_filename}
+          itemDetails={{
+            size: deleteModalState.fileToDelete?.file_size,
+            date: deleteModalState.fileToDelete?.created_at,
+            transactionCount: deleteModalState.fileToDelete?.transactions?.[0]?.count
+          }}
+          isDeleting={deleteModalState.isDeleting}
         />
       </div>
     </div>

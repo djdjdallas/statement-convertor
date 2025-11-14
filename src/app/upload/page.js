@@ -27,6 +27,7 @@ import Link from 'next/link'
 import { Checkbox } from '@/components/ui/checkbox.jsx'
 import { toast } from '@/hooks/use-toast'
 import analyticsService from '@/lib/analytics/analytics-service'
+import DeleteConfirmationModal from '@/components/DeleteConfirmationModal'
 
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState([])
@@ -35,6 +36,11 @@ export default function UploadPage() {
   const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
   const [xeroConnections, setXeroConnections] = useState([])
   const [autoSendToXero, setAutoSendToXero] = useState(false)
+  const [deleteModalState, setDeleteModalState] = useState({
+    isOpen: false,
+    fileToDelete: null,
+    isDeleting: false
+  })
   const { user } = useAuth()
   const { profile: userProfileFromHook, subscriptionTier } = useUserProfile()
   const router = useRouter()
@@ -212,29 +218,67 @@ export default function UploadPage() {
     }
   }
 
-  const handleFileRemove = async (fileId) => {
+  const handleFileRemove = (fileId) => {
+    const fileToRemove = uploadedFiles.find(f => f.id === fileId)
+    setDeleteModalState({
+      isOpen: true,
+      fileToDelete: fileToRemove,
+      isDeleting: false
+    })
+  }
+
+  const confirmFileRemove = async () => {
+    const fileToRemove = deleteModalState.fileToDelete
+    if (!fileToRemove) return
+
+    setDeleteModalState(prev => ({ ...prev, isDeleting: true }))
+
     try {
       // Remove from state
-      setUploadedFiles(prev => prev.filter(file => file.id !== fileId))
+      setUploadedFiles(prev => prev.filter(file => file.id !== fileToRemove.id))
 
       // Delete from storage and database
       const { error: deleteError } = await supabase
         .from('files')
         .delete()
-        .eq('id', fileId)
+        .eq('id', fileToRemove.id)
         .eq('user_id', user.id)
 
       if (deleteError) {
         console.error('Error deleting file:', deleteError)
+        toast({
+          title: "Error",
+          description: "Failed to remove file. Please try again.",
+          variant: "destructive"
+        })
       }
 
       // Also delete from storage
       await supabase.storage
         .from('statement-files')
-        .remove([`${user.id}/${fileId}.pdf`])
+        .remove([`${user.id}/${fileToRemove.id}.pdf`])
+
+      // Close modal
+      setDeleteModalState({
+        isOpen: false,
+        fileToDelete: null,
+        isDeleting: false
+      })
+
+      toast({
+        title: "File Removed",
+        description: "The file has been removed successfully.",
+        variant: "success"
+      })
 
     } catch (error) {
       console.error('Error removing file:', error)
+      toast({
+        title: "Error",
+        description: "Failed to remove file. Please try again.",
+        variant: "destructive"
+      })
+      setDeleteModalState(prev => ({ ...prev, isDeleting: false }))
     }
   }
 
@@ -638,6 +682,26 @@ export default function UploadPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={deleteModalState.isOpen}
+          onClose={() => setDeleteModalState({
+            isOpen: false,
+            fileToDelete: null,
+            isDeleting: false
+          })}
+          onConfirm={confirmFileRemove}
+          title="Remove File"
+          description="Are you sure you want to remove this file? It will be deleted from the upload queue."
+          itemName={deleteModalState.fileToDelete?.name}
+          itemDetails={{
+            size: deleteModalState.fileToDelete?.size
+          }}
+          isDeleting={deleteModalState.isDeleting}
+          confirmButtonText="Remove"
+          showWarning={false}
+        />
       </div>
     </div>
   )

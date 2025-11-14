@@ -9,11 +9,17 @@ export const metadata = {
 import { AuthProvider } from '@/contexts/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
 import AnalyticsProvider from '@/components/AnalyticsProvider'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+        {/* Only load Google Analytics in production */}
+        {process.env.NODE_ENV === 'production' && (
+          <GoogleAnalytics ga_id={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
+
         <AuthProvider>
           <AnalyticsProvider>
             {children}

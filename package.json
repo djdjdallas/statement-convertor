@@ -33,6 +33,7 @@
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.52.1",
+    "bcryptjs": "^3.0.3",
     "bullmq": "^5.58.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

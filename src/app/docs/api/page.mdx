@@ -1,0 +1,243 @@
+# Statement Desk API Documentation
+
+Welcome to the Statement Desk API! This RESTful API allows you to integrate bank statement processing directly into your application.
+
+## Quick Start
+
+### 1. Get Your API Key
+
+First, create an API key from your [API Dashboard](/dashboard/api).
+
+### 2. Make Your First Request
+
+```bash
+curl -X POST https://statementdesk.com/api/v1/convert \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F "file=@statement.pdf" \
+  -F "ai_enhanced=true" \
+  -F "export_format=excel"
+```
+
+### 3. Handle the Response
+
+The API will return the converted file as a downloadable attachment.
+
+---
+
+## Authentication
+
+All API requests require authentication using an API key.
+
+### API Key Format
+
+- **Live keys**: `sd_live_xxxxxxxxxxxxx`
+- **Test keys**: `sd_test_xxxxxxxxxxxxx`
+
+### Using Your API Key
+
+Include your API key in the `Authorization` header:
+
+```
+Authorization: Bearer sd_live_xxxxxxxxxxxxx
+```
+
+---
+
+## Endpoints
+
+### POST /api/v1/convert
+
+Convert a bank statement PDF to Excel or CSV.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `file` | File | Yes | PDF file to process (max 10MB) |
+| `ai_enhanced` | Boolean | No | Use AI processing (default: false) |
+| `export_format` | String | No | Output format: 'excel' or 'csv' (default: 'excel') |
+
+**Response:**
+
+Returns the converted file as a downloadable attachment.
+
+**Response Headers:**
+
+- `X-Conversion-Id`: Unique conversion ID
+- `X-Transaction-Count`: Number of transactions found
+- `X-Quota-Used`: Current quota usage
+- `X-Quota-Remaining`: Remaining quota
+- `X-RateLimit-Limit`: Rate limit for your tier
+- `X-RateLimit-Remaining`: Remaining requests
+- `X-RateLimit-Reset`: Timestamp when rate limit resets
+
+---
+
+### GET /api/v1/usage
+
+Get your current usage statistics and quota information.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "quota": {
+    "plan_tier": "starter",
+    "used": 45,
+    "limit": 100,
+    "remaining": 55,
+    "period": {
+      "start": "2025-01-01T00:00:00Z",
+      "end": "2025-02-01T00:00:00Z",
+      "days_remaining": 15
+    }
+  },
+  "usage": {
+    "current_period": {
+      "total_requests": 50,
+      "successful_requests": 45,
+      "failed_requests": 5,
+      "total_transactions": 2150,
+      "success_rate": "90.00"
+    },
+    "daily_breakdown": [...]
+  }
+}
+```
+
+---
+
+## Rate Limits
+
+Rate limits vary by plan tier:
+
+| Plan | Requests/Minute | Daily Limit |
+|------|----------------|-------------|
+| Starter | 10 | 100 |
+| Growth | 30 | 500 |
+| Scale | 60 | 2000 |
+| Enterprise | 120 | Unlimited |
+
+When you exceed your rate limit, you'll receive a `429 Too Many Requests` response.
+
+---
+
+## Error Handling
+
+The API uses standard HTTP status codes:
+
+| Status | Meaning |
+|--------|---------|
+| 200 | Success |
+| 400 | Bad Request - Invalid parameters |
+| 401 | Unauthorized - Invalid or missing API key |
+| 403 | Forbidden - API access disabled or quota exceeded |
+| 413 | Payload Too Large - File exceeds 10MB |
+| 422 | Unprocessable Entity - No transactions found |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Internal Server Error |
+
+**Error Response Format:**
+
+```json
+{
+  "error": "Error type",
+  "message": "Human-readable message",
+  "code": "ERROR_CODE"
+}
+```
+
+---
+
+## Code Examples
+
+### JavaScript/Node.js
+
+```javascript
+const FormData = require('form-data');
+const fs = require('fs');
+const axios = require('axios');
+
+const form = new FormData();
+form.append('file', fs.createReadStream('statement.pdf'));
+form.append('ai_enhanced', 'true');
+form.append('export_format', 'excel');
+
+const response = await axios.post(
+  'https://statementdesk.com/api/v1/convert',
+  form,
+  {
+    headers: {
+      ...form.getHeaders(),
+      'Authorization': 'Bearer sd_live_xxxxxxxxxxxxx'
+    },
+    responseType: 'arraybuffer'
+  }
+);
+
+fs.writeFileSync('output.xlsx', response.data);
+```
+
+### Python
+
+```python
+import requests
+
+url = 'https://statementdesk.com/api/v1/convert'
+headers = {'Authorization': 'Bearer sd_live_xxxxxxxxxxxxx'}
+files = {'file': open('statement.pdf', 'rb')}
+data = {
+    'ai_enhanced': 'true',
+    'export_format': 'excel'
+}
+
+response = requests.post(url, headers=headers, files=files, data=data)
+
+with open('output.xlsx', 'wb') as f:
+    f.write(response.content)
+```
+
+### PHP
+
+```php
+<?php
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, 'https://statementdesk.com/api/v1/convert');
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Bearer sd_live_xxxxxxxxxxxxx'
+]);
+
+$file = new CURLFile('statement.pdf');
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'file' => $file,
+    'ai_enhanced' => 'true',
+    'export_format' => 'excel'
+]);
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$result = curl_exec($ch);
+file_put_contents('output.xlsx', $result);
+
+curl_close($ch);
+?>
+```
+
+---
+
+## Best Practices
+
+1. **Secure Your API Key**: Never commit API keys to version control
+2. **Use Test Keys**: Test your integration with test keys before going live
+3. **Handle Errors**: Always check response status codes and handle errors gracefully
+4. **Respect Rate Limits**: Implement exponential backoff when hitting rate limits
+5. **Monitor Usage**: Check your usage regularly to avoid hitting quotas
+
+---
+
+## Support
+
+Need help? Contact us at support@statementdesk.com or visit our [Help Center](/help).
