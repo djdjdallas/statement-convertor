@@ -131,7 +131,7 @@ import { generateFAQJsonLd } from '@/components/blog/SEOHead';
 const faqJsonLd = generateFAQJsonLd([
   {
     question: "How accurate is Statement Desk's PDF conversion?",
-    answer: "Statement Desk uses AI-powered extraction with 99% accuracy, significantly better than manual data entry or traditional OCR tools."
+    answer: "Statement Desk uses AI-powered extraction achieving 95-98% accuracy in our testing, significantly better than manual data entry or traditional OCR tools."
   },
   {
     question: "Which banks are supported?",
@@ -177,7 +177,7 @@ import ComparisonTable from '@/components/blog/ComparisonTable';
   rows={[
     ['Processing Speed', '30 seconds', '2-3 hours', '5 minutes'],
     ['AI-Powered', true, false, false],
-    ['Accuracy', '99%', '70%', '85%'],
+    ['Accuracy', '95-98%', '70%', '85%'],
     ['User Rating', 5, 3, 4],
     ['Monthly Price', '$29', 'Free', '$49']
   ]}
@@ -385,7 +385,7 @@ export default function BlogPost() {
   const faqJsonLd = generateFAQJsonLd([
     {
       question: "What is the most accurate bank statement converter?",
-      answer: "Statement Desk offers 99% accuracy using AI-powered extraction, making it the most accurate option we tested."
+      answer: "Statement Desk offers 95-98% accuracy in our testing using AI-powered extraction, making it the most accurate option we tested."
     },
     {
       question: "Can I convert bank statements for free?",
@@ -460,7 +460,7 @@ export default function BlogPost() {
           headers={['Feature', 'Statement Desk', 'Tool A', 'Tool B', 'Tool C', 'Tool D']}
           rows={[
             ['AI-Powered Extraction', true, false, true, false, false],
-            ['Accuracy Rate', '99%', '85%', '90%', '75%', '80%'],
+            ['Accuracy Rate', '95-98%', '85%', '90%', '75%', '80%'],
             ['Processing Speed', '30 sec', '5 min', '2 min', '10 min', '3 min'],
             ['Multi-Bank Support', true, true, false, true, false],
             ['Auto Categorization', true, false, true, false, false],
@@ -481,12 +481,12 @@ export default function BlogPost() {
         <p>
           Statement Desk is our top pick for most users, offering the perfect balance
           of accuracy, speed, and features. The AI-powered extraction correctly identified
-          99% of transactions in our tests, significantly better than competitors.
+          95-98% of transactions in our tests, significantly better than competitors.
         </p>
 
         <p><strong>Pros:</strong></p>
         <ul>
-          <li>99% accuracy with AI-powered extraction</li>
+          <li>95-98% accuracy with AI-powered extraction in our testing</li>
           <li>Lightning-fast processing (30 seconds average)</li>
           <li>Automatic transaction categorization</li>
           <li>200+ banks supported</li>
@@ -534,7 +534,7 @@ export default function BlogPost() {
 
         <h3>What is the most accurate bank statement converter?</h3>
         <p>
-          Statement Desk achieved 99% accuracy in our tests, the highest of any tool
+          Statement Desk achieved 95-98% accuracy in our tests, the highest of any tool
           we evaluated. The AI-powered extraction correctly identified transaction dates,
           descriptions, and amounts with minimal errors.
         </p>
@@ -556,7 +556,7 @@ export default function BlogPost() {
         <h2>Final Recommendation</h2>
         <p>
           For most users, <strong>Statement Desk</strong> is the clear winner. The
-          combination of 99% accuracy, fast processing, automatic categorization, and
+          combination of 95-98% accuracy in our testing, fast processing, automatic categorization, and
           excellent support justifies the $29/month price tag. If you process even just
           2-3 statements per month, the time savings alone make it worthwhile.
         </p>

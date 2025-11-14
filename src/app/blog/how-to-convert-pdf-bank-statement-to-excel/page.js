@@ -32,12 +32,12 @@ export default function HowToConvertPDFBankStatementToExcel() {
     {
       id: 'faq-1',
       question: 'Can I convert PDF bank statements to Excel for free?',
-      answer: 'Yes, you can convert PDF bank statements to Excel for free using several methods: manual copy-paste (time-consuming but free), bank CSV export (if your bank supports it), or Google Sheets add-ons. However, free methods typically have limitations in accuracy (60-75%), require significant manual work (2-3 hours per statement), and don\'t include advanced features like automatic categorization or duplicate detection. For regular conversions, AI-powered tools like Statement Desk offer free tiers and provide 99% accuracy with automatic data extraction in under 30 seconds.'
+      answer: 'Yes, you can convert PDF bank statements to Excel for free using several methods: manual copy-paste (time-consuming but free), bank CSV export (if your bank supports it), or Google Sheets add-ons. However, free methods typically have limitations in accuracy (60-75%), require significant manual work (2-3 hours per statement), and don\'t include advanced features like automatic categorization or duplicate detection. For regular conversions, AI-powered tools like Statement Desk offer free tiers and provide 95-98% accuracy with automatic data extraction in under 30 seconds.'
     },
     {
       id: 'faq-2',
       question: 'Which is the most accurate method to convert bank statements?',
-      answer: 'AI-powered converters like Statement Desk provide the highest accuracy at 99%, followed by direct bank CSV exports at 100% (but limited availability). Traditional OCR software typically achieves 65-75% accuracy, while manual copy-paste averages 70% accuracy due to human error. AI-powered solutions use machine learning trained on millions of bank statements to accurately extract dates, amounts, descriptions, and automatically categorize transactions. They also normalize messy merchant names and detect duplicates across statements.'
+      answer: 'AI-powered converters like Statement Desk provide the highest accuracy at 95-98%, followed by direct bank CSV exports at 100% (but limited availability). Traditional OCR software typically achieves 65-75% accuracy, while manual copy-paste averages 70% accuracy due to human error. AI-powered solutions use machine learning trained on millions of bank statements to accurately extract dates, amounts, descriptions, and automatically categorize transactions. They also normalize messy merchant names and detect duplicates across statements.'
     },
     {
       id: 'faq-3',

@@ -75,7 +75,7 @@ export default function SmallBusinessPage() {
     {
       id: 'q4',
       question: 'How accurate is the AI categorization?',
-      answer: 'Our AI achieves 95-99% accuracy on transaction categorization. It automatically recognizes common business expense categories like Office Supplies, Travel, Meals & Entertainment, Utilities, and more. You can review and adjust any categorizations, and the AI learns from your preferences over time. We also show confidence scores so you know which transactions to double-check.'
+      answer: 'Our AI achieves 95-98% accuracy on transaction categorization in our testing. It automatically recognizes common business expense categories like Office Supplies, Travel, Meals & Entertainment, Utilities, and more. You can review and adjust any categorizations, and the AI learns from your preferences over time. We also show confidence scores so you know which transactions to double-check.'
     },
     {
       id: 'q5',
@@ -147,7 +147,7 @@ export default function SmallBusinessPage() {
                   <div className="text-sm text-gray-600">Professional Plan</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600">99%</div>
+                  <div className="text-3xl font-bold text-blue-600">95-98%</div>
                   <div className="text-sm text-gray-600">Accuracy Rate</div>
                 </div>
                 <div className="text-center">
@@ -206,7 +206,7 @@ export default function SmallBusinessPage() {
                   </p>
                   <p className="flex items-start gap-3">
                     <span className="text-green-500 mt-1">✓</span>
-                    <span><strong>AI categorization</strong> automatically tags expenses (Office, Travel, Meals) with 95-99% accuracy - no manual tagging required</span>
+                    <span><strong>AI categorization</strong> automatically tags expenses (Office, Travel, Meals) with 95-98% accuracy - no manual tagging required</span>
                   </p>
                   <p className="flex items-start gap-3">
                     <span className="text-green-500 mt-1">✓</span>
@@ -964,7 +964,7 @@ export default function SmallBusinessPage() {
               rows={[
                 ['Time per Statement', '2-3 hours', 'Hands-off', '5 minutes'],
                 ['Monthly Cost', 'Free (but time = money)', '$300-500/month', '$19/month'],
-                ['Accuracy Rate', '70-80%', '95%', '99%'],
+                ['Accuracy Rate', '70-80%', '95%', '95-98%'],
                 ['Scalability', 'Limited', 'Scalable', 'Unlimited'],
                 ['Stress Level', 'High', 'Low (but expensive)', 'Low & affordable'],
                 ['Setup Time', 'None', 'Days/weeks', '5 minutes'],
@@ -985,7 +985,7 @@ export default function SmallBusinessPage() {
                   </h3>
                   <p className="text-lg text-gray-700 mb-6">
                     Statement Desk offers <strong>bookkeeper-level results</strong> at <strong>DIY pricing</strong>.
-                    Get 99% accuracy, AI-powered insights, and professional features for just $19/month -
+                    Get 95-98% accuracy, AI-powered insights, and professional features for just $19/month -
                     a fraction of the cost of hiring a bookkeeper.
                   </p>
                   <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
@@ -1039,7 +1039,7 @@ export default function SmallBusinessPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-3xl mb-2">⚡</div>
-                  <div className="font-bold text-gray-900">99% Accuracy</div>
+                  <div className="font-bold text-gray-900">95-98% Accuracy</div>
                   <div className="text-sm text-gray-600">AI-Powered</div>
                 </div>
                 <div className="text-center">

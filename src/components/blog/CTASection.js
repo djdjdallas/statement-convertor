@@ -271,9 +271,9 @@ export default function CTASection({
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <span className="text-2xl">🎯</span>
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">99% Accuracy</h4>
+              <h4 className="font-semibold text-gray-900 mb-1">95-98% Accuracy in Testing</h4>
               <p className="text-sm text-gray-600">
-                AI-powered extraction with human-level precision
+                AI-powered extraction with exceptional precision
               </p>
             </div>
 

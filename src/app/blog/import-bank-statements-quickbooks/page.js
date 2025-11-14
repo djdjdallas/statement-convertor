@@ -516,7 +516,7 @@ export default function ImportBankStatementsQuickBooks() {
 
           <div className="not-prose my-6 bg-purple-50 rounded-lg p-6 space-y-3">
             <p className="text-gray-800"><strong>Step 1 - Upload PDF:</strong> Sign up at Statement Desk (free tier available) and upload your PDF bank statement. The system automatically detects your bank and statement format.</p>
-            <p className="text-gray-800"><strong>Step 2 - AI Extraction:</strong> Claude AI processes your statement in 20-30 seconds, extracting dates, merchant names, amounts, and balances with 99% accuracy. AI automatically categorizes transactions and normalizes messy merchant names.</p>
+            <p className="text-gray-800"><strong>Step 2 - AI Extraction:</strong> Claude AI processes your statement in 20-30 seconds, extracting dates, merchant names, amounts, and balances with 95-98% accuracy. AI automatically categorizes transactions and normalizes messy merchant names.</p>
             <p className="text-gray-800"><strong>Step 3 - Review & Edit:</strong> Preview all extracted data with confidence scores. Make any corrections (AI learns from edits). Verify dates, amounts, and merchant names match your statement.</p>
             <p className="text-gray-800"><strong>Step 4 - Export QuickBooks CSV:</strong> Click "Export" and select "QuickBooks" format. Statement Desk creates a perfectly formatted CSV with: MM/DD/YYYY dates, proper negative amounts, correct field mapping, UTF-8 encoding for Excel compatibility.</p>
             <p className="text-gray-800"><strong>Step 5 - Import to QuickBooks:</strong> Use the CSV import process (described above) to import into your QuickBooks account. Takes 2-3 minutes.</p>
@@ -530,7 +530,7 @@ export default function ImportBankStatementsQuickBooks() {
 
           <ul>
             <li>
-              <strong>99% Accuracy:</strong> AI extracts transaction data more accurately than manual copy-paste or basic OCR. Handles scanned PDFs, multiple columns, unusual formats.
+              <strong>95-98% Accuracy:</strong> AI extracts transaction data more accurately than manual copy-paste or basic OCR. Handles scanned PDFs, multiple columns, unusual formats.
             </li>
             <li>
               <strong>Automatic Categorization:</strong> AI categorizes each transaction, saving manual categorization time. Categories map to QuickBooks standard chart of accounts.
@@ -553,7 +553,7 @@ export default function ImportBankStatementsQuickBooks() {
             title="PDF AI Conversion: Pros and Cons"
             pros={[
               'Fastest method overall (2-3 minutes per statement)',
-              '99% accuracy with automatic error detection',
+              '95-98% accuracy with automatic error detection',
               'Handles scanned PDF statements (built-in OCR)',
               'Automatic transaction categorization included',
               'Merchant name normalization (cleanup)',

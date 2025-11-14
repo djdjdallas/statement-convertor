@@ -103,7 +103,7 @@ export default function AccountantsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
-                  <span><strong className="font-semibold">99%</strong> accuracy</span>
+                  <span><strong className="font-semibold">95-98%</strong> accuracy</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="h-5 w-5" />
@@ -395,7 +395,7 @@ export default function AccountantsPage() {
                   <ul className="space-y-4">
                     <li className="flex items-start gap-3">
                       <div className="h-6 w-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-white text-xs font-bold">99%</span>
+                        <span className="text-white text-xs font-bold">95-98%</span>
                       </div>
                       <div>
                         <strong className="text-gray-900">Transaction extraction accuracy</strong>
@@ -449,7 +449,7 @@ export default function AccountantsPage() {
                     Precision Matters for Client Billing
                   </h3>
                   <p className="text-lg text-gray-700 mb-6">
-                    Your reputation depends on accuracy. Statement Desk delivers 99%+ extraction precision with built-in verification tools to ensure every transaction is captured correctly for client billing and audit purposes.
+                    Your reputation depends on accuracy. Statement Desk delivers 95-98% extraction precision in our testing with built-in verification tools to ensure every transaction is captured correctly for client billing and audit purposes.
                   </p>
                   <blockquote className="border-l-4 border-purple-600 pl-6 py-2 mb-6">
                     <p className="text-gray-700 italic mb-2">
@@ -997,7 +997,7 @@ export default function AccountantsPage() {
               rows={[
                 ['Time per statement', '2-3 hours', '5 min review'],
                 ['Cost per statement', '$30-45 (at $15/hr)', '$0.82 (at $49/mo plan)'],
-                ['Accuracy rate', '75-85%', '99%+'],
+                ['Accuracy rate', '75-85%', '95-98%'],
                 ['Human errors', 'Common (typos, missed transactions)', 'Rare (AI-verified)'],
                 ['Scalability', 'Limited by hours available', 'Process 50+ statements at once'],
                 ['Client capacity', '15-20 clients max', '50+ clients easily'],
@@ -1075,7 +1075,7 @@ export default function AccountantsPage() {
                 {
                   id: 'accuracy',
                   question: 'How accurate is the AI categorization?',
-                  answer: 'Statement Desk achieves 99%+ transaction extraction accuracy and 90%+ categorization accuracy. Each transaction includes a confidence score (90%+ is high confidence, 70-89% is medium, below 70% needs review). You can create custom categorization rules that apply across all clients, and the AI learns from your corrections over time. Most accountants find they only need to review low-confidence transactions, which saves significant time.'
+                  answer: 'Statement Desk achieves 95-98% transaction extraction accuracy and 90%+ categorization accuracy in our testing. Each transaction includes a confidence score (90%+ is high confidence, 70-89% is medium, below 70% needs review). You can create custom categorization rules that apply across all clients, and the AI learns from your corrections over time. Most accountants find they only need to review low-confidence transactions, which saves significant time.'
                 },
                 {
                   id: 'roi',

@@ -296,7 +296,7 @@ export default function FreePDFToExcelConverter() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                <span>99% accuracy</span>
+                <span>95-98% accuracy</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
@@ -439,7 +439,7 @@ export default function FreePDFToExcelConverter() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Accuracy</p>
-                        <p className="text-2xl font-bold text-green-600">99%</p>
+                        <p className="text-2xl font-bold text-green-600">95-98%</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Processing Time</p>
@@ -666,7 +666,7 @@ export default function FreePDFToExcelConverter() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">99% accuracy</p>
+                      <p className="font-semibold text-gray-900">95-98% accuracy</p>
                       <p className="text-sm text-gray-600">AI-powered vs human error-prone</p>
                     </div>
                   </div>
@@ -1369,7 +1369,7 @@ export default function FreePDFToExcelConverter() {
               {
                 id: 'faq-3',
                 question: 'How accurate is the free converter?',
-                answer: '99% accuracy on digital PDFs, 95% on scanned PDFs. We use the same AI technology (Claude AI) as our paid plans - we don\'t limit accuracy on the free tier. The only difference is the number of conversions allowed per month.'
+                answer: '95-98% accuracy on digital PDFs, 90-95% on scanned PDFs in our testing. We use the same AI technology (Claude AI) as our paid plans - we don\'t limit accuracy on the free tier. The only difference is the number of conversions allowed per month.'
               },
               {
                 id: 'faq-4',

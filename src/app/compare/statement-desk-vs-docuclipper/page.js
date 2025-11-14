@@ -41,7 +41,7 @@ export default function ComparisonPage() {
     {
       id: 'q3',
       question: 'How accurate is Statement Desk compared to DocuClipper?',
-      answer: 'Based on testing with 50 real bank statements from various institutions, Statement Desk achieves 99% accuracy compared to DocuClipper\'s 92%. This 7% difference translates to significantly fewer manual corrections. Statement Desk\'s AI-powered extraction understands financial context (deposits vs withdrawals, merchant names, categories) while DocuClipper uses traditional OCR pattern matching which is less context-aware.'
+      answer: 'Based on testing with 50 real bank statements from various institutions, Statement Desk achieves 95-98% accuracy compared to DocuClipper\'s 92%. This difference translates to significantly fewer manual corrections. Statement Desk\'s AI-powered extraction understands financial context (deposits vs withdrawals, merchant names, categories) while DocuClipper uses traditional OCR pattern matching which is less context-aware.'
     },
     {
       id: 'q4',
@@ -128,7 +128,7 @@ export default function ComparisonPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">TL;DR: Quick Comparison Summary</h2>
           <div className="space-y-3 text-gray-800">
             <p><strong className="text-blue-600">Winner:</strong> Statement Desk (better accuracy, lower price, more AI features)</p>
-            <p><strong className="text-blue-600">Accuracy:</strong> Statement Desk 99% vs DocuClipper 92%</p>
+            <p><strong className="text-blue-600">Accuracy:</strong> Statement Desk 95-98% vs DocuClipper 92%</p>
             <p><strong className="text-blue-600">Speed:</strong> Statement Desk 30 seconds vs DocuClipper 2 minutes</p>
             <p><strong className="text-blue-600">Pricing:</strong> Statement Desk $19/mo vs DocuClipper $29/mo</p>
             <p><strong className="text-blue-600">Best For:</strong> Statement Desk = small businesses, accountants, bookkeepers | DocuClipper = general document management</p>
@@ -157,7 +157,7 @@ export default function ComparisonPage() {
         <ComparisonTable
           headers={['Feature', 'Statement Desk', 'DocuClipper', 'Winner']}
           rows={[
-            ['Transaction Accuracy', '99%', '92%', 'Statement Desk'],
+            ['Transaction Accuracy', '95-98%', '92%', 'Statement Desk'],
             ['Processing Speed (Average)', '30 seconds', '2 minutes', 'Statement Desk'],
             ['AI Categorization', 'Yes (20+ categories)', 'Limited', 'Statement Desk'],
             ['Merchant Normalization', 'Yes (automatic)', 'No', 'Statement Desk'],
@@ -192,9 +192,9 @@ export default function ComparisonPage() {
           Accuracy is the single most important factor when choosing a bank statement converter. Even small errors require manual corrections that eliminate the time-saving benefits of automation.
         </p>
 
-        <h3>Statement Desk: 99% Accuracy with AI-Powered Understanding</h3>
+        <h3>Statement Desk: 95-98% Accuracy with AI-Powered Understanding</h3>
         <p>
-          Statement Desk achieves an industry-leading 99% accuracy rate using Claude AI, one of the most advanced language models available. Here's what makes it so accurate:
+          Statement Desk achieves 95-98% accuracy in testing using Claude AI, one of the most advanced language models available. Here's what makes it so accurate:
         </p>
         <ul>
           <li><strong>Contextual Understanding:</strong> The AI understands financial concepts like deposits vs withdrawals, running balances, and transaction types rather than just pattern matching</li>
@@ -218,14 +218,14 @@ export default function ComparisonPage() {
         <div className="bg-green-50 border-l-4 border-green-600 p-6 my-6 rounded-r-lg">
           <h4 className="font-bold text-gray-900 mb-2">Verdict: Statement Desk Wins</h4>
           <p className="text-gray-800">
-            The 7% accuracy difference between Statement Desk (99%) and DocuClipper (92%) is significant. On a 100-transaction statement, this means approximately 1 error vs 8 errors. That's 7 fewer manual corrections per statement, which saves 5-10 minutes of review time per document.
+            The accuracy difference between Statement Desk (95-98%) and DocuClipper (92%) is significant. On a 100-transaction statement, this can mean approximately 2-5 errors vs 8 errors. That's fewer manual corrections per statement, which saves 5-10 minutes of review time per document.
           </p>
         </div>
 
         <ProConsList
           title="Statement Desk Accuracy: Pros and Cons"
           pros={[
-            '99% accuracy rate - industry leading',
+            '95-98% accuracy rate in testing - industry leading',
             'AI understands financial context, not just patterns',
             'Works with 200+ banks automatically',
             'Handles scanned PDFs effectively',
@@ -637,7 +637,7 @@ export default function ComparisonPage() {
           <li>✅ Process bank statements regularly (5+ per month)</li>
           <li>✅ Want AI categorization and financial insights</li>
           <li>✅ Need QuickBooks or Xero integration</li>
-          <li>✅ Value accuracy (99%) and time savings</li>
+          <li>✅ Value accuracy (95-98%) and time savings</li>
           <li>✅ Want cash flow forecasting and budget recommendations</li>
           <li>✅ Process statements from various banks (200+ supported)</li>
           <li>✅ Need fast processing (30 seconds average)</li>
@@ -754,7 +754,7 @@ export default function ComparisonPage() {
             <div>
               <h4 className="font-bold text-green-600 mb-2">Why Statement Desk Wins:</h4>
               <ul className="space-y-2 text-gray-800">
-                <li>✅ 7% higher accuracy (99% vs 92%)</li>
+                <li>✅ Higher accuracy (95-98% vs 92%)</li>
                 <li>✅ 4x faster processing (30 sec vs 2 min)</li>
                 <li>✅ $10/month cheaper ($19 vs $29)</li>
                 <li>✅ Advanced AI features included</li>

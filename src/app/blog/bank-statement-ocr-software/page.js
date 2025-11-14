@@ -40,12 +40,12 @@ export default function BankStatementOCRSoftwarePage() {
     {
       id: 'q1',
       question: 'What is OCR software?',
-      answer: 'OCR (Optical Character Recognition) software converts scanned documents and images into editable text. For bank statements, OCR reads the text from PDF scans and extracts transaction data into structured formats like Excel or CSV. Modern AI-powered OCR achieves 95-99% accuracy compared to 60-70% for traditional OCR methods.'
+      answer: 'OCR (Optical Character Recognition) software converts scanned documents and images into editable text. For bank statements, OCR reads the text from PDF scans and extracts transaction data into structured formats like Excel or CSV. Modern AI-powered OCR achieves 95-98% accuracy compared to 60-70% for traditional OCR methods.'
     },
     {
       id: 'q2',
       question: 'How accurate is OCR for bank statements?',
-      answer: 'OCR accuracy varies significantly: Traditional OCR (ABBYY, Adobe) achieves 60-75% accuracy on bank statements. AI-powered OCR (Statement Desk, Nanonets) achieves 95-99% accuracy. The difference is huge—AI understands context and handles complex layouts much better than template-based systems.'
+      answer: 'OCR accuracy varies significantly: Traditional OCR (ABBYY, Adobe) achieves 60-75% accuracy on bank statements. AI-powered OCR (Statement Desk, Nanonets) achieves 95-98% accuracy. The difference is huge—AI understands context and handles complex layouts much better than template-based systems.'
     },
     {
       id: 'q3',
@@ -55,12 +55,12 @@ export default function BankStatementOCRSoftwarePage() {
     {
       id: 'q4',
       question: 'What is the difference between free and paid OCR software?',
-      answer: 'Free OCR tools (like Tesseract, Google Vision) offer basic character recognition with 60-70% accuracy and require technical setup. Paid OCR software ($19-499/month) provides higher accuracy (90-99%), specialized bank statement processing, AI categorization, automatic formatting, batch processing, and dedicated support. For business use, paid tools save significant time and reduce errors.'
+      answer: 'Free OCR tools (like Tesseract, Google Vision) offer basic character recognition with 60-70% accuracy and require technical setup. Paid OCR software ($19-499/month) provides higher accuracy (90-98%), specialized bank statement processing, AI categorization, automatic formatting, batch processing, and dedicated support. For business use, paid tools save significant time and reduce errors.'
     },
     {
       id: 'q5',
       question: 'Which OCR software is most accurate for bank statements?',
-      answer: 'Statement Desk is the most accurate OCR software for bank statements in our testing, achieving 99% accuracy on digital PDFs and 95% on scanned documents. It uses Claude AI to understand context and handle various bank formats. Nanonets comes second at 95% accuracy but costs $499/month versus Statement Desk at $19/month.'
+      answer: 'Statement Desk is the most accurate OCR software for bank statements in our testing, achieving 95-98% accuracy on digital PDFs and 90-95% on scanned documents. It uses Claude AI to understand context and handle various bank formats. Nanonets comes second at 95% accuracy but costs $499/month versus Statement Desk at $19/month.'
     },
     {
       id: 'q6',
@@ -112,7 +112,7 @@ export default function BankStatementOCRSoftwarePage() {
           </p>
 
           <p className="mb-6">
-            In 2025, AI-powered OCR has changed everything. Tools like Statement Desk now achieve 95-99% accuracy on scanned bank statements, compared to 60-75% for traditional OCR software. This comprehensive guide compares the 5 best <strong>bank statement OCR software</strong> options available today, explaining how OCR works, why AI makes such a dramatic difference, and which tool is right for your specific needs.
+            In 2025, AI-powered OCR has changed everything. Tools like Statement Desk now achieve 95-98% accuracy on scanned bank statements, compared to 60-75% for traditional OCR software. This comprehensive guide compares the 5 best <strong>bank statement OCR software</strong> options available today, explaining how OCR works, why AI makes such a dramatic difference, and which tool is right for your specific needs.
           </p>
 
           <p className="mb-6">
@@ -220,7 +220,7 @@ export default function BankStatementOCRSoftwarePage() {
             </div>
 
             <div className="border border-blue-500 rounded-lg p-5 bg-blue-50">
-              <h4 className="font-bold text-lg text-blue-700 mb-3">AI-Powered OCR (95-99% accuracy)</h4>
+              <h4 className="font-bold text-lg text-blue-700 mb-3">AI-Powered OCR (95-98% accuracy)</h4>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">✓</span>
@@ -369,7 +369,7 @@ export default function BankStatementOCRSoftwarePage() {
           <ComparisonTable
             headers={['Feature', 'Traditional OCR', 'AI-Powered OCR']}
             rows={[
-              ['Accuracy (Digital Scans)', '70-85%', '95-99%'],
+              ['Accuracy (Digital Scans)', '70-85%', '95-98%'],
               ['Accuracy (Poor Quality Scans)', '40-60%', '85-95%'],
               ['Context Understanding', 'None', 'Advanced'],
               ['Learning Capability', 'Static', 'Improves Over Time'],
@@ -471,7 +471,7 @@ export default function BankStatementOCRSoftwarePage() {
 
             <h4 className="font-bold text-lg mb-3 mt-6">Overview</h4>
             <p className="mb-4">
-              Statement Desk is the most accurate OCR software for bank statements, achieving 99% accuracy on digital PDFs and 95% on scanned documents. Powered by Claude AI, it doesn't just perform OCR—it understands financial documents. Statement Desk automatically detects whether a PDF is scanned or digital and applies the appropriate processing method. For scanned PDFs, it combines Google Cloud Vision OCR (industry-leading image-to-text) with Claude AI's contextual understanding to achieve accuracy levels that surpass traditional OCR by 30-40 percentage points.
+              Statement Desk is the most accurate OCR software for bank statements in our testing, achieving 95-98% accuracy on digital PDFs and 90-95% on scanned documents. Powered by Claude AI, it doesn't just perform OCR—it understands financial documents. Statement Desk automatically detects whether a PDF is scanned or digital and applies the appropriate processing method. For scanned PDFs, it combines Google Cloud Vision OCR (industry-leading image-to-text) with Claude AI's contextual understanding to achieve accuracy levels that surpass traditional OCR by 30-40 percentage points.
             </p>
 
             <p className="mb-4">
@@ -504,7 +504,7 @@ export default function BankStatementOCRSoftwarePage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold mt-1">✓</span>
-                <span><strong>99% Accuracy (Digital) / 95% Accuracy (Scanned):</strong> Industry-leading accuracy across all bank formats</span>
+                <span><strong>95-98% Accuracy (Digital) / 90-95% Accuracy (Scanned):</strong> Industry-leading accuracy across all bank formats</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold mt-1">✓</span>
@@ -557,7 +557,7 @@ export default function BankStatementOCRSoftwarePage() {
             <ProConsList
               title="Statement Desk: Pros and Cons"
               pros={[
-                'Highest accuracy of any OCR software tested (99% digital, 95% scanned)',
+                'Highest accuracy of any OCR software tested (95-98% digital, 90-95% scanned)',
                 'Automatic detection of scanned PDFs—no manual setup',
                 'Handles poor quality scans better than competitors',
                 'AI categorization and merchant normalization included',
@@ -944,7 +944,7 @@ export default function BankStatementOCRSoftwarePage() {
           <ComparisonTable
             headers={['OCR Software', 'Digital PDFs', 'High-Quality Scans', 'Poor-Quality Scans', 'Processing Speed']}
             rows={[
-              ['Statement Desk (AI)', '99%', '95%', '90%', '30-60 sec'],
+              ['Statement Desk (AI)', '95-98%', '90-95%', '85-90%', '30-60 sec'],
               ['Nanonets (AI)', '98%', '95%', '88%', '1-2 min'],
               ['Docsumo (AI)', '96%', '90%', '82%', '1-2 min'],
               ['ABBYY FineReader', '85%', '75%', '55%', '3-5 min'],
@@ -1074,7 +1074,7 @@ export default function BankStatementOCRSoftwarePage() {
                 </div>
                 <div>
                   <p className="font-bold text-purple-700">95%+ critical (audit, loan applications)</p>
-                  <p className="text-sm text-gray-700">Statement Desk (95-99%) or Nanonets (95%) are your only options. For financial decisions, accuracy matters more than cost.</p>
+                  <p className="text-sm text-gray-700">Statement Desk (95-98%) or Nanonets (95%) are your only options. For financial decisions, accuracy matters more than cost.</p>
                 </div>
               </div>
             </div>
@@ -1293,7 +1293,7 @@ export default function BankStatementOCRSoftwarePage() {
           <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6 my-8">
             <h3 className="font-bold text-lg mb-3">Pro Tip: Always Verify OCR Output</h3>
             <p className="mb-3">
-              Even 99% accurate OCR means 1 in 100 fields has an error. For financial documents, always:
+              Even 95-98% accurate OCR means 2-5 in 100 fields may have errors. For financial documents, always:
             </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-start gap-2">
@@ -1326,11 +1326,11 @@ export default function BankStatementOCRSoftwarePage() {
           <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-xl p-8 mb-8">
             <h3 className="text-2xl font-bold mb-4">Final Recommendation: Statement Desk</h3>
             <p className="text-lg mb-4">
-              After extensive testing of OCR software with scanned bank statements, Statement Desk stands out as the clear winner. The combination of 95-99% accuracy, automatic scan detection, AI categorization, and affordable $19/month pricing makes it the best choice for everyone from individuals to enterprises.
+              After extensive testing of OCR software with scanned bank statements, Statement Desk stands out as the clear winner. The combination of 95-98% accuracy, automatic scan detection, AI categorization, and affordable $19/month pricing makes it the best choice for everyone from individuals to enterprises.
             </p>
             <div className="grid md:grid-cols-3 gap-4 mt-6">
               <div className="bg-white/10 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold mb-2">95-99%</div>
+                <div className="text-3xl font-bold mb-2">95-98%</div>
                 <div className="text-sm">Accuracy Rate</div>
               </div>
               <div className="bg-white/10 rounded-lg p-4 text-center">
@@ -1407,7 +1407,7 @@ export default function BankStatementOCRSoftwarePage() {
           <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-8 mb-8">
             <h3 className="font-bold text-2xl mb-4">The Bottom Line</h3>
             <p className="text-lg mb-4">
-              OCR technology has evolved dramatically. AI-powered OCR like Statement Desk achieves 95-99% accuracy on scanned bank statements—a 30-40 point improvement over traditional OCR methods. At $19/month for unlimited statements with AI categorization included, there's simply no reason to settle for 60-70% accuracy and hours of manual corrections.
+              OCR technology has evolved dramatically. AI-powered OCR like Statement Desk achieves 95-98% accuracy on scanned bank statements—a 30-40 point improvement over traditional OCR methods. At $19/month for unlimited statements with AI categorization included, there's simply no reason to settle for 60-70% accuracy and hours of manual corrections.
             </p>
             <p className="text-lg">
               Whether you're processing old scanned statements from 2015 or dealing with banks that provide image-based PDFs, modern AI-powered OCR turns a multi-hour manual task into a 2-minute automated process. The time savings alone justify the investment—everything else is a bonus.

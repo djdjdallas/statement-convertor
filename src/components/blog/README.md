@@ -124,7 +124,7 @@ import ComparisonTable from '@/components/blog/ComparisonTable';
   headers={['Feature', 'Statement Desk', 'Competitor']}
   rows={[
     ['AI-Powered', true, false],
-    ['Accuracy', '99%', '85%'],
+    ['Accuracy', '95-98%', '85%'],
     ['Rating', 5, 3]
   ]}
   highlightColumn={1}

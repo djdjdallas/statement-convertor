@@ -36,7 +36,7 @@ const comparisonData = [
   },
   {
     feature: 'Accuracy (Bank Statements)',
-    statementDesk: '99%',
+    statementDesk: '95-98%',
     competitor: '95%',
     winner: 'Statement Desk',
   },
@@ -259,7 +259,7 @@ const statementDeskPros = [
   '26x more affordable ($19/mo vs $499/mo)',
   'No-code, anyone can use it in 5 minutes',
   'Pre-configured for 200+ banks',
-  '99% accuracy for bank statements',
+  '95-98% accuracy for bank statements in testing',
   'Built-in QuickBooks and Xero integration',
   'Financial insights (forecasting, budgeting)',
   'Unlimited statements (no overage fees)',
@@ -291,7 +291,7 @@ const nanonetsCons = [
   'Requires technical expertise (API integration)',
   'Steep learning curve (2-3 days)',
   'Time-consuming setup (2-4 hours)',
-  'Lower accuracy for bank statements (95% vs 99%)',
+  'Lower accuracy for bank statements (95% vs 95-98%)',
   'No pre-built accounting integrations',
   'Must configure bank formats manually',
   'No financial insights features',
@@ -310,7 +310,7 @@ const faqData = [
   },
   {
     question: 'Which is more accurate for bank statements?',
-    answer: 'Statement Desk achieves 99% accuracy versus Nanonets\' 95% for bank statements. This is because we\'re specialized and pre-trained on thousands of bank statement formats from 200+ financial institutions. We understand banking-specific context, merchant name patterns, transaction categorization, and financial data structures. Nanonets requires manual training for each bank format, which takes time and still results in lower accuracy.',
+    answer: 'Statement Desk achieves 95-98% accuracy in our testing versus Nanonets\' 95% for bank statements. This is because we\'re specialized and pre-trained on thousands of bank statement formats from 200+ financial institutions. We understand banking-specific context, merchant name patterns, transaction categorization, and financial data structures. Nanonets requires manual training for each bank format, which takes time and may result in lower accuracy out-of-the-box.',
   },
   {
     question: 'Do I need technical skills for either platform?',
@@ -365,7 +365,7 @@ export default function StatementDeskVsNanonets() {
               </li>
               <li className="flex items-start">
                 <span className="text-green-600 mr-2 mt-1">✓</span>
-                <span><strong>Accuracy:</strong> 99% for bank statements</span>
+                <span><strong>Accuracy:</strong> 95-98% for bank statements in testing</span>
               </li>
               <li className="flex items-start">
                 <span className="text-green-600 mr-2 mt-1">✓</span>
@@ -529,7 +529,7 @@ export default function StatementDeskVsNanonets() {
       </p>
       <p className="text-lg text-gray-700 mb-6 leading-relaxed">
         If your primary need is converting bank statements to Excel, paying 26x more for Nanonets makes no sense. You'll
-        spend weeks on setup and training only to get lower accuracy (95% vs 99%) and no accounting integrations. However,
+        spend weeks on setup and training only to get similar accuracy (95% vs 95-98%) and no accounting integrations. However,
         if you process many document types and have developer resources, Nanonets' flexibility might justify the premium.
       </p>
 
@@ -827,7 +827,7 @@ export default function StatementDeskVsNanonets() {
                 <span className="text-green-600 mr-2">✓</span>
                 <div>
                   <strong>Intelligent Transaction Extraction</strong><br />
-                  <span className="text-sm">Extracts date, description, amount, balance with 99% accuracy. Handles multi-line transactions.</span>
+                  <span className="text-sm">Extracts date, description, amount, balance with 95-98% accuracy. Handles multi-line transactions.</span>
                 </div>
               </li>
               <li className="flex items-start">
@@ -1069,7 +1069,7 @@ export default function StatementDeskVsNanonets() {
       />
 
       {/* Accuracy Section */}
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">Accuracy Comparison: 99% vs 95%</h2>
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 mt-12">Accuracy Comparison: 95-98% vs 95%</h2>
 
       <p className="text-lg text-gray-700 mb-6 leading-relaxed">
         When it comes to financial data, accuracy is paramount. Even small errors in transaction extraction can cause
@@ -1082,7 +1082,7 @@ export default function StatementDeskVsNanonets() {
         <div className="grid md:grid-cols-2 gap-8 mb-6">
           <div className="bg-green-100 border-2 border-green-300 rounded-lg p-6">
             <h4 className="font-bold text-green-800 text-xl mb-4">Statement Desk</h4>
-            <div className="text-5xl font-bold text-green-700 mb-4">99%</div>
+            <div className="text-5xl font-bold text-green-700 mb-4">95-98%</div>
             <p className="text-gray-700 mb-4">Overall Accuracy</p>
             <ul className="space-y-2 text-sm text-gray-700">
               <li>✓ 99.2% date extraction accuracy</li>
@@ -1112,7 +1112,7 @@ export default function StatementDeskVsNanonets() {
         <p className="text-gray-700 mb-4">
           <strong>Important note:</strong> Nanonets' 95% accuracy was achieved <em>after</em> 2-4 hours of model training
           on sample statements. Out-of-the-box accuracy (before training) was approximately 75-80%. Statement Desk achieves
-          99% accuracy immediately with zero training required.
+          95-98% accuracy immediately with zero training required.
         </p>
       </div>
 
@@ -1163,7 +1163,7 @@ export default function StatementDeskVsNanonets() {
 
       <p className="text-lg text-gray-700 mb-4 leading-relaxed">
         <strong>The verdict:</strong> Statement Desk delivers <strong>superior accuracy</strong> for bank statements with
-        zero setup. The 4% accuracy difference (99% vs 95%) means fewer errors, less manual correction, and more reliable
+        zero setup. The accuracy advantage (95-98% vs 95%) means fewer errors, less manual correction, and more reliable
         financial data. Over hundreds of transactions, this accuracy gap compounds into significant time savings.
       </p>
 
@@ -1457,7 +1457,7 @@ export default function StatementDeskVsNanonets() {
             <li>✓ You <strong>only</strong> process bank statements (don't need Nanonets' other document features)</li>
             <li>✓ You want to reduce costs by <strong>$480/month ($5,760/year)</strong></li>
             <li>✓ You're tired of the technical complexity and want a simpler tool</li>
-            <li>✓ You want better accuracy (99% vs 95%) for bank statements</li>
+            <li>✓ You want better accuracy (95-98% vs 95%) for bank statements</li>
             <li>✓ You need QuickBooks/Xero integration (not available in Nanonets)</li>
             <li>✓ You want financial insights features (forecasting, budgeting)</li>
             <li>✓ Your team struggles with Nanonets' learning curve</li>
@@ -1535,7 +1535,7 @@ export default function StatementDeskVsNanonets() {
               <li>✓ <strong>$480/month savings</strong> ($5,760/year)</li>
               <li>✓ <strong>Easier to use</strong> - no technical expertise required</li>
               <li>✓ <strong>Faster processing</strong> - under 30 seconds vs variable</li>
-              <li>✓ <strong>Better accuracy</strong> - 99% vs 95% for bank statements</li>
+              <li>✓ <strong>Better accuracy</strong> - 95-98% vs 95% for bank statements</li>
               <li>✓ <strong>Built-in integrations</strong> - QuickBooks, Xero</li>
               <li>✓ <strong>Financial insights</strong> - forecasting, budgeting, analytics</li>
               <li>✓ <strong>No maintenance</strong> - we handle updates and improvements</li>
@@ -1593,7 +1593,7 @@ export default function StatementDeskVsNanonets() {
           <ul className="space-y-2 text-gray-700 mb-6">
             <li>✓ 26x more affordable ($19 vs $499/month)</li>
             <li>✓ 100x easier to use (5 min vs 2-4 hours setup)</li>
-            <li>✓ Higher accuracy (99% vs 95%)</li>
+            <li>✓ Higher accuracy (95-98% vs 95%)</li>
             <li>✓ Purpose-built for bank statements</li>
             <li>✓ Built-in accounting integrations</li>
             <li>✓ Financial insights included</li>
@@ -1670,7 +1670,7 @@ export default function StatementDeskVsNanonets() {
           <li>✓ If the financial insights add value to your workflow</li>
         </ul>
         <p className="text-lg text-gray-700 mb-4">
-          <strong>99% of people who test Statement Desk upgrade to paid plans</strong> because the value is obvious. You're
+          <strong>Most people who test Statement Desk upgrade to paid plans</strong> because the value is obvious. You're
           getting better results, saving time, and paying a fraction of what alternatives cost.
         </p>
         <p className="text-lg text-gray-700">
@@ -1692,7 +1692,7 @@ export default function StatementDeskVsNanonets() {
             <p className="text-sm text-gray-600">vs $499/mo with Nanonets</p>
           </div>
           <div>
-            <div className="text-4xl font-bold text-green-600 mb-2">99%</div>
+            <div className="text-4xl font-bold text-green-600 mb-2">95-98%</div>
             <p className="text-gray-700">Accuracy Rate</p>
             <p className="text-sm text-gray-600">vs 95% with Nanonets</p>
           </div>

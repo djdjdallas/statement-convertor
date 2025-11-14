@@ -24,7 +24,7 @@ import { useState } from 'react';
  *   headers={['Feature', 'Statement Desk', 'Competitor A', 'Competitor B']}
  *   rows={[
  *     ['AI-Powered Processing', true, false, false],
- *     ['Accuracy Rate', '99%', '85%', '80%'],
+ *     ['Accuracy Rate', '95-98%', '85%', '80%'],
  *     ['User Rating', 5, 4, 3],
  *     ['Price', '$29/mo', '$49/mo', '$39/mo'],
  *     ['API Access', true, true, false]
@@ -224,7 +224,7 @@ export function StatementDeskComparison() {
       headers={['Feature', 'Statement Desk', 'Manual Excel', 'Other Tools']}
       rows={[
         ['AI-Powered Extraction', true, false, false],
-        ['Accuracy Rate', '99%', '70%', '85%'],
+        ['Accuracy Rate', '95-98%', '70%', '85%'],
         ['Processing Time', '30 seconds', '2-3 hours', '5-10 minutes'],
         ['Categorization', 'Automatic', 'Manual', 'Semi-automatic'],
         ['Multi-Bank Support', true, false, true],
