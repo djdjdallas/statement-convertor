@@ -9,10 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import DataPreview from '@/components/DataPreview'
 import AIInsights from '@/components/AIInsights'
 import FinancialChat from '@/components/chat/FinancialChat'
+import SyncButton from '@/components/quickbooks/SyncButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { useUserProfile } from '@/hooks/useUserProfile'
-import { hasXeroAccess } from '@/lib/subscription-tiers'
+import { hasXeroAccess, hasQuickBooksAccess } from '@/lib/subscription-tiers'
 import { ArrowLeft, Download, Loader2, Brain, MessageCircle, Building, Zap } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -35,10 +36,14 @@ export default function PreviewPage() {
   const [selectedTenant, setSelectedTenant] = useState('')
   const [selectedBankAccount, setSelectedBankAccount] = useState('')
   const [bankAccounts, setBankAccounts] = useState([])
+  const [qbConnected, setQbConnected] = useState(false)
   const supabase = createClient()
 
   // Check if user has Xero access
   const userHasXeroAccess = hasXeroAccess(subscriptionTier)
+
+  // Check if user has QuickBooks access
+  const userHasQuickBooksAccess = hasQuickBooksAccess(subscriptionTier)
 
   useEffect(() => {
     if (!user) {
@@ -54,7 +59,12 @@ export default function PreviewPage() {
     if (userHasXeroAccess) {
       fetchXeroConnections()
     }
-  }, [user, fileId, router, userHasXeroAccess])
+
+    // Fetch QuickBooks connection status if user has access
+    if (userHasQuickBooksAccess) {
+      fetchQuickBooksStatus()
+    }
+  }, [user, fileId, router, userHasXeroAccess, userHasQuickBooksAccess])
 
   const fetchFileInfo = async () => {
     try {
@@ -126,6 +136,26 @@ export default function PreviewPage() {
       }
     } catch (error) {
       console.error('Failed to fetch Xero connections:', error)
+    }
+  }
+
+  const fetchQuickBooksStatus = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch('/api/quickbooks/status', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setQbConnected(data.connected || false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch QuickBooks status:', error)
     }
   }
 
@@ -459,6 +489,33 @@ export default function PreviewPage() {
                   <Zap className="h-4 w-4 mr-1" />
                   Exported to Xero
                 </Badge>
+              )}
+
+              {/* QuickBooks Sync Button */}
+              {qbConnected && userHasQuickBooksAccess && (
+                <SyncButton
+                  fileId={fileId}
+                  fileName={fileInfo?.filename}
+                  transactions={transactions}
+                  onSyncComplete={() => {
+                    toast({
+                      title: 'Sync Complete',
+                      description: 'Transactions synced to QuickBooks successfully',
+                    })
+                    fetchFileInfo()
+                  }}
+                />
+              )}
+
+              {!qbConnected && userHasQuickBooksAccess && (
+                <Button
+                  onClick={() => router.push('/settings?tab=integrations')}
+                  variant="outline"
+                  className="border-green-300"
+                >
+                  <Building className="h-4 w-4 mr-2" />
+                  Connect QuickBooks
+                </Button>
               )}
             </div>
           </div>

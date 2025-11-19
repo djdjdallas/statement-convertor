@@ -22,7 +22,8 @@ export const SUBSCRIPTION_TIERS = {
       bulkUploadLimit: 1,
       teamMembers: 1,
       xeroAccess: false,
-      bulkXeroExport: false
+      bulkXeroExport: false,
+      quickbooksAccess: false
     }
   },
   professional: {
@@ -41,7 +42,8 @@ export const SUBSCRIPTION_TIERS = {
       bulkUploadLimit: STRIPE_PRODUCTS.professional.limits.bulkUploadLimit, // 10
       teamMembers: STRIPE_PRODUCTS.professional.limits.teamMembers, // 1
       xeroAccess: true,
-      bulkXeroExport: false
+      bulkXeroExport: false,
+      quickbooksAccess: true
     },
     trial: {
       days: 7,
@@ -63,7 +65,8 @@ export const SUBSCRIPTION_TIERS = {
       bulkUploadLimit: STRIPE_PRODUCTS.business.limits.bulkUploadLimit, // 50
       teamMembers: STRIPE_PRODUCTS.business.limits.teamMembers, // 5 - UPDATED: Multi-user access
       xeroAccess: true,
-      bulkXeroExport: true
+      bulkXeroExport: true,
+      quickbooksAccess: true
     },
     trial: {
       days: 7,
@@ -83,7 +86,8 @@ export const SUBSCRIPTION_TIERS = {
       teamMembers: -1, // unlimited
       xeroAccess: true,
       bulkXeroExport: true,
-      xeroOrganizations: -1 // unlimited
+      xeroOrganizations: -1, // unlimited
+      quickbooksAccess: true
     },
     contactSales: true
   }
@@ -180,4 +184,10 @@ export function hasTrialPeriod(tierName) {
 export function getTrialDays(tierName) {
   const tier = SUBSCRIPTION_TIERS[tierName]
   return tier?.trial?.days || 0
+}
+
+// Helper to check QuickBooks access
+export function hasQuickBooksAccess(tierName) {
+  const limits = getTierLimits(tierName)
+  return limits.quickbooksAccess === true
 }

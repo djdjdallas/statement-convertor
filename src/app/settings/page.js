@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import GoogleDriveIntegration from '@/components/GoogleDriveIntegration';
 import XeroConnectionStatus from '@/components/xero/XeroConnectionStatus';
+import QuickBooksConnectionStatus from '@/components/quickbooks/QuickBooksConnectionStatus';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { hasXeroAccess } from '@/lib/subscription-tiers';
+import { hasXeroAccess, hasQuickBooksAccess } from '@/lib/subscription-tiers';
 import { toast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
@@ -173,7 +174,40 @@ export default function SettingsPage() {
                   </CardContent>
                 </Card>
               )}
-              
+
+              {/* QuickBooks Integration */}
+              {hasQuickBooksAccess(profile?.subscription_tier || 'free') ? (
+                <QuickBooksConnectionStatus />
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <svg className="h-6 w-6" viewBox="0 0 32 32" fill="#2CA01C">
+                        <circle cx="16" cy="16" r="16" fill="#2CA01C"/>
+                        <path d="M22 11h-3V8h-6v3H10v10h3v3h6v-3h3V11zm-8 9h-2v-6h2v6zm6 0h-2v-6h2v6z" fill="white"/>
+                      </svg>
+                      QuickBooks Online Integration
+                    </CardTitle>
+                    <CardDescription>
+                      Automatically sync bank statement transactions to QuickBooks
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 mb-4">
+                        QuickBooks integration is available on Professional plans and above
+                      </p>
+                      <Button
+                        onClick={() => router.push('/pricing')}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Upgrade to Professional
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Google Drive Integration */}
               <GoogleDriveIntegration />
 

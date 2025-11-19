@@ -706,7 +706,7 @@ export default function DashboardPage() {
                 </Button>
               </Link>
 
-              <Link href="#pricing">
+              <Link href="/pricing">
                 <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-32">
                   <CardContent className="p-6 h-full">
                     <div className="flex items-center h-full">
