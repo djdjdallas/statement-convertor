@@ -108,6 +108,8 @@ export function getTierLimits(tierName) {
 }
 
 export function checkUsageLimit(tierName, currentUsage) {
+  if (isLocalDev()) return true // Bypass for local development
+
   const limits = getTierLimits(tierName)
 
   if (limits.monthlyConversions === -1) return true // unlimited
@@ -148,14 +150,22 @@ export function getPriceId(tierName, billingPeriod = 'monthly') {
   return tier.monthlyPriceId || tier.stripePriceId
 }
 
+// Local development bypass
+const isLocalDev = () => {
+  return process.env.NODE_ENV === 'development' ||
+         process.env.NEXT_PUBLIC_BYPASS_PREMIUM === 'true'
+}
+
 // Helper to check Xero access
 export function hasXeroAccess(tierName) {
+  if (isLocalDev()) return true // Bypass for local development
   const limits = getTierLimits(tierName)
   return limits.xeroAccess === true
 }
 
 // Helper to check bulk Xero export access
 export function hasBulkXeroExport(tierName) {
+  if (isLocalDev()) return true // Bypass for local development
   const limits = getTierLimits(tierName)
   return limits.bulkXeroExport === true
 }
@@ -188,6 +198,7 @@ export function getTrialDays(tierName) {
 
 // Helper to check QuickBooks access
 export function hasQuickBooksAccess(tierName) {
+  if (isLocalDev()) return true // Bypass for local development
   const limits = getTierLimits(tierName)
   return limits.quickbooksAccess === true
 }

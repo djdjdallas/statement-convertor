@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Loader2, Building, AlertCircle, RefreshCw, Settings } from 'lucide-react';
+import { CheckCircle, Loader2, Building, AlertCircle, RefreshCw, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 
 export default function QuickBooksConnectionStatus() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function QuickBooksConnectionStatus() {
   const [testing, setTesting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const supabase = createClient();
 
   useEffect(() => {
     if (user) {
@@ -52,10 +54,10 @@ export default function QuickBooksConnectionStatus() {
 
   const fetchConnectionStatus = async () => {
     try {
-      const token = await user.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch('/api/quickbooks/status', {
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
         },
       });
 
@@ -80,11 +82,11 @@ export default function QuickBooksConnectionStatus() {
   const initiateConnection = async () => {
     setConnecting(true);
     try {
-      const token = await user.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch('/api/quickbooks/connect', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
         },
       });
 
@@ -108,11 +110,11 @@ export default function QuickBooksConnectionStatus() {
 
   const disconnectQuickBooks = async () => {
     try {
-      const token = await user.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch('/api/quickbooks/disconnect', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
         },
       });
 
@@ -138,10 +140,10 @@ export default function QuickBooksConnectionStatus() {
   const testConnection = async () => {
     setTesting(true);
     try {
-      const token = await user.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch('/api/quickbooks/status?test=true', {
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
         },
       });
 
