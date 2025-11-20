@@ -31,7 +31,7 @@ export async function createSyncJob(userId, connectionId, fileId, settings = {})
     .select('*')
     .eq('file_id', fileId)
     .eq('user_id', userId)
-    .order('date');
+    .order('date', { ascending: true });
 
   if (txnError) {
     throw new Error('Failed to fetch transactions for file');
