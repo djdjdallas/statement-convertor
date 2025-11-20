@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, RefreshCw, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 import SyncProgressModal from './SyncProgressModal';
 
 export default function SyncButton({ fileId, fileName, transactions = [], onSyncComplete }) {
@@ -28,11 +29,17 @@ export default function SyncButton({ fileId, fileName, transactions = [], onSync
     setSyncing(true);
 
     try {
-      const token = await user.getSession();
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
       const response = await fetch('/api/quickbooks/sync/start', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
