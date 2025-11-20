@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SyncProgressModal({ jobId, fileName, onClose }) {
   const [status, setStatus] = useState(null);
@@ -32,10 +33,17 @@ export default function SyncProgressModal({ jobId, fileName, onClose }) {
 
   const fetchStatus = useCallback(async () => {
     try {
-      const token = await user.getSession();
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        console.error('No session found');
+        return false;
+      }
+
       const response = await fetch(`/api/quickbooks/sync/status?jobId=${jobId}`, {
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
       });
 
@@ -85,11 +93,17 @@ export default function SyncProgressModal({ jobId, fileName, onClose }) {
   const handleRetry = async () => {
     setRetrying(true);
     try {
-      const token = await user.getSession();
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
       const response = await fetch('/api/quickbooks/sync/retry', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token.session.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ jobId }),
