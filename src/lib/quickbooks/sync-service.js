@@ -30,7 +30,6 @@ export async function createSyncJob(userId, connectionId, fileId, settings = {})
     .from('transactions')
     .select('*')
     .eq('file_id', fileId)
-    .eq('user_id', userId)
     .order('date', { ascending: true });
 
   if (txnError) {
