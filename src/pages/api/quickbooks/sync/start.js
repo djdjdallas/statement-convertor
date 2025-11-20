@@ -53,8 +53,11 @@ export default async function handler(req, res) {
       .single();
 
     if (fileError || !file) {
+      console.error('File verification failed:', { fileError, fileId, userId: user.id });
       return res.status(404).json({ error: 'File not found' });
     }
+
+    console.log('File verified, creating sync job:', { fileId, userId: user.id, connectionId: connection.id });
 
     // Create sync job
     const job = await createSyncJob(user.id, connection.id, fileId, settings);

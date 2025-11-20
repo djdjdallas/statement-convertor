@@ -34,7 +34,9 @@ export async function createSyncJob(userId, connectionId, fileId, settings = {})
     .order('date', { ascending: true });
 
   if (txnError) {
-    throw new Error('Failed to fetch transactions for file');
+    console.error('Transaction fetch error:', txnError);
+    console.error('Query params:', { fileId, userId });
+    throw new Error(`Failed to fetch transactions for file: ${txnError.message || JSON.stringify(txnError)}`);
   }
 
   if (!transactions || transactions.length === 0) {
