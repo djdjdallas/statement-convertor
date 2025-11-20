@@ -55,20 +55,21 @@ export function generateAuthUrl(userId) {
 
 /**
  * Exchange authorization code for access tokens
- * @param {string} authCode - Authorization code from callback
+ * @param {string} callbackUrl - Full callback URL with authorization code
  * @param {string} realmId - QuickBooks company ID
  * @returns {Promise<Object>} Token data
  */
-export async function exchangeCodeForTokens(authCode, realmId) {
+export async function exchangeCodeForTokens(callbackUrl, realmId) {
   const oauthClient = getOAuthClient();
 
   try {
-    // Set the redirect URI explicitly before creating token
-    oauthClient.redirectUri = process.env.QUICKBOOKS_REDIRECT_URI;
-
-    // Create token
-    const authResponse = await oauthClient.createToken(authCode);
+    // The intuit-oauth library expects the full callback URL
+    // It will parse the authorization code from the URL query parameters
+    console.log('Creating token from callback URL');
+    const authResponse = await oauthClient.createToken(callbackUrl);
     const token = authResponse.getJson();
+
+    console.log('Token exchange successful');
 
     return {
       accessToken: token.access_token,
@@ -80,7 +81,7 @@ export async function exchangeCodeForTokens(authCode, realmId) {
   } catch (error) {
     console.error('Error exchanging code for tokens:', error);
     console.error('Error details:', error.authResponse || error.message);
-    console.error('Redirect URI used:', process.env.QUICKBOOKS_REDIRECT_URI);
+    console.error('Redirect URI configured:', process.env.QUICKBOOKS_REDIRECT_URI);
     throw new Error('Failed to exchange authorization code for tokens: ' + (error.message || 'Unknown error'));
   }
 }

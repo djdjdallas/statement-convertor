@@ -51,7 +51,13 @@ export default async function handler(req, res) {
     }
 
     // Exchange authorization code for tokens
-    const tokenData = await exchangeCodeForTokens(code, realmId);
+    // Build full callback URL for the OAuth library
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const fullUrl = `${protocol}://${host}${req.url}`;
+
+    console.log('Attempting token exchange with full URL');
+    const tokenData = await exchangeCodeForTokens(fullUrl, realmId);
 
     // Get company information
     let companyInfo;
