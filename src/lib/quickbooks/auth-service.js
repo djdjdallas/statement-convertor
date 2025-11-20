@@ -63,7 +63,10 @@ export async function exchangeCodeForTokens(authCode, realmId) {
   const oauthClient = getOAuthClient();
 
   try {
-    // Create token - the library automatically uses the redirect URI from the client config
+    // Set the redirect URI explicitly before creating token
+    oauthClient.redirectUri = process.env.QUICKBOOKS_REDIRECT_URI;
+
+    // Create token
     const authResponse = await oauthClient.createToken(authCode);
     const token = authResponse.getJson();
 
@@ -77,6 +80,7 @@ export async function exchangeCodeForTokens(authCode, realmId) {
   } catch (error) {
     console.error('Error exchanging code for tokens:', error);
     console.error('Error details:', error.authResponse || error.message);
+    console.error('Redirect URI used:', process.env.QUICKBOOKS_REDIRECT_URI);
     throw new Error('Failed to exchange authorization code for tokens: ' + (error.message || 'Unknown error'));
   }
 }
