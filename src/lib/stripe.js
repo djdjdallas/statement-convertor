@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { STRIPE_PRODUCTS } from './stripe/config'
 
 // Server-side Stripe instance - lazy initialization to avoid build errors
 let stripeInstance = null
@@ -15,8 +16,15 @@ function getStripe() {
 // Export the getStripe function for internal use
 export { getStripe }
 
-// Price IDs for subscription tiers - these would come from your Stripe dashboard
+// Price IDs for subscription tiers - Import from centralized config
 export const STRIPE_PRICES = {
+  // Professional tier (new)
+  professional_monthly: STRIPE_PRODUCTS.professional.prices.monthly.id,
+  professional_yearly: STRIPE_PRODUCTS.professional.prices.yearly.id,
+  // Business tier (new)
+  business_monthly: STRIPE_PRODUCTS.business.prices.monthly.id,
+  business_yearly: STRIPE_PRODUCTS.business.prices.yearly.id,
+  // Legacy mappings (backwards compatibility)
   basic: process.env.STRIPE_BASIC_PRICE_ID || 'price_basic_monthly',
   premium: process.env.STRIPE_PREMIUM_PRICE_ID || 'price_premium_monthly'
 }
@@ -245,11 +253,18 @@ export async function handleSubscriptionCreated(subscription) {
     // Determine subscription tier based on price
     let tier = 'free'
     const priceId = subscription.items.data[0].price.id
-    
-    if (priceId === STRIPE_PRICES.basic) {
-      tier = 'basic'
+
+    // Check for new tier price IDs (professional and business)
+    if (priceId === STRIPE_PRICES.professional_monthly || priceId === STRIPE_PRICES.professional_yearly) {
+      tier = 'professional'
+    } else if (priceId === STRIPE_PRICES.business_monthly || priceId === STRIPE_PRICES.business_yearly) {
+      tier = 'business'
+    }
+    // Legacy tier mappings (backwards compatibility)
+    else if (priceId === STRIPE_PRICES.basic) {
+      tier = 'professional' // Map old 'basic' to new 'professional'
     } else if (priceId === STRIPE_PRICES.premium) {
-      tier = 'premium'
+      tier = 'business' // Map old 'premium' to new 'business'
     }
 
     return {
@@ -287,11 +302,18 @@ export async function handleSubscriptionUpdated(subscription) {
     let tier = 'free'
     if (subscription.status === 'active' && subscription.items.data.length > 0) {
       const priceId = subscription.items.data[0].price.id
-      
-      if (priceId === STRIPE_PRICES.basic) {
-        tier = 'basic'
+
+      // Check for new tier price IDs (professional and business)
+      if (priceId === STRIPE_PRICES.professional_monthly || priceId === STRIPE_PRICES.professional_yearly) {
+        tier = 'professional'
+      } else if (priceId === STRIPE_PRICES.business_monthly || priceId === STRIPE_PRICES.business_yearly) {
+        tier = 'business'
+      }
+      // Legacy tier mappings (backwards compatibility)
+      else if (priceId === STRIPE_PRICES.basic) {
+        tier = 'professional' // Map old 'basic' to new 'professional'
       } else if (priceId === STRIPE_PRICES.premium) {
-        tier = 'premium'
+        tier = 'business' // Map old 'premium' to new 'business'
       }
     }
 

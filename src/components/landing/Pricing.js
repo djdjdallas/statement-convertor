@@ -94,7 +94,7 @@ export default function Pricing() {
             Choose the right plan for you
           </p>
           <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            Start with Professional for just $19/month. 7-day free trial, no credit card required.
+            Start with Professional for just $19/month. 7-day free trial.
           </p>
         </div>
 
@@ -210,7 +210,7 @@ export default function Pricing() {
                 )}
                 {tier.id === "professional" && (
                   <p className="text-center text-sm text-gray-500 mt-3">
-                    7-day free trial • No credit card required • Cancel anytime
+                    7-day free trial • Cancel anytime
                   </p>
                 )}
                 {tier.id === "business" && (
@@ -295,7 +295,6 @@ export default function Pricing() {
               </h5>
               <p className="text-sm text-gray-600">
                 Yes! Both Professional and Business plans include a 7-day free trial.
-                No credit card required to start.
               </p>
             </div>
           </div>

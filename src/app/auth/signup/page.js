@@ -157,13 +157,7 @@ function SignUpContent() {
           <CardHeader>
             <CardTitle>
               {trial ? (
-                <>
-                  Start your 7-day free trial
-                  <Badge variant="secondary" className="ml-2">
-                    <Sparkles className="w-3 h-3 mr-1" />
-                    No credit card required
-                  </Badge>
-                </>
+                'Start your 7-day free trial'
               ) : (
                 'Get started for free'
               )}

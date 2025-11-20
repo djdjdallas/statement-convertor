@@ -63,6 +63,7 @@ export async function exchangeCodeForTokens(authCode, realmId) {
   const oauthClient = getOAuthClient();
 
   try {
+    // Create token - the library automatically uses the redirect URI from the client config
     const authResponse = await oauthClient.createToken(authCode);
     const token = authResponse.getJson();
 
@@ -75,7 +76,8 @@ export async function exchangeCodeForTokens(authCode, realmId) {
     };
   } catch (error) {
     console.error('Error exchanging code for tokens:', error);
-    throw new Error('Failed to exchange authorization code for tokens');
+    console.error('Error details:', error.authResponse || error.message);
+    throw new Error('Failed to exchange authorization code for tokens: ' + (error.message || 'Unknown error'));
   }
 }
 

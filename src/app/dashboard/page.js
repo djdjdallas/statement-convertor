@@ -844,16 +844,18 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {/* Subscription Management */}
+        {/* Subscription Management - Only show subscription card for free tier */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2">
-            <SubscriptionCard
-              userProfile={userProfile}
-              monthlyUsage={stats.thisMonth}
-            />
-          </div>
+          {userTier === 'free' && (
+            <div className="lg:col-span-2">
+              <SubscriptionCard
+                userProfile={userProfile}
+                monthlyUsage={stats.thisMonth}
+              />
+            </div>
+          )}
 
-          <Card>
+          <Card className={userTier === 'free' ? '' : 'lg:col-span-3'}>
             <CardHeader>
               <CardTitle>Quick Tips</CardTitle>
             </CardHeader>
