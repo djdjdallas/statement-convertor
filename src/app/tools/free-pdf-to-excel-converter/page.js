@@ -24,7 +24,7 @@ import {
   Shield
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { analyticsService } from '@/lib/analytics/analytics-service';
+import analyticsService from '@/lib/analytics/analytics-service';
 
 export default function FreePDFToExcelConverter() {
   const router = useRouter();

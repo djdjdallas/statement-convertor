@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { Code, Key, Database, Zap, AlertCircle } from 'lucide-react';
 import { enableApiAccessForUser, disableApiAccessForUser } from '@/lib/features/flags';
 
@@ -20,7 +20,7 @@ export default function DeveloperSettingsPage() {
 
   useEffect(() => {
     async function loadSettings() {
-      const supabase = createClient();
+      // supabase is imported from @/lib/supabase
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
@@ -48,7 +48,7 @@ export default function DeveloperSettingsPage() {
     setUpdating(true);
 
     try {
-      const supabase = createClient();
+      // supabase is imported from @/lib/supabase
 
       if (apiAccess?.api_enabled) {
         // Disable API access
@@ -78,7 +78,7 @@ export default function DeveloperSettingsPage() {
     setUpdating(true);
 
     try {
-      const supabase = createClient();
+      // supabase is imported from @/lib/supabase
 
       // Create initial quota for testing
       const now = new Date();

@@ -390,22 +390,5 @@ class AuditLogger {
 // Export singleton instance
 export const auditLogger = new AuditLogger()
 
-// Cleanup on process exit - only in Node.js environment
-if (typeof process !== 'undefined' && process.on) {
-  process.on('exit', () => {
-    auditLogger.stopBatchProcessor()
-    auditLogger.flush()
-  })
-
-  process.on('SIGINT', () => {
-    auditLogger.stopBatchProcessor()
-    auditLogger.flush()
-    process.exit()
-  })
-
-  process.on('SIGTERM', () => {
-    auditLogger.stopBatchProcessor()
-    auditLogger.flush()
-    process.exit()
-  })
-}
+// Note: Process cleanup handlers removed for Edge Runtime compatibility
+// In serverless/edge environments, cleanup happens automatically when the function completes

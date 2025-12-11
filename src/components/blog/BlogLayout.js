@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { analyticsService } from '@/lib/analytics/analytics-service';
+import analyticsService from '@/lib/analytics/analytics-service';
 
 /**
  * BlogLayout Component

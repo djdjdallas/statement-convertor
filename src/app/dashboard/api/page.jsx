@@ -14,7 +14,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { Lock, Key, BarChart3, FileText, Zap } from 'lucide-react';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import APIKeyManager from '@/components/api/APIKeyManager';
@@ -29,7 +29,7 @@ export default function APIPage() {
 
   useEffect(() => {
     async function checkAccess() {
-      const supabase = createClient();
+      // supabase is imported from @/lib/supabase
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
@@ -193,7 +193,7 @@ export default function APIPage() {
             <button
               onClick={async () => {
                 // Join waitlist functionality
-                const supabase = createClient();
+                // supabase is imported from @/lib/supabase
                 const { error } = await supabase
                   .from('user_api_access')
                   .upsert({
