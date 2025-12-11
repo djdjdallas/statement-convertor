@@ -6,12 +6,12 @@ import FAQSection from '@/components/blog/FAQSection';
 
 export const metadata = {
   title: 'Statement Desk vs DocuClipper: Which is Better in 2025? (Full Comparison)',
-  description: 'Statement Desk vs DocuClipper: Compare accuracy, pricing, and AI features. See which bank statement converter offers better value for your needs in 2025.',
+  description: 'StatementDesk vs DocuClipper: Side-by-side comparison. Better accuracy, simpler pricing, and direct Xero/QuickBooks export. Try free today.',
   keywords: 'docuclipper alternative, statement desk comparison, bank statement converter comparison, pdf to excel converter, statement desk vs docuclipper',
   authors: [{ name: 'Statement Desk Team' }],
   openGraph: {
     title: 'Statement Desk vs DocuClipper: Which is Better in 2025?',
-    description: 'Compare accuracy, pricing, and AI features. See which bank statement converter offers better value.',
+    description: 'StatementDesk vs DocuClipper: Side-by-side comparison. Better accuracy, simpler pricing, and direct Xero/QuickBooks export. Try free today.',
     type: 'article',
     publishedTime: '2025-01-12T00:00:00Z',
     modifiedTime: '2025-01-15T00:00:00Z',

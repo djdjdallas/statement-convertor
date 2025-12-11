@@ -10,6 +10,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
 import AnalyticsProvider from '@/components/AnalyticsProvider'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import PostHogProvider from '@/components/PostHogProvider'
 
 export default function RootLayout({ children }) {
   return (
@@ -21,9 +22,11 @@ export default function RootLayout({ children }) {
         )}
 
         <AuthProvider>
-          <AnalyticsProvider>
-            {children}
-          </AnalyticsProvider>
+          <PostHogProvider>
+            <AnalyticsProvider>
+              {children}
+            </AnalyticsProvider>
+          </PostHogProvider>
           <Toaster />
         </AuthProvider>
       </body>

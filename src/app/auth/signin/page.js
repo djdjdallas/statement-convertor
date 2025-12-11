@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
 import GoogleSignInButton from '@/components/GoogleSignInButton'
 import SocialAuthDivider from '@/components/SocialAuthDivider'
+import posthog from 'posthog-js'
 
 const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -47,6 +48,14 @@ export default function SignInPage() {
         setError(error.message)
         return
       }
+
+      // PostHog: Identify user and capture signin event
+      posthog.identify(values.email, {
+        email: values.email,
+      })
+      posthog.capture('user_signed_in', {
+        signin_method: 'email',
+      })
 
       router.push('/dashboard')
     } catch (error) {

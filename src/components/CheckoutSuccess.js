@@ -1,21 +1,30 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Upload, Eye, Settings } from 'lucide-react'
 import Link from 'next/link'
+import posthog from 'posthog-js'
 
 export default function CheckoutSuccess() {
   const [showSuccess, setShowSuccess] = useState(false)
+  const hasCapturedEvent = useRef(false)
   const searchParams = useSearchParams()
   const checkoutStatus = searchParams?.get('checkout')
 
   useEffect(() => {
     if (checkoutStatus === 'success') {
       setShowSuccess(true)
+
+      // PostHog: Capture checkout completed event (only once)
+      if (!hasCapturedEvent.current) {
+        hasCapturedEvent.current = true
+        posthog.capture('subscription_checkout_completed')
+      }
+
       // Clear the URL parameter after showing success
       if (window.history.replaceState) {
         window.history.replaceState({}, '', window.location.pathname)

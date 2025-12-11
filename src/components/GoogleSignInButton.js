@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
+import posthog from 'posthog-js'
 
 export default function GoogleSignInButton({ 
   mode = 'signin', 
@@ -17,15 +18,24 @@ export default function GoogleSignInButton({
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true)
+
+      // PostHog: Capture Google auth initiated event
+      posthog.capture('google_auth_initiated', {
+        auth_mode: mode,
+      })
+
       const { error } = await signInWithGoogle()
-      
+
       if (error) {
         console.error('Google sign-in error:', error)
-        // Error handling is done by parent component
+        // PostHog: Capture error
+        posthog.captureException(error)
       }
       // Success handling is done through auth state change listener
     } catch (error) {
       console.error('Unexpected error during Google sign-in:', error)
+      // PostHog: Capture exception
+      posthog.captureException(error)
     } finally {
       setIsLoading(false)
     }

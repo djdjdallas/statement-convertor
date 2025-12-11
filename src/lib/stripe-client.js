@@ -1,4 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js'
+import posthog from 'posthog-js'
 
 // Make sure to call loadStripe outside of a component's render to avoid
 // recreating the Stripe object on every render.
@@ -45,6 +46,9 @@ export async function redirectToCheckout(tier, billingPeriod = 'monthly') {
  */
 export async function redirectToPortal() {
   try {
+    // PostHog: Capture billing portal opened event
+    posthog.capture('billing_portal_opened')
+
     const response = await fetch('/api/stripe/portal', {
       method: 'POST',
       headers: {
@@ -61,9 +65,11 @@ export async function redirectToPortal() {
 
     // Redirect to Stripe portal
     window.location.href = data.portalUrl
-    
+
   } catch (error) {
     console.error('Portal error:', error)
+    // PostHog: Capture portal error
+    posthog.captureException(error)
     throw error
   }
 }

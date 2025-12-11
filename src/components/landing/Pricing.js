@@ -15,6 +15,7 @@ import { SUBSCRIPTION_TIERS, getMonthlyEquivalent } from "@/lib/subscription-tie
 import { redirectToCheckout } from "@/lib/stripe-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import posthog from "posthog-js";
 
 export default function Pricing() {
   const [loading, setLoading] = useState({});
@@ -66,9 +67,19 @@ export default function Pricing() {
 
     try {
       setLoading((prev) => ({ ...prev, [tierId]: true }));
+
+      // PostHog: Capture checkout initiated event
+      posthog.capture('subscription_checkout_initiated', {
+        tier_id: tierId,
+        billing_period: billingPeriod,
+        is_authenticated: !!user,
+      });
+
       await redirectToCheckout(tierId, billingPeriod);
     } catch (error) {
       console.error("Subscription error:", error);
+      // PostHog: Capture checkout error
+      posthog.captureException(error);
       toast({
         title: "Subscription Failed",
         description: error.message || "Failed to start subscription. Please try again.",

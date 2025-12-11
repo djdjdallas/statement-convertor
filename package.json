@@ -53,6 +53,8 @@
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^5.3.93",
+    "posthog-js": "^1.305.0",
+    "posthog-node": "^5.17.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-dropzone": "^14.3.8",

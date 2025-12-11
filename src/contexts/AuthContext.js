@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 
 const AuthContext = createContext({})
 
@@ -54,6 +55,21 @@ export const AuthProvider = ({ children }) => {
         async (event, session) => {
           setUser(session?.user ?? null)
           setLoading(false)
+
+          // PostHog: Identify user on sign in events
+          if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED')) {
+            posthog.identify(session.user.email || session.user.id, {
+              email: session.user.email,
+              provider: session.user.app_metadata?.provider,
+            })
+
+            // Capture Google sign-in completion if applicable
+            if (event === 'SIGNED_IN' && session.user.app_metadata?.provider === 'google') {
+              posthog.capture('google_drive_connected', {
+                provider: 'google',
+              })
+            }
+          }
         }
       )
 
@@ -89,6 +105,11 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     const supabase = createClient()
     if (!supabase) return { error: new Error('Supabase not initialized') }
+
+    // PostHog: Capture signout event before signing out
+    posthog.capture('user_signed_out')
+    posthog.reset()
+
     const { error } = await supabase.auth.signOut()
     return { error }
   }

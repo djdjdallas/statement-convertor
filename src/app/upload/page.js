@@ -28,6 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox.jsx'
 import { toast } from '@/hooks/use-toast'
 import analyticsService from '@/lib/analytics/analytics-service'
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal'
+import posthog from 'posthog-js'
 
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState([])
@@ -211,6 +212,13 @@ export default function UploadPage() {
         file_id: fileId
       })
 
+      // PostHog: Capture PDF upload event
+      posthog.capture('pdf_uploaded', {
+        file_id: fileId,
+        file_name: file.name,
+        file_size: file.size,
+      })
+
       return newFile
     } catch (error) {
       console.error('File upload error:', error)
@@ -287,9 +295,15 @@ export default function UploadPage() {
 
     setProcessing(true)
 
+    // PostHog: Capture processing started event
+    posthog.capture('pdf_processing_started', {
+      file_count: uploadedFiles.length,
+      file_ids: uploadedFiles.map(f => f.id),
+    })
+
     try {
       // Update all files to processing status
-      setUploadedFiles(prev => 
+      setUploadedFiles(prev =>
         prev.map(file => ({ ...file, status: 'processing' }))
       )
 
@@ -326,6 +340,13 @@ export default function UploadPage() {
               file_id: file.id,
               transaction_count: result.data.transactionCount,
               bank_type: result.data.bankType
+            })
+
+            // PostHog: Capture processing completed event
+            posthog.capture('pdf_processing_completed', {
+              file_id: file.id,
+              transaction_count: result.data.transactionCount,
+              bank_type: result.data.bankType,
             })
 
             // Auto-send to Xero if enabled and user has access

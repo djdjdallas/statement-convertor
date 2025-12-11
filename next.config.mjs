@@ -6,6 +6,21 @@ const nextConfig = {
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
+  // PostHog reverse proxy rewrites
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+    ];
+  },
+  // Required for PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
   // Add custom headers for Google Picker support
   async headers() {
     return [

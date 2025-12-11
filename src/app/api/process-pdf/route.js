@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { enhancedBankStatementParser } from '@/lib/enhanced-pdf-parser'
 import { checkUsageLimit, getTierLimits } from '@/lib/subscription-tiers'
+import { trackPdfProcessing, trackError } from '@/lib/posthog-server'
 
 // Configure Vercel timeout (requires Pro plan)
 // Free: 10s, Hobby: 10s, Pro: 60s, Enterprise: 900s
@@ -185,6 +186,15 @@ export async function POST(request) {
         p_amount: 1
       })
 
+      // Track successful PDF processing in PostHog
+      trackPdfProcessing(userId, {
+        fileId,
+        transactionCount: extractedData.transactions.length,
+        bankType: extractedData.bankType,
+        aiEnhanced: extractedData.metadata?.aiEnhanced || false,
+        success: true
+      })
+
       // Return success response with extracted data
       return NextResponse.json({
         success: true,
@@ -202,7 +212,15 @@ export async function POST(request) {
 
     } catch (processingError) {
       console.error('PDF processing error:', processingError)
-      
+
+      // Track failed PDF processing in PostHog
+      trackError(userId, {
+        type: 'pdf_processing_failed',
+        message: processingError.message,
+        endpoint: '/api/process-pdf',
+        context: { fileId }
+      })
+
       // Update file status to failed
       await supabase
         .from('files')

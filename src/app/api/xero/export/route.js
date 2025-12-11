@@ -3,6 +3,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { XeroService } from '@/lib/xero/xero-service'
 import { hasXeroAccess } from '@/lib/subscription-tiers'
+import { trackSync, trackError } from '@/lib/posthog-server'
 
 export async function POST(req) {
   try {
@@ -130,6 +131,13 @@ export async function POST(req) {
       })
       .eq('id', fileId)
 
+    // Track successful Xero sync in PostHog
+    trackSync(session.user.id, {
+      platform: 'xero',
+      transactionCount: file.transactions.length,
+      success: true
+    })
+
     return NextResponse.json({
       success: true,
       importId: importRecord?.id,
@@ -139,6 +147,13 @@ export async function POST(req) {
 
   } catch (error) {
     console.error('Xero export error:', error)
+
+    // Track Xero sync error in PostHog
+    trackError(null, {
+      type: 'xero_sync_failed',
+      message: error.message,
+      endpoint: '/api/xero/export'
+    })
     
     // Check for refresh token expired error
     if (error.message?.includes('Refresh token has expired') || error.code === 'XERO_TOKEN_EXPIRED') {

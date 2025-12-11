@@ -17,6 +17,7 @@ import GoogleSignInButton from '@/components/GoogleSignInButton'
 import SocialAuthDivider from '@/components/SocialAuthDivider'
 import { Badge } from '@/components/ui/badge'
 import analyticsService from '@/lib/analytics/analytics-service'
+import posthog from 'posthog-js'
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -88,6 +89,21 @@ function SignUpContent() {
         trial: trial,
         intended_tier: intendedTier,
         signup_method: 'email'
+      })
+
+      // PostHog: Identify user and capture signup event
+      posthog.identify(values.email, {
+        email: values.email,
+        name: values.fullName,
+        signup_plan: plan,
+        signup_trial: trial,
+        intended_tier: intendedTier,
+      })
+      posthog.capture('user_signed_up', {
+        signup_method: 'email',
+        plan: plan,
+        trial: trial,
+        intended_tier: intendedTier,
       })
 
       // Redirect directly to dashboard (email confirmation is bypassed)

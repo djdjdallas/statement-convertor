@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { toast } from '@/hooks/use-toast'
 import { GoogleErrorHandler, useGoogleErrorHandler } from '@/components/GoogleErrorHandler'
 import { GOOGLE_ERROR_CODES } from '@/lib/google/error-handler'
+import posthog from 'posthog-js'
 
 export default function DriveExportDialog({ 
   isOpen, 
@@ -101,6 +102,14 @@ export default function DriveExportDialog({
           clearInterval(progressInterval)
           setExportProgress(100)
           setExportResult({ type: 'local', success: true })
+
+          // PostHog: Capture file exported event
+          posthog.capture('file_exported', {
+            file_id: fileId,
+            export_format: format,
+            destination: 'local',
+          })
+
           toast({
             title: 'Export Successful',
             description: `Your ${format.toUpperCase()} file has been downloaded.`,
@@ -125,6 +134,14 @@ export default function DriveExportDialog({
             success: true,
             data: data.data
           })
+
+          // PostHog: Capture file exported event
+          posthog.capture('file_exported', {
+            file_id: fileId,
+            export_format: format,
+            destination: 'google_drive',
+          })
+
           toast({
             title: 'Upload Successful',
             description: 'Your file has been uploaded to Google Drive.',

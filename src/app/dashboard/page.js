@@ -54,6 +54,7 @@ import {
 } from "lucide-react";
 import BulkImportDialog from "@/components/xero/BulkImportDialog";
 import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
+import posthog from "posthog-js";
 
 export default function DashboardPage() {
   const [files, setFiles] = useState([]);
@@ -243,6 +244,11 @@ export default function DashboardPage() {
         ...prev,
         totalFiles: prev.totalFiles - 1,
       }));
+
+      // PostHog: Capture file deleted event
+      posthog.capture("file_deleted", {
+        file_id: fileToDelete.id,
+      });
 
       // Show success toast
       toast({

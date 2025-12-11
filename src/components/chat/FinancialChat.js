@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { 
+import {
   MessageCircle,
   Send,
   Loader2,
@@ -22,6 +22,7 @@ import {
   Trash2,
   Download
 } from 'lucide-react'
+import posthog from 'posthog-js'
 
 export default function FinancialChat({ transactions, userProfile, className = "" }) {
   const [messages, setMessages] = useState([])
@@ -99,6 +100,12 @@ export default function FinancialChat({ transactions, userProfile, className = "
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
     setIsLoading(true)
+
+    // PostHog: Capture AI chat message sent event
+    posthog.capture('ai_chat_message_sent', {
+      message_length: message.length,
+      transaction_count: transactions?.length || 0,
+    })
 
     try {
       const response = await fetch('/api/chat/query', {

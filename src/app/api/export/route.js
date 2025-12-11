@@ -6,6 +6,7 @@ import { createDriveService } from '@/lib/google/drive-service'
 import { createSheetsService } from '@/lib/google/sheets-service'
 import { hasGoogleIntegration } from '@/lib/google/auth'
 import { createErrorResponse, GOOGLE_ERROR_CODES } from '@/lib/google/error-handler'
+import { trackExport, trackError } from '@/lib/posthog-server'
 
 // Configure extended timeout for large exports
 export const maxDuration = 300 // 5 minutes for Pro/Enterprise plans
@@ -276,6 +277,14 @@ export async function POST(request) {
           }
         })
 
+        // Track export in PostHog
+        trackExport(user.id, {
+          fileId,
+          format,
+          transactionCount: transactions.length,
+          destination: 'google_drive'
+        })
+
         // Return Drive upload result
         return NextResponse.json({
           success: true,
@@ -347,6 +356,14 @@ export async function POST(request) {
           destination: 'local',
           transaction_count: transactions.length
         }
+      })
+
+      // Track export in PostHog
+      trackExport(user.id, {
+        fileId,
+        format,
+        transactionCount: transactions.length,
+        destination: 'download'
       })
 
       // Return file as download

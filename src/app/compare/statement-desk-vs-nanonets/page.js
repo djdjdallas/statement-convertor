@@ -6,11 +6,11 @@ import FAQSection from '@/components/blog/FAQSection';
 
 export const metadata = {
   title: 'Statement Desk vs Nanonets: Which is Better in 2025? (Detailed Comparison)',
-  description: 'Statement Desk vs Nanonets: Compare features, pricing, and ease of use. See which AI-powered document processor is best for bank statements in 2025.',
+  description: 'StatementDesk vs Nanonets: Honest comparison for bank statement OCR. See pricing, accuracy rates, and which is better for accounting firms.',
   keywords: 'nanonets alternative, statement desk comparison, AI document processor, bank statement automation, nanonets vs statement desk, document processing software',
   openGraph: {
     title: 'Statement Desk vs Nanonets: Which is Better in 2025?',
-    description: 'Statement Desk vs Nanonets: Compare features, pricing, and ease of use. See which AI-powered document processor is best for bank statements in 2025.',
+    description: 'StatementDesk vs Nanonets: Honest comparison for bank statement OCR. See pricing, accuracy rates, and which is better for accounting firms.',
     url: 'https://statementdesk.com/compare/statement-desk-vs-nanonets',
     siteName: 'Statement Desk',
     type: 'article',
