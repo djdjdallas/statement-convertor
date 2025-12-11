@@ -35,7 +35,6 @@ function SignUpContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -91,7 +90,8 @@ function SignUpContent() {
         signup_method: 'email'
       })
 
-      setSuccess(true)
+      // Redirect directly to dashboard (email confirmation is bypassed)
+      router.push('/dashboard')
     } catch (error) {
       console.error('Sign up error:', error)
       setError('An unexpected error occurred')
@@ -112,31 +112,6 @@ function SignUpContent() {
 
   const password = form.watch('password')
   const checks = passwordStrength(password || '')
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full">
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-green-600">Check your email</CardTitle>
-              <CardDescription>
-                We've sent you a confirmation link to complete your registration.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-sm text-gray-600 mb-4">
-                Click the link in your email to verify your account and get started.
-              </p>
-              <Link href="/auth/signin">
-                <Button variant="outline">Back to sign in</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
