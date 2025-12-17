@@ -62,7 +62,7 @@ export default function ImportBankStatementsXero() {
     {
       id: 'faq-1',
       question: 'Can I import PDF statements into Xero?',
-      answer: 'No, Xero does not support direct PDF import. You must first convert your PDF bank statements to CSV, OFX, QIF, or MT940 format. Statement Desk makes this easy by automatically converting PDF statements to Xero-formatted CSV files in 30 seconds with 99% accuracy. Simply upload your PDF, and download a ready-to-import CSV file with proper DD/MM/YYYY date formatting and column mapping.'
+      answer: 'No, Xero does not support direct PDF import. You must first convert your PDF bank statements to CSV, OFX, QIF, or MT940 format. Statement Desk makes this easy by automatically converting PDF statements to Xero-formatted CSV files in 30 seconds with 97% accuracy. Simply upload your PDF, and download a ready-to-import CSV file with proper DD/MM/YYYY date formatting and column mapping.'
     },
     {
       id: 'faq-2',
@@ -112,7 +112,7 @@ export default function ImportBankStatementsXero() {
     {
       id: 'faq-11',
       question: 'Can I use Statement Desk with Xero Accounting?',
-      answer: 'Yes! Statement Desk offers a Xero-formatted CSV export option specifically designed for Xero Accounting. Upload your PDF bank statement, let AI extract transactions with 99% accuracy, then download as "Xero Format" CSV with proper DD/MM/YYYY dates, correct column headers (Date, Payee, Description, Reference, Amount), and clean formatting. This eliminates 90% of manual CSV preparation work and import errors. Try your first statement free at statementdesk.com.'
+      answer: 'Yes! Statement Desk offers a Xero-formatted CSV export option specifically designed for Xero Accounting. Upload your PDF bank statement, let AI extract transactions with 97% accuracy, then download as "Xero Format" CSV with proper DD/MM/YYYY dates, correct column headers (Date, Payee, Description, Reference, Amount), and clean formatting. This eliminates 90% of manual CSV preparation work and import errors. Try your first statement free at statementdesk.com.'
     },
     {
       id: 'faq-12',
@@ -598,7 +598,7 @@ export default function ImportBankStatementsXero() {
           <h2 id="method-3-statement-desk">Method 3: Statement Desk to Xero (AI-Powered)</h2>
 
           <p>
-            For banks that don't offer CSV export or when you only have PDF statements, Statement Desk provides the fastest solution. Our AI-powered converter transforms PDF bank statements into Xero-formatted CSV files in 30 seconds with 99% accuracy.
+            For banks that don't offer CSV export or when you only have PDF statements, Statement Desk provides the fastest solution. Our AI-powered converter transforms PDF bank statements into Xero-formatted CSV files in 30 seconds with 97% accuracy.
           </p>
 
           <h3>Why Use Statement Desk for Xero Imports?</h3>
@@ -636,7 +636,7 @@ export default function ImportBankStatementsXero() {
               <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-purple-600 text-white rounded-full font-bold text-lg">2</div>
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">AI Extracts Transaction Data</h4>
-                <p className="text-gray-700">Claude AI processes your statement in 20-30 seconds, extracting dates, payees, amounts, descriptions with 99% accuracy. Automatically categorizes transactions and normalizes merchant names (e.g., "STARBUCKS #1234" → "Starbucks").</p>
+                <p className="text-gray-700">Claude AI processes your statement in 20-30 seconds, extracting dates, payees, amounts, descriptions with 97% accuracy. Automatically categorizes transactions and normalizes merchant names (e.g., "STARBUCKS #1234" → "Starbucks").</p>
               </div>
             </div>
 
@@ -669,7 +669,7 @@ export default function ImportBankStatementsXero() {
             title="Statement Desk to Xero: Pros and Cons"
             pros={[
               'Fastest method - 30 seconds total vs 1-2 hours manual',
-              '99% accuracy with AI-powered extraction',
+              '97% accuracy with AI-powered extraction',
               'Xero-specific CSV format eliminates import errors',
               'Works with all banks (200+) - no feed support needed',
               'Automatic transaction categorization included',
@@ -998,7 +998,7 @@ export default function ImportBankStatementsXero() {
                 <span className="text-blue-600 font-bold text-xl mt-1">3</span>
                 <div>
                   <strong className="text-blue-900">Statement Desk AI Conversion (Best for PDF Statements):</strong>
-                  <p className="text-gray-700 mt-1">Convert PDF statements to Xero-formatted CSV in 30 seconds. 99% accuracy, automatic categorization, works with 200+ banks. Ideal when CSV export isn't available. Free tier available.</p>
+                  <p className="text-gray-700 mt-1">Convert PDF statements to Xero-formatted CSV in 30 seconds. 97% accuracy, automatic categorization, works with 200+ banks. Ideal when CSV export isn't available. Free tier available.</p>
                 </div>
               </li>
             </ul>

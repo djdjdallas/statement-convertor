@@ -15,6 +15,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useUserProfile } from '@/hooks/useUserProfile'
 import { hasXeroAccess, hasQuickBooksAccess } from '@/lib/subscription-tiers'
 import { ArrowLeft, Download, Loader2, Brain, MessageCircle, Building, Zap } from 'lucide-react'
+import posthog from 'posthog-js'
 import { toast } from '@/hooks/use-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
@@ -202,9 +203,17 @@ export default function PreviewPage() {
       return
     }
 
+    // Track Xero export button click
+    posthog.capture('export_button_clicked', {
+      file_id: fileId,
+      export_type: 'xero',
+      transaction_count: transactions.length,
+      source: 'preview_page'
+    })
+
     try {
       setExporting(prev => ({ ...prev, xero: true }))
-      
+
       const response = await fetch('/api/xero/export', {
         method: 'POST',
         headers: {
@@ -224,6 +233,14 @@ export default function PreviewPage() {
         throw new Error(result.error || 'Export to Xero failed')
       }
 
+      // Track successful Xero export
+      posthog.capture('export_completed', {
+        file_id: fileId,
+        export_type: 'xero',
+        transaction_count: result.transactionCount,
+        source: 'preview_page'
+      })
+
       toast({
         title: 'Success!',
         description: `${result.transactionCount} transactions exported to Xero successfully`,
@@ -236,18 +253,26 @@ export default function PreviewPage() {
 
     } catch (error) {
       console.error('Xero export error:', error)
-      
+
+      // Track failed Xero export
+      posthog.capture('export_failed', {
+        file_id: fileId,
+        export_type: 'xero',
+        error_message: error.message,
+        source: 'preview_page'
+      })
+
       // Check if it's a token expiration error
-      if (error.message?.includes('Xero session expired') || 
+      if (error.message?.includes('Xero session expired') ||
           error.message?.includes('authentication failed')) {
         toast({
           title: 'Xero Session Expired',
           description: 'Your Xero session has expired. Please reconnect your Xero account in Settings.',
           variant: 'destructive',
           action: (
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push('/settings?tab=integrations')}
             >
               Go to Settings
@@ -267,6 +292,14 @@ export default function PreviewPage() {
   }
 
   const handleExport = async (format) => {
+    // Track export button click
+    posthog.capture('export_button_clicked', {
+      file_id: fileId,
+      export_type: format,
+      transaction_count: transactions.length,
+      source: 'preview_page'
+    })
+
     try {
       setExporting(prev => ({ ...prev, [format]: true }))
 
@@ -291,7 +324,7 @@ export default function PreviewPage() {
       // Get the filename from response headers
       const contentDisposition = response.headers.get('content-disposition')
       let filename = `transactions.${format}`
-      
+
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="(.+)"/)
         if (filenameMatch) {
@@ -310,8 +343,31 @@ export default function PreviewPage() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
 
+      // Track successful export
+      posthog.capture('export_completed', {
+        file_id: fileId,
+        export_type: format,
+        transaction_count: transactions.length,
+        source: 'preview_page'
+      })
+
+      toast({
+        title: 'Export Successful',
+        description: `Your ${format.toUpperCase()} file has been downloaded.`,
+        variant: 'success'
+      })
+
     } catch (error) {
       console.error('Export error:', error)
+
+      // Track failed export
+      posthog.capture('export_failed', {
+        file_id: fileId,
+        export_type: format,
+        error_message: error.message,
+        source: 'preview_page'
+      })
+
       toast({
         title: 'Export Failed',
         description: error.message || 'Failed to export file. Please try again.',

@@ -14,7 +14,7 @@
 Stop wasting hours manually entering bank transactions. Statement Desk uses AI to convert your PDF statements into organized spreadsheets instantly, complete with smart categorization and financial insights. Focus on growing your business, not data entry.
 
 ### For Accountants & Bookkeepers
-Process client statements 10x faster with 99% accuracy. Statement Desk's AI understands 200+ bank formats, automatically categorizes transactions, and flags anomalies. Deliver more value to clients with AI-generated financial insights and reports.
+Process client statements 10x faster with 97% accuracy. Statement Desk's AI understands 200+ bank formats, automatically categorizes transactions, and flags anomalies. Deliver more value to clients with AI-generated financial insights and reports.
 
 ### For Personal Finance Users
 Take control of your finances with AI-powered insights. Statement Desk not only converts your statements but also analyzes spending patterns, provides budget recommendations, and lets you chat with your financial data like having a personal advisor.
@@ -67,7 +67,7 @@ Take control of your finances with AI-powered insights. Statement Desk not only 
 
 [CITY, Date] - Statement Desk today announced the launch of its AI-powered bank statement converter for Google Workspace, offering businesses and individuals a revolutionary way to process financial data. The platform uses advanced artificial intelligence to convert PDF bank statements from over 200 banks into organized spreadsheets with unprecedented accuracy.
 
-Unlike traditional converters that rely on rigid templates, Statement Desk's AI understands and adapts to any bank format, achieving 99% accuracy in transaction extraction. The platform goes beyond simple conversion by providing intelligent categorization, anomaly detection, and personalized financial insights.
+Unlike traditional converters that rely on rigid templates, Statement Desk's AI understands and adapts to any bank format, achieving 97% accuracy in transaction extraction. The platform goes beyond simple conversion by providing intelligent categorization, anomaly detection, and personalized financial insights.
 
 "We're not just converting PDFs - we're transforming how people interact with their financial data," said [Founder Name], CEO of Statement Desk. "Our AI assistant can answer questions about spending patterns, provide budget recommendations, and even forecast cash flow, making financial management accessible to everyone."
 

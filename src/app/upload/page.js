@@ -28,6 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox.jsx'
 import { toast } from '@/hooks/use-toast'
 import analyticsService from '@/lib/analytics/analytics-service'
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal'
+import ExportSuccessModal from '@/components/ExportSuccessModal'
 import posthog from 'posthog-js'
 
 export default function UploadPage() {
@@ -41,6 +42,10 @@ export default function UploadPage() {
     isOpen: false,
     fileToDelete: null,
     isDeleting: false
+  })
+  const [exportModalState, setExportModalState] = useState({
+    isOpen: false,
+    completedFile: null
   })
   const { user } = useAuth()
   const { profile: userProfileFromHook, subscriptionTier } = useUserProfile()
@@ -326,13 +331,15 @@ export default function UploadPage() {
           }
 
           if (result.success) {
+            const completedFileData = {
+              ...file,
+              status: 'completed',
+              transactionCount: result.data.transactionCount,
+              bankType: result.data.bankType
+            }
+
             setUploadedFiles(prev =>
-              prev.map(f => f.id === file.id ? {
-                ...f,
-                status: 'completed',
-                transactionCount: result.data.transactionCount,
-                bankType: result.data.bankType
-              } : f)
+              prev.map(f => f.id === file.id ? completedFileData : f)
             )
 
             // Track processing completion event
@@ -347,6 +354,13 @@ export default function UploadPage() {
               file_id: file.id,
               transaction_count: result.data.transactionCount,
               bank_type: result.data.bankType,
+            })
+
+            // Show export success modal immediately for the first completed file
+            // This reduces friction - users can export in 1 click after processing
+            setExportModalState({
+              isOpen: true,
+              completedFile: completedFileData
             })
 
             // Auto-send to Xero if enabled and user has access
@@ -722,6 +736,19 @@ export default function UploadPage() {
           isDeleting={deleteModalState.isDeleting}
           confirmButtonText="Remove"
           showWarning={false}
+        />
+
+        {/* Export Success Modal - Shows immediately after processing completes */}
+        <ExportSuccessModal
+          isOpen={exportModalState.isOpen}
+          onClose={() => setExportModalState({
+            isOpen: false,
+            completedFile: null
+          })}
+          file={exportModalState.completedFile}
+          hasGoogleDrive={hasGoogleDrive}
+          xeroConnections={xeroConnections}
+          userHasXeroAccess={userHasXeroAccess}
         />
       </div>
     </div>

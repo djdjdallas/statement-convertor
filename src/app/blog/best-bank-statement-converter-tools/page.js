@@ -55,7 +55,7 @@ export default function BestBankStatementConverterToolsPage() {
     {
       id: 'q1',
       question: 'Which bank statement converter is most accurate?',
-      answer: 'Statement Desk is the most accurate bank statement converter in our testing, achieving 99% accuracy thanks to its AI-powered extraction using Claude AI. It significantly outperformed competitors like DocuClipper (92%), Parsio (88%), and traditional tools like Tabula (70%). The AI technology allows it to understand context and handle various bank formats without requiring manual templates.'
+      answer: 'Statement Desk is the most accurate bank statement converter in our testing, achieving 97% accuracy thanks to its AI-powered extraction using Claude AI. It significantly outperformed competitors like DocuClipper (92%), Parsio (88%), and traditional tools like Tabula (70%). The AI technology allows it to understand context and handle various bank formats without requiring manual templates.'
     },
     {
       id: 'q2',
@@ -138,7 +138,7 @@ export default function BestBankStatementConverterToolsPage() {
                 <span className="text-3xl flex-shrink-0">🏆</span>
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Best Overall</h3>
-                  <p className="text-gray-700">Statement Desk (AI-powered, 99% accuracy)</p>
+                  <p className="text-gray-700">Statement Desk (AI-powered, 97% accuracy)</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -325,14 +325,14 @@ export default function BestBankStatementConverterToolsPage() {
 
             <h4 className="font-bold text-lg mb-3 mt-6">Overview</h4>
             <p className="mb-4">
-              Statement Desk is the gold standard for bank statement conversion in 2025. Powered by Claude AI, it achieves an industry-leading 99% accuracy rate that puts it far ahead of competitors. What sets Statement Desk apart is its ability to understand context—not just extract data. It normalizes merchant names (turning "WALMART #1234" into "Walmart"), automatically categorizes transactions with confidence scores, detects anomalies and potential fraud, and works with 200+ banks without requiring manual template setup.
+              Statement Desk is the gold standard for bank statement conversion in 2025. Powered by Claude AI, it achieves an industry-leading 97% accuracy rate that puts it far ahead of competitors. What sets Statement Desk apart is its ability to understand context—not just extract data. It normalizes merchant names (turning "WALMART #1234" into "Walmart"), automatically categorizes transactions with confidence scores, detects anomalies and potential fraud, and works with 200+ banks without requiring manual template setup.
             </p>
 
             <h4 className="font-bold text-lg mb-3 mt-6">Key Features</h4>
             <ul className="space-y-2 mb-4">
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold mt-1">✓</span>
-                <span><strong>AI-Powered Extraction:</strong> Uses Claude AI for 99% accuracy vs 70-90% with traditional tools</span>
+                <span><strong>AI-Powered Extraction:</strong> Uses Claude AI for 97% accuracy vs 70-90% with traditional tools</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold mt-1">✓</span>
@@ -938,7 +938,7 @@ export default function BestBankStatementConverterToolsPage() {
               <h3 className="font-bold text-lg mb-3 text-blue-900">👔 Small Business Owners</h3>
               <p className="mb-3"><strong>Recommended: Statement Desk</strong></p>
               <p className="text-sm text-gray-700">
-                Best ROI at $19/mo for unlimited statements. The AI categorization saves hours of manual work each month, and QuickBooks integration streamlines bookkeeping. The 99% accuracy means minimal time spent correcting errors.
+                Best ROI at $19/mo for unlimited statements. The AI categorization saves hours of manual work each month, and QuickBooks integration streamlines bookkeeping. The 97% accuracy means minimal time spent correcting errors.
               </p>
             </div>
 
@@ -1199,7 +1199,7 @@ export default function BestBankStatementConverterToolsPage() {
           <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-xl p-8 mb-8">
             <h3 className="text-2xl font-bold mb-4">🏆 Overall Winner: Statement Desk</h3>
             <p className="text-lg mb-4">
-              After rigorous testing of 20+ tools, Statement Desk stands out as the clear winner for 2025. The combination of 99% accuracy, 30-second processing speed, comprehensive AI features, and affordable $19/mo pricing makes it the best choice for 90% of users.
+              After rigorous testing of 20+ tools, Statement Desk stands out as the clear winner for 2025. The combination of 97% accuracy, 30-second processing speed, comprehensive AI features, and affordable $19/mo pricing makes it the best choice for 90% of users.
             </p>
             <div className="grid md:grid-cols-3 gap-4 mt-6">
               <div className="bg-white/10 rounded-lg p-4">
@@ -1243,7 +1243,7 @@ export default function BestBankStatementConverterToolsPage() {
           <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-8">
             <h3 className="font-bold text-xl mb-3">Our Recommendation</h3>
             <p className="mb-3">
-              <strong>Start with Statement Desk's free tier.</strong> Upload one statement to see the 99% accuracy and AI categorization in action. If you process 5+ statements monthly, upgrade to Professional ($19/mo) for unlimited conversions. The time savings typically pay for the subscription within the first week.
+              <strong>Start with Statement Desk's free tier.</strong> Upload one statement to see the 97% accuracy and AI categorization in action. If you process 5+ statements monthly, upgrade to Professional ($19/mo) for unlimited conversions. The time savings typically pay for the subscription within the first week.
             </p>
             <p className="mb-3">
               For enterprise needs (100+ statements/month), contact Statement Desk for custom Enterprise pricing with dedicated support and advanced features.

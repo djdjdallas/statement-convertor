@@ -70,7 +70,7 @@ export default function DocuClipperAlternativePage() {
     {
       id: 'q7',
       question: 'How do alternatives compare on accuracy?',
-      answer: 'Statement Desk leads with 99% accuracy, followed by Nanonets (95%), DocuClipper (92%), Bank2CSV (90%), Parsio (88%), and Tabula (70%). AI-powered tools like Statement Desk and Nanonets significantly outperform traditional OCR-based converters.'
+      answer: 'Statement Desk leads with 97% accuracy, followed by Nanonets (95%), DocuClipper (92%), Bank2CSV (90%), Parsio (88%), and Tabula (70%). AI-powered tools like Statement Desk and Nanonets significantly outperform traditional OCR-based converters.'
     },
     {
       id: 'q8',
@@ -280,7 +280,7 @@ export default function DocuClipperAlternativePage() {
             <ul className="space-y-2 mb-4">
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold mt-1">1.</span>
-                <span><strong>Claude AI-Powered Extraction:</strong> Latest AI technology achieves 99% accuracy vs traditional OCR's 70-90%</span>
+                <span><strong>Claude AI-Powered Extraction:</strong> Latest AI technology achieves 97% accuracy vs traditional OCR's 70-90%</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold mt-1">2.</span>

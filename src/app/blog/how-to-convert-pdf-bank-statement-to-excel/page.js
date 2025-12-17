@@ -52,7 +52,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
     {
       id: 'faq-5',
       question: 'Can I convert scanned or image-based PDF bank statements?',
-      answer: 'Yes, but you need a tool with OCR (Optical Character Recognition) capabilities. AI-powered converters like Statement Desk automatically detect scanned PDFs and use advanced OCR combined with machine learning to extract transaction data with 99% accuracy. Traditional copy-paste won\'t work on scanned PDFs, and basic PDF converters will fail. Desktop OCR software like Adobe Acrobat or ABBYY FineReader can also handle scanned documents but require manual cleanup and formatting.'
+      answer: 'Yes, but you need a tool with OCR (Optical Character Recognition) capabilities. AI-powered converters like Statement Desk automatically detect scanned PDFs and use advanced OCR combined with machine learning to extract transaction data with 97% accuracy. Traditional copy-paste won\'t work on scanned PDFs, and basic PDF converters will fail. Desktop OCR software like Adobe Acrobat or ABBYY FineReader can also handle scanned documents but require manual cleanup and formatting.'
     },
     {
       id: 'faq-6',
@@ -133,7 +133,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           </p>
 
           <p>
-            The good news? You don't have to manually enter data anymore. In this comprehensive guide, we'll explore <strong>5 proven methods to convert PDF bank statements to Excel</strong>, ranging from free manual approaches to cutting-edge AI-powered converters that complete the job in 30 seconds with 99% accuracy.
+            The good news? You don't have to manually enter data anymore. In this comprehensive guide, we'll explore <strong>5 proven methods to convert PDF bank statements to Excel</strong>, ranging from free manual approaches to cutting-edge AI-powered converters that complete the job in 30 seconds with 97% accuracy.
           </p>
 
           <p>
@@ -192,7 +192,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
               <strong>Easier Sharing with Accountants and Bookkeepers:</strong> Professionals can work more efficiently with Excel files than PDFs. They can add formulas, highlight discrepancies, categorize transactions, and provide comments directly in the spreadsheet, streamlining the collaboration process.
             </li>
             <li>
-              <strong>Massive Time Savings vs Manual Entry:</strong> The average bank statement contains 50-150 transactions. Manual data entry takes 2-3 hours per statement with significant error rates. Automated conversion reduces this to 30 seconds with 99% accuracy, saving 10-25 hours monthly for businesses processing multiple statements.
+              <strong>Massive Time Savings vs Manual Entry:</strong> The average bank statement contains 50-150 transactions. Manual data entry takes 2-3 hours per statement with significant error rates. Automated conversion reduces this to 30 seconds with 97% accuracy, saving 10-25 hours monthly for businesses processing multiple statements.
             </li>
           </ul>
 
@@ -237,7 +237,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
 
           <ul>
             <li>Automatically detect your bank's statement format (works with 200+ banks worldwide)</li>
-            <li>Extract transaction dates, descriptions, amounts, and balances with 99% accuracy</li>
+            <li>Extract transaction dates, descriptions, amounts, and balances with 97% accuracy</li>
             <li>Intelligently categorize transactions into 50+ categories (Groceries, Gas, Utilities, etc.)</li>
             <li>Normalize messy merchant names ("WALMART #1234 ANYTOWN" becomes "Walmart")</li>
             <li>Detect duplicate transactions across multiple statement uploads</li>
@@ -796,7 +796,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           <CTASection
             variant="primary"
             title="Ready to Save 10-25 Hours Per Month?"
-            description="Join 10,000+ accountants, bookkeepers, and businesses who trust Statement Desk to convert their PDF bank statements to Excel in 30 seconds with 99% accuracy."
+            description="Join 10,000+ accountants, bookkeepers, and businesses who trust Statement Desk to convert their PDF bank statements to Excel in 30 seconds with 97% accuracy."
             buttonText="Start Free Trial - No Credit Card Required"
             buttonLink="/auth/signup?utm_source=blog&utm_campaign=how-to-convert-decision"
             badge="Most Popular Choice"
@@ -815,7 +815,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           </p>
 
           <p>
-            <strong>Solution:</strong> Use an OCR-capable converter. AI-powered tools like Statement Desk automatically detect scanned PDFs and apply advanced OCR combined with machine learning for 99% accuracy. Alternatively, use Adobe Acrobat Pro's OCR feature (Tools → Recognize Text → In This File) to convert the image to searchable text, then export to Excel. Avoid basic converters that can't handle scanned documents.
+            <strong>Solution:</strong> Use an OCR-capable converter. AI-powered tools like Statement Desk automatically detect scanned PDFs and apply advanced OCR combined with machine learning for 97% accuracy. Alternatively, use Adobe Acrobat Pro's OCR feature (Tools → Recognize Text → In This File) to convert the image to searchable text, then export to Excel. Avoid basic converters that can't handle scanned documents.
           </p>
 
           <h3>2. Transactions Not Aligned Properly in Excel</h3>
@@ -899,7 +899,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           </p>
 
           <ul>
-            <li><strong>AI-Powered Converters (Statement Desk):</strong> Best for most users. 30-second conversion, 99% accuracy, automatic categorization, merchant normalization. $19/month with free tier available. Saves 10-25 hours monthly.</li>
+            <li><strong>AI-Powered Converters (Statement Desk):</strong> Best for most users. 30-second conversion, 97% accuracy, automatic categorization, merchant normalization. $19/month with free tier available. Saves 10-25 hours monthly.</li>
             <li><strong>Bank CSV Export:</strong> Best if your bank supports it. Free, 100% accurate, but limited to supported banks and recent transactions (18-24 months).</li>
             <li><strong>Manual Copy-Paste:</strong> Best for one-time conversions of very small statements (under 20 transactions). Free but time-consuming (2-3 hours) and error-prone (70% accuracy).</li>
             <li><strong>Google Sheets Add-ons:</strong> Best for occasional Google Workspace users. Free to $10/month, moderate accuracy (75%), requires cleanup but better than manual.</li>
@@ -907,7 +907,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           </ul>
 
           <p>
-            For the vast majority of users - small business owners, accountants, bookkeepers, and finance professionals processing 3+ bank statements monthly - <strong>AI-powered converters offer the best balance of speed, accuracy, and cost</strong>. At just $19/month (or free for 1 statement), Statement Desk saves 10-25 hours of manual work, eliminates categorization time, and provides 99% accuracy that far exceeds any alternative method.
+            For the vast majority of users - small business owners, accountants, bookkeepers, and finance professionals processing 3+ bank statements monthly - <strong>AI-powered converters offer the best balance of speed, accuracy, and cost</strong>. At just $19/month (or free for 1 statement), Statement Desk saves 10-25 hours of manual work, eliminates categorization time, and provides 97% accuracy that far exceeds any alternative method.
           </p>
 
           <div className="my-8 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-6 not-prose">

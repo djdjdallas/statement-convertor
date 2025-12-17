@@ -102,7 +102,7 @@ export default function BankStatementToCSVConverter() {
     {
       id: 'faq-9',
       question: 'What if my bank doesn\'t offer CSV export?',
-      answer: 'Many smaller banks and credit unions don\'t provide CSV export functionality. In these cases, use Statement Desk to convert PDF statements to CSV format. Our AI works with 200+ banks worldwide, accurately extracting transaction data even from banks without native CSV export. The process takes 30 seconds and provides 99% accuracy with automatic categorization and merchant normalization included.'
+      answer: 'Many smaller banks and credit unions don\'t provide CSV export functionality. In these cases, use Statement Desk to convert PDF statements to CSV format. Our AI works with 200+ banks worldwide, accurately extracting transaction data even from banks without native CSV export. The process takes 30 seconds and provides 97% accuracy with automatic categorization and merchant normalization included.'
     },
     {
       id: 'faq-10',
@@ -305,7 +305,7 @@ export default function BankStatementToCSVConverter() {
               <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full font-bold text-lg">2</div>
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">AI Extracts Transaction Data</h4>
-                <p className="text-gray-700">Claude AI processes your statement in 20-30 seconds, extracting dates, descriptions, amounts, and balances with 99% accuracy. It automatically categorizes each transaction and normalizes messy merchant names.</p>
+                <p className="text-gray-700">Claude AI processes your statement in 20-30 seconds, extracting dates, descriptions, amounts, and balances with 97% accuracy. It automatically categorizes each transaction and normalizes messy merchant names.</p>
               </div>
             </div>
 
@@ -354,7 +354,7 @@ export default function BankStatementToCSVConverter() {
             title="AI-Powered CSV Conversion: Pros and Cons"
             pros={[
               'Fastest method - 30 seconds per statement including categorization',
-              '99% accuracy with automatic error detection and correction',
+              '97% accuracy with automatic error detection and correction',
               'Multiple CSV format options (Standard, QuickBooks, Xero, Custom)',
               'Proper encoding (UTF-8 BOM) for Excel compatibility',
               'Automatic quoting of fields containing commas or special characters',
@@ -960,7 +960,7 @@ export default function BankStatementToCSVConverter() {
 
           <ul>
             <li>
-              <strong>AI-Powered Converters (Statement Desk):</strong> Best for most users - 30 seconds, 99% accuracy, automatic categorization, multiple CSV formats (Standard, QuickBooks, Xero). $19/month with free tier available.
+              <strong>AI-Powered Converters (Statement Desk):</strong> Best for most users - 30 seconds, 97% accuracy, automatic categorization, multiple CSV formats (Standard, QuickBooks, Xero). $19/month with free tier available.
             </li>
             <li>
               <strong>Bank Direct CSV Export:</strong> Best if your bank supports it - free, 100% accurate, but limited to supported banks and recent transactions (18-24 months).
