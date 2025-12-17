@@ -536,47 +536,51 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <FileText className="h-6 w-6 text-white" />
+          <Link href="/files">
+            <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <FileText className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Total Files
+                    </p>
+                    <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      {stats.totalFiles}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Successfully processed
+                    </p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Files
-                  </p>
-                  <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                    {stats.totalFiles}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Successfully processed
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-purple-500 to-violet-500 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Calendar className="h-6 w-6 text-white" />
+          <Link href="/transactions">
+            <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="bg-gradient-to-r from-purple-500 to-violet-500 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Transactions
+                    </p>
+                    <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+                      {stats.totalTransactions.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Extracted & analyzed
+                    </p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
-                    Transactions
-                  </p>
-                  <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
-                    {stats.totalTransactions.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Extracted & analyzed
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card className="bg-white/70 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 group">
             <CardContent className="p-6">
@@ -912,12 +916,20 @@ export default function DashboardPage() {
                   Your uploaded and processed bank statements
                 </CardDescription>
               </div>
-              <Link href="/upload">
-                <Button>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload New
-                </Button>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link href="/files">
+                  <Button variant="outline">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View All
+                  </Button>
+                </Link>
+                <Link href="/upload">
+                  <Button>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload New
+                  </Button>
+                </Link>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
