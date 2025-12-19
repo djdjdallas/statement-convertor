@@ -66,6 +66,9 @@ class AuditLogger {
   constructor() {
     this.queue = []
     this.flushInterval = null
+    this.flushErrorCount = 0
+    this.maxFlushErrors = 3 // Stop after 3 consecutive errors
+    this.lastErrorMessage = null
     this.startBatchProcessor()
   }
 
@@ -136,6 +139,15 @@ class AuditLogger {
   async flush() {
     if (this.queue.length === 0) return
 
+    // Skip flushing if we've exceeded max errors (table likely doesn't exist)
+    if (this.flushErrorCount >= this.maxFlushErrors) {
+      // Clear queue to prevent memory buildup, log only once
+      if (this.queue.length > 0) {
+        this.queue = []
+      }
+      return
+    }
+
     const entries = [...this.queue]
     this.queue = []
 
@@ -145,14 +157,35 @@ class AuditLogger {
         .insert(entries)
 
       if (error) {
-        console.error('Failed to flush audit logs:', error)
-        // Re-add to queue on failure
-        this.queue.unshift(...entries)
+        this.flushErrorCount++
+        const errorMessage = error.message || error.code || JSON.stringify(error)
+
+        // Only log if it's a new error or first occurrence
+        if (this.lastErrorMessage !== errorMessage) {
+          console.error('Failed to flush audit logs:', errorMessage)
+          if (this.flushErrorCount >= this.maxFlushErrors) {
+            console.warn('[AuditLogger] Max errors reached, disabling audit log flushing. Ensure audit_logs table exists in Supabase.')
+          }
+          this.lastErrorMessage = errorMessage
+        }
+        // Don't re-add entries - discard to prevent memory buildup
+      } else {
+        // Reset error count on success
+        this.flushErrorCount = 0
+        this.lastErrorMessage = null
       }
     } catch (error) {
-      console.error('Audit flush error:', error)
-      // Re-add to queue on failure
-      this.queue.unshift(...entries)
+      this.flushErrorCount++
+      const errorMessage = error.message || 'Unknown error'
+
+      if (this.lastErrorMessage !== errorMessage) {
+        console.error('Audit flush error:', errorMessage)
+        if (this.flushErrorCount >= this.maxFlushErrors) {
+          console.warn('[AuditLogger] Max errors reached, disabling audit log flushing.')
+        }
+        this.lastErrorMessage = errorMessage
+      }
+      // Don't re-add entries - discard to prevent memory buildup
     }
   }
 

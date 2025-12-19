@@ -16,19 +16,12 @@ export default function GlobalError({
       posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
         api_host: '/ingest',
         ui_host: 'https://us.posthog.com',
-        capture_exceptions: true,
+        defaults: '2025-11-30',
       })
     }
 
-    // Capture the global error in PostHog
-    posthog.capture('$exception', {
-      $exception_message: error.message,
-      $exception_type: error.name,
-      $exception_stack_trace_raw: error.stack,
-      $exception_digest: error.digest,
-      $exception_source: 'global-error-boundary',
-      $exception_severity: 'critical',
-    })
+    // Capture the global error in PostHog using the proper method
+    posthog.captureException(error)
   }, [error])
 
   return (

@@ -16,6 +16,9 @@ export function getPostHogClient() {
   return posthogClient
 }
 
+// Alias for documentation compatibility
+export const getPostHogServer = getPostHogClient
+
 export async function shutdownPostHog() {
   if (posthogClient) {
     await posthogClient.shutdown()

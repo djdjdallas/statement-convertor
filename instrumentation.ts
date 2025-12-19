@@ -1,11 +1,9 @@
-import { getPostHogClient } from '@/lib/posthog-server'
-
-export async function register() {
-  // Server-side initialization if needed
+export function register() {
+  // No-op for initialization
 }
 
 export const onRequestError = async (
-  error: { digest: string } & Error,
+  err: { digest: string } & Error,
   request: {
     path: string
     method: string
@@ -23,18 +21,39 @@ export const onRequestError = async (
     renderType: 'dynamic' | 'dynamic-resumable'
   }
 ) => {
-  const posthog = getPostHogClient()
-  if (!posthog) return
+  // Only run in Node.js runtime (not Edge)
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { getPostHogServer } = await import('@/lib/posthog-server')
+    const posthog = getPostHogServer()
 
-  try {
-    posthog.capture({
-      distinctId: 'server-error',
-      event: '$exception',
-      properties: {
-        $exception_message: error.message,
-        $exception_type: error.name,
-        $exception_stack_trace_raw: error.stack,
-        $exception_digest: error.digest,
+    if (!posthog) return
+
+    // Extract distinct_id from PostHog cookie
+    let distinctId: string | undefined = undefined
+    const cookieHeader = request.headers?.cookie
+
+    if (cookieHeader) {
+      const cookieString = Array.isArray(cookieHeader)
+        ? cookieHeader.join('; ')
+        : cookieHeader
+
+      const postHogCookieMatch = cookieString.match(/ph_phc_.*?_posthog=([^;]+)/)
+
+      if (postHogCookieMatch && postHogCookieMatch[1]) {
+        try {
+          const decodedCookie = decodeURIComponent(postHogCookieMatch[1])
+          const postHogData = JSON.parse(decodedCookie)
+          distinctId = postHogData.distinct_id
+        } catch (e) {
+          console.error('[PostHog] Error parsing PostHog cookie:', e)
+        }
+      }
+    }
+
+    try {
+      // Use captureException for proper error tracking
+      posthog.captureException(err, distinctId, {
+        $exception_digest: err.digest,
         $exception_source: 'server',
         request_path: request.path,
         request_method: request.method,
@@ -44,11 +63,11 @@ export const onRequestError = async (
         render_source: context.renderSource,
         revalidate_reason: context.revalidateReason,
         render_type: context.renderType,
-      },
-    })
+      })
 
-    await posthog.flush()
-  } catch (e) {
-    console.error('[PostHog] Failed to capture server error:', e)
+      await posthog.flush()
+    } catch (e) {
+      console.error('[PostHog] Failed to capture server error:', e)
+    }
   }
 }

@@ -6,20 +6,15 @@ import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 
-// Initialize PostHog only in production with valid key
-if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+// Initialize PostHog only if not already loaded (instrumentation-client.ts may have already loaded it)
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY && !posthog.__loaded) {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+    api_host: '/ingest',
+    ui_host: 'https://us.posthog.com',
+    defaults: '2025-11-30', // Modern defaults including exception capture
     person_profiles: 'identified_only',
     capture_pageview: false, // We'll capture manually for more control
-    capture_pageleave: true,
-    loaded: (posthog) => {
-      // Enable capturing in development for testing
-      // Comment out the next line to disable dev tracking after verification
-      // if (process.env.NODE_ENV === 'development') {
-      //   posthog.opt_out_capturing()
-      // }
-    }
+    debug: process.env.NODE_ENV === 'development',
   })
 }
 
