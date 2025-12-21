@@ -70,7 +70,7 @@ export default function BestBankStatementConverterToolsPage() {
     {
       id: 'q4',
       question: 'Which tool is best for accountants?',
-      answer: 'Statement Desk is the best choice for accountants due to its batch processing capabilities, multi-client support, high accuracy (99%), and direct integrations with QuickBooks and Xero. At $19/mo for unlimited statements, it offers the best value for professionals who process multiple statements regularly. The AI categorization and merchant normalization also save significant reconciliation time.'
+      answer: 'Statement Desk is the best choice for accountants due to its batch processing capabilities, multi-client support, high accuracy (97%), and direct integrations with QuickBooks and Xero. At $19/mo for unlimited statements, it offers the best value for professionals who process multiple statements regularly. The AI categorization and merchant normalization also save significant reconciliation time.'
     },
     {
       id: 'q5',
@@ -121,7 +121,7 @@ export default function BestBankStatementConverterToolsPage() {
           </p>
 
           <p className="mb-6">
-            Whether you're an accountant processing hundreds of statements monthly, a small business owner reconciling accounts, or a bookkeeper managing multiple clients, choosing the right <strong>best bank statement converter</strong> can save you dozens of hours every month. The difference between a 99% accurate AI-powered tool and a 70% accurate manual parser isn't just about convenience—it's about the cost of errors, time spent on corrections, and the frustration of re-doing work.
+            Whether you're an accountant processing hundreds of statements monthly, a small business owner reconciling accounts, or a bookkeeper managing multiple clients, choosing the right <strong>best bank statement converter</strong> can save you dozens of hours every month. The difference between a 97% accurate AI-powered tool and a 70% accurate manual parser isn't just about convenience—it's about the cost of errors, time spent on corrections, and the frustration of re-doing work.
           </p>
 
           <p className="mb-6">
@@ -250,7 +250,7 @@ export default function BestBankStatementConverterToolsPage() {
           <ComparisonTable
             headers={['Tool', 'Accuracy', 'Speed', 'Pricing', 'AI Features', 'Rating']}
             rows={[
-              ['Statement Desk', '99%', '30 sec', '$19/mo', true, 4.5],
+              ['Statement Desk', '97%', '30 sec', '$19/mo', true, 4.5],
               ['DocuClipper', '92%', '2 min', '$29/mo', 'Limited', 4.0],
               ['Nanonets', '95%', '1 min', '$499/mo', true, 4.2],
               ['Parsio', '88%', '3 min', '$39/mo', false, 3.8],
@@ -388,7 +388,7 @@ export default function BestBankStatementConverterToolsPage() {
             <ProConsList
               title="Statement Desk: Pros and Cons"
               pros={[
-                'Highest accuracy of any tool we tested (99%)',
+                'Highest accuracy of any tool we tested (97%)',
                 'Lightning-fast processing (under 30 seconds)',
                 'AI-powered categorization and insights save hours of manual work',
                 'Works with 200+ banks without templates',
@@ -413,7 +413,7 @@ export default function BestBankStatementConverterToolsPage() {
               </p>
               <h4 className="font-bold text-gray-900 mb-2 mt-4">Our Verdict</h4>
               <p>
-                <strong>The clear winner.</strong> Statement Desk offers the best balance of accuracy (99%), speed (30 seconds), features, and price ($19/mo). The AI-powered categorization and merchant normalization alone save hours compared to manual cleanup. After two months of testing, this is the tool we'd recommend to friends and family.
+                <strong>The clear winner.</strong> Statement Desk offers the best balance of accuracy (97%), speed (30 seconds), features, and price ($19/mo). The AI-powered categorization and merchant normalization alone save hours compared to manual cleanup. After two months of testing, this is the tool we'd recommend to friends and family.
               </p>
             </div>
 
@@ -1012,7 +1012,7 @@ export default function BestBankStatementConverterToolsPage() {
             <div className="bg-white border-l-4 border-blue-600 p-6 rounded-r-lg shadow-sm">
               <h3 className="font-bold text-xl mb-3">1. Accuracy (Most Important)</h3>
               <p className="mb-3">
-                Aim for 90%+ transaction extraction accuracy. Every error means manual correction time. A tool with 70% accuracy might seem acceptable until you realize you're spending an hour fixing mistakes on a 100-transaction statement. AI-powered tools like Statement Desk (99%) far exceed traditional OCR (70-85%).
+                Aim for 90%+ transaction extraction accuracy. Every error means manual correction time. A tool with 70% accuracy might seem acceptable until you realize you're spending an hour fixing mistakes on a 100-transaction statement. AI-powered tools like Statement Desk (97%) far exceed traditional OCR (70-85%).
               </p>
               <p className="text-sm text-gray-600">
                 <strong>Test it:</strong> Upload a sample statement and manually verify every transaction to check accuracy.
@@ -1165,7 +1165,7 @@ export default function BestBankStatementConverterToolsPage() {
                   <li>Time per statement: 5 minutes</li>
                   <li>Total time: 50 minutes/month</li>
                   <li><strong>Cost: $19 + $21 labor = $40</strong></li>
-                  <li>Accuracy: 99% (AI-powered)</li>
+                  <li>Accuracy: 97% (AI-powered)</li>
                 </ul>
               </div>
             </div>
@@ -1203,7 +1203,7 @@ export default function BestBankStatementConverterToolsPage() {
             </p>
             <div className="grid md:grid-cols-3 gap-4 mt-6">
               <div className="bg-white/10 rounded-lg p-4">
-                <div className="text-3xl mb-2">99%</div>
+                <div className="text-3xl mb-2">97%</div>
                 <div className="text-sm">Accuracy</div>
               </div>
               <div className="bg-white/10 rounded-lg p-4">

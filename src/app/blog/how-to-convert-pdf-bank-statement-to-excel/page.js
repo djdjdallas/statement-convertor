@@ -149,7 +149,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
             <ol className="space-y-3 text-gray-800">
               <li className="flex items-start gap-3">
                 <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold">1</span>
-                <span><strong>Choose your conversion method:</strong> AI converter (fastest, 99% accurate), bank CSV export (free, limited banks), manual copy-paste (free, slow), Google Sheets add-on (moderate), or desktop OCR software (one-time projects).</span>
+                <span><strong>Choose your conversion method:</strong> AI converter (fastest, 97% accurate), bank CSV export (free, limited banks), manual copy-paste (free, slow), Google Sheets add-on (moderate), or desktop OCR software (one-time projects).</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold">2</span>
@@ -165,7 +165,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
               </li>
             </ol>
             <p className="mt-4 text-sm text-gray-700">
-              <strong>Recommended:</strong> For most users, AI-powered converters like <Link href="/auth/signup?utm_source=blog&utm_campaign=how-to-convert" className="text-blue-600 hover:text-blue-700 underline">Statement Desk</Link> offer the best balance of speed (30 sec), accuracy (99%), and cost ($19/mo or free tier).
+              <strong>Recommended:</strong> For most users, AI-powered converters like <Link href="/auth/signup?utm_source=blog&utm_campaign=how-to-convert" className="text-blue-600 hover:text-blue-700 underline">Statement Desk</Link> offer the best balance of speed (30 sec), accuracy (97%), and cost ($19/mo or free tier).
             </p>
           </div>
 
@@ -209,7 +209,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           <ComparisonTable
             headers={['Method', 'Time Required', 'Accuracy', 'Cost', 'Best For']}
             rows={[
-              ['AI-Powered Converters (Statement Desk)', '30 seconds', '99%', '$19/mo (Free tier available)', 'Small businesses, accountants, regular users'],
+              ['AI-Powered Converters (Statement Desk)', '30 seconds', '97%', '$19/mo (Free tier available)', 'Small businesses, accountants, regular users'],
               ['Manual Copy-Paste', '2-3 hours', '70%', 'Free', 'One-time conversions, tech-averse users'],
               ['Bank CSV Export', '5 minutes', '100%', 'Free', 'Supported banks only, direct downloads'],
               ['Google Sheets Add-ons', '10-15 minutes', '75%', 'Free - $10/mo', 'Google Workspace users, occasional use'],
@@ -296,7 +296,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
           <h3>Benefits of AI-Powered Conversion</h3>
 
           <ul>
-            <li><strong>99% Accuracy:</strong> Machine learning models trained on millions of transactions ensure near-perfect data extraction, far exceeding manual entry (70%) or traditional OCR (65%).</li>
+            <li><strong>97% Accuracy:</strong> Machine learning models trained on millions of transactions ensure near-perfect data extraction, far exceeding manual entry (70%) or traditional OCR (65%).</li>
             <li><strong>Works with 200+ Banks:</strong> Unlike hardcoded tools that support 5-10 banks, AI understands any bank's format through pattern recognition and natural language processing.</li>
             <li><strong>Automatic Categorization:</strong> Saves 1-2 hours per statement by intelligently categorizing transactions into accounting-standard categories compatible with QuickBooks, Xero, and other platforms.</li>
             <li><strong>Merchant Normalization:</strong> Cleans messy merchant names like "SQ *COFFEE SHOP #123 SAN FRANCISCO CA" into "Coffee Shop" for cleaner reporting and better analytics.</li>
@@ -317,7 +317,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
             title="AI-Powered Converters: Pros and Cons"
             pros={[
               'Fastest conversion time (30 seconds per statement)',
-              'Highest accuracy at 99% with automatic error detection',
+              'Highest accuracy at 97% with automatic error detection',
               'Automatic transaction categorization saves 1-2 hours per statement',
               'Works with 200+ banks worldwide without configuration',
               'Handles both native and scanned PDF statements',
@@ -752,7 +752,7 @@ export default function HowToConvertPDFBankStatementToExcel() {
                 Based on Accuracy Needs
               </h4>
               <ul className="space-y-2 text-gray-800">
-                <li><strong>High accuracy required (accounting, taxes):</strong> AI-powered converter (99%) or bank CSV export (100%)</li>
+                <li><strong>High accuracy required (accounting, taxes):</strong> AI-powered converter (97%) or bank CSV export (100%)</li>
                 <li><strong>Moderate accuracy okay (personal budgeting):</strong> Google Sheets add-ons (75%)</li>
                 <li><strong>Willing to manually verify everything:</strong> Manual copy-paste or desktop OCR</li>
                 <li><strong>Need categorization and normalization:</strong> AI-powered converter only</li>

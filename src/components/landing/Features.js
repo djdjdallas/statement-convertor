@@ -47,7 +47,7 @@ const features = [
   },
   {
     icon: CheckCircle,
-    title: "99.9% Accuracy",
+    title: "97% Accuracy",
     description:
       "Our AI accurately extracts dates, descriptions, amounts, and balances from all major bank formats.",
   },

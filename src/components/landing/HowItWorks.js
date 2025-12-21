@@ -28,7 +28,7 @@ const steps = [
     step: '02',
     icon: Settings,
     title: 'AI Processing',
-    description: 'Our advanced AI analyzes your statement and extracts all transaction data with 99.9% accuracy.',
+    description: 'Our advanced AI analyzes your statement and extracts all transaction data with 97% accuracy.',
     details: [
       'Smart data extraction',
       'Automatic categorization',

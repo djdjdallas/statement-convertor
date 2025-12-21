@@ -58,7 +58,7 @@ export default function Hero() {
               <div className="text-sm text-gray-500">Files Converted</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900">99.9%</div>
+              <div className="text-2xl font-bold text-gray-900">97%</div>
               <div className="text-sm text-gray-500">Accuracy Rate</div>
             </div>
             <div>

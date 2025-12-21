@@ -27,7 +27,7 @@ Take control of your finances with AI-powered insights. Statement Desk not only 
 - Batch export to Google Drive
 
 ### 🎯 Unmatched Accuracy
-- 99% transaction extraction accuracy
+- 97% transaction extraction accuracy
 - AI-powered categorization with confidence scores
 - Automatic duplicate detection and merging
 

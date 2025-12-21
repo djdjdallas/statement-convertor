@@ -40,7 +40,7 @@ export default function DocuClipperAlternativePage() {
     {
       id: 'q1',
       question: 'What\'s the best DocuClipper alternative?',
-      answer: 'Statement Desk is our top recommendation. It\'s cheaper ($19/mo vs $29/mo), more accurate (99% vs 92%), faster (30 sec vs 2 min), and has AI features DocuClipper lacks. It supports 200+ banks and offers automatic categorization, merchant normalization, and financial insights.'
+      answer: 'Statement Desk is our top recommendation. It\'s cheaper ($19/mo vs $29/mo), more accurate (97% vs 92%), faster (30 sec vs 2 min), and has AI features DocuClipper lacks. It supports 200+ banks and offers automatic categorization, merchant normalization, and financial insights.'
     },
     {
       id: 'q2',
@@ -202,7 +202,7 @@ export default function DocuClipperAlternativePage() {
           <ComparisonTable
             headers={['Alternative', 'Price', 'Accuracy', 'Speed', 'Banks', 'AI Features', 'Best For']}
             rows={[
-              ['Statement Desk', '$19/mo', '99%', '30 sec', '200+', '✓', 'All users'],
+              ['Statement Desk', '$19/mo', '97%', '30 sec', '200+', '✓', 'All users'],
               ['Nanonets', '$499/mo', '95%', '60 sec', 'Custom', '✓', 'Enterprise'],
               ['Parsio', '$39/mo', '88%', '3 min', 'Custom', '✗', 'Email workflow'],
               ['Bank2CSV', '$25/mo', '90%', '90 sec', '100+', '✗', 'CSV-focused'],
@@ -215,7 +215,7 @@ export default function DocuClipperAlternativePage() {
 
           <div className="bg-blue-50 border-l-4 border-blue-600 p-6 my-8">
             <p className="text-gray-800">
-              <strong>Our Pick:</strong> Statement Desk offers the best combination of lower price ($19 vs $29), higher accuracy (99% vs 92%), faster processing (30 sec vs 2 min), and more features. For 90% of users, it's the ideal DocuClipper alternative.
+              <strong>Our Pick:</strong> Statement Desk offers the best combination of lower price ($19 vs $29), higher accuracy (97% vs 92%), faster processing (30 sec vs 2 min), and more features. For 90% of users, it's the ideal DocuClipper alternative.
             </p>
           </div>
 
@@ -247,7 +247,7 @@ export default function DocuClipperAlternativePage() {
 
             <h4 className="font-bold text-lg mb-3 mt-6">Why It's the Best DocuClipper Alternative</h4>
             <p className="mb-4">
-              Statement Desk is purpose-built for bank statement conversion and beats DocuClipper in every category that matters. It's 26% cheaper ($19/mo vs $29/mo), processes statements 4x faster (30 seconds vs 2 minutes), achieves higher accuracy (99% vs 92%), and supports 4x more banks (200+ vs 50).
+              Statement Desk is purpose-built for bank statement conversion and beats DocuClipper in every category that matters. It's 26% cheaper ($19/mo vs $29/mo), processes statements 4x faster (30 seconds vs 2 minutes), achieves higher accuracy (97% vs 92%), and supports 4x more banks (200+ vs 50).
             </p>
 
             <div className="bg-white rounded-lg p-4 mb-4 border border-blue-200">
@@ -259,7 +259,7 @@ export default function DocuClipperAlternativePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-600 font-bold mt-1">✓</span>
-                  <span><strong>Higher accuracy:</strong> 99% vs DocuClipper's 92%</span>
+                  <span><strong>Higher accuracy:</strong> 97% vs DocuClipper's 92%</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-600 font-bold mt-1">✓</span>
@@ -335,7 +335,7 @@ export default function DocuClipperAlternativePage() {
             <ProConsList
               title="Statement Desk: Pros and Cons"
               pros={[
-                'Best accuracy of any alternative tested (99%)',
+                'Best accuracy of any alternative tested (97%)',
                 'Cheapest option at $19/mo (save $10/mo vs DocuClipper)',
                 'Fastest processing - 4x faster than DocuClipper',
                 'Most AI features - categorization, normalization, forecasting',
@@ -709,7 +709,7 @@ export default function DocuClipperAlternativePage() {
             headers={['Feature', 'Statement Desk', 'Nanonets', 'Parsio', 'Bank2CSV', 'Tabula', 'DocuClipper']}
             rows={[
               ['Monthly Price', '$19', '$499', '$39', '$25', 'Free', '$29'],
-              ['Accuracy', '99%', '95%', '88%', '90%', '70%', '92%'],
+              ['Accuracy', '97%', '95%', '88%', '90%', '70%', '92%'],
               ['Processing Speed', '30 sec', '60 sec', '3 min', '90 sec', '10 min', '2 min'],
               ['Banks Supported', '200+', 'Custom', 'Custom', '100+', 'Manual', '50+'],
               ['AI Categorization', true, true, false, false, false, false],
@@ -819,7 +819,7 @@ export default function DocuClipperAlternativePage() {
               <ul className="space-y-1 text-sm">
                 <li>• Subscription: $19/month</li>
                 <li>• Processing time: 30 sec/statement × 10 = 5 min/month</li>
-                <li>• Accuracy: 99% (1% require manual fixes = ~2 min/month)</li>
+                <li>• Accuracy: 97% (1% require manual fixes = ~2 min/month)</li>
                 <li>• <strong>Total time: 7 min/month</strong></li>
                 <li>• <strong>Total cost: $19 + $3 labor (@$25/hr) = $22/month</strong></li>
               </ul>
@@ -865,7 +865,7 @@ export default function DocuClipperAlternativePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">✓</span>
-                  <span>You value accuracy (99%) and speed (30 seconds)</span>
+                  <span>You value accuracy (97%) and speed (30 seconds)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">✓</span>
@@ -958,7 +958,7 @@ export default function DocuClipperAlternativePage() {
           <div className="bg-blue-600 text-white rounded-lg p-6 mb-8">
             <h3 className="font-bold text-xl mb-3">Our Recommendation for 95% of Users</h3>
             <p className="mb-3">
-              <strong>Statement Desk</strong> offers the best combination of lower price ($19 vs $29), higher accuracy (99% vs 92%), faster processing (30 sec vs 2 min), and more features (AI categorization, forecasting, insights).
+              <strong>Statement Desk</strong> offers the best combination of lower price ($19 vs $29), higher accuracy (97% vs 92%), faster processing (30 sec vs 2 min), and more features (AI categorization, forecasting, insights).
             </p>
             <p className="text-blue-100">
               Start with the free tier (1 statement) to test with your actual bank statements. If it works well, upgrade to Professional for unlimited conversions at $19/mo and save $120/year vs DocuClipper.
@@ -1061,7 +1061,7 @@ export default function DocuClipperAlternativePage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-600 font-bold">✓</span>
-                <span><strong>Higher accuracy</strong> (99% vs 92%)</span>
+                <span><strong>Higher accuracy</strong> (97% vs 92%)</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-600 font-bold">✓</span>
@@ -1096,7 +1096,7 @@ export default function DocuClipperAlternativePage() {
           <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-xl p-8 mb-8">
             <h3 className="text-2xl font-bold mb-4">Bottom Line</h3>
             <p className="text-lg mb-4">
-              If you're looking for a DocuClipper alternative, <strong>Statement Desk</strong> is the clear winner for most users. It's cheaper ($19/mo vs $29/mo), more accurate (99% vs 92%), faster (30 sec vs 2 min), and offers advanced AI features that DocuClipper simply doesn't have.
+              If you're looking for a DocuClipper alternative, <strong>Statement Desk</strong> is the clear winner for most users. It's cheaper ($19/mo vs $29/mo), more accurate (97% vs 92%), faster (30 sec vs 2 min), and offers advanced AI features that DocuClipper simply doesn't have.
             </p>
             <div className="grid md:grid-cols-4 gap-4 mt-6">
               <div className="bg-white/10 rounded-lg p-4">
@@ -1104,7 +1104,7 @@ export default function DocuClipperAlternativePage() {
                 <div className="text-sm">Annual savings</div>
               </div>
               <div className="bg-white/10 rounded-lg p-4">
-                <div className="text-3xl font-bold mb-1">99%</div>
+                <div className="text-3xl font-bold mb-1">97%</div>
                 <div className="text-sm">Accuracy rate</div>
               </div>
               <div className="bg-white/10 rounded-lg p-4">

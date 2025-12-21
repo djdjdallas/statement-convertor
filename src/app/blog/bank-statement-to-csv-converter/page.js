@@ -267,7 +267,7 @@ export default function BankStatementToCSVConverter() {
           <ComparisonTable
             headers={['Method', 'Time Required', 'Accuracy', 'Cost', 'Best For']}
             rows={[
-              ['AI-Powered Converters', '30 sec', '99%', '$19/mo', 'All users'],
+              ['AI-Powered Converters', '30 sec', '97%', '$19/mo', 'All users'],
               ['Bank Direct Export', '5 min', '100%', 'Free', 'Supported banks'],
               ['Manual Excel Save-As', '1-2 hours', '70%', 'Free', 'One-time use'],
               ['Google Sheets Export', '15 min', '75%', 'Free', 'Google users']
