@@ -11,9 +11,14 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY && !pos
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
     api_host: '/ingest',
     ui_host: 'https://us.posthog.com',
-    defaults: '2025-11-30', // Modern defaults including exception capture
+    defaults: '2025-11-30',
     person_profiles: 'identified_only',
     capture_pageview: false, // We'll capture manually for more control
+    capture_exceptions: {
+      capture_unhandled_errors: true,
+      capture_unhandled_rejections: true,
+      capture_console_errors: false,
+    },
     debug: process.env.NODE_ENV === 'development',
   })
 }
