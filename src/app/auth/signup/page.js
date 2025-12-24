@@ -203,7 +203,7 @@ function SignUpContent() {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center text-gray-600">
                   <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                  <span>10 free conversions</span>
+                  <span>5 free conversions</span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />

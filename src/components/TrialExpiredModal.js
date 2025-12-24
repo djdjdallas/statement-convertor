@@ -44,7 +44,7 @@ export default function TrialExpiredModal({ isOpen, onClose, userProfile }) {
 
   const features = {
     free: [
-      { text: '10 conversions per month', included: true },
+      { text: '5 conversions per month', included: true },
       { text: 'Basic CSV export', included: true },
       { text: 'Email support', included: true },
       { text: 'Advanced AI recognition', included: false },

@@ -117,7 +117,7 @@ export default function TrialStatusBanner({ userProfile, userSubscription }) {
         {daysRemaining <= 7 && (
           <div className="mt-3 pt-3 border-t border-gray-200">
             <p className="text-xs text-gray-600">
-              <strong>What happens when my trial ends?</strong> You'll automatically switch to our free plan with 10 conversions/month. 
+              <strong>What happens when my trial ends?</strong> You'll automatically switch to our free plan with 5 conversions/month. 
               Upgrade anytime to keep unlimited access to all features.
             </p>
           </div>
