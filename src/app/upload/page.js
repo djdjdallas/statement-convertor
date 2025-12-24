@@ -34,6 +34,7 @@ import posthog from 'posthog-js'
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [processing, setProcessing] = useState(false)
+  const [processingStep, setProcessingStep] = useState(null) // Track current AI processing step
   const [userProfile, setUserProfile] = useState(null)
   const [hasGoogleDrive, setHasGoogleDrive] = useState(false)
   const [xeroConnections, setXeroConnections] = useState([])
@@ -295,10 +296,22 @@ export default function UploadPage() {
     }
   }
 
+  // AI Processing steps for progress indication
+  const PROCESSING_STEPS = [
+    { id: 'extracting', label: 'Extracting text from PDF...', icon: '📄' },
+    { id: 'analyzing', label: 'AI analyzing transactions...', icon: '🤖' },
+    { id: 'categorizing', label: 'Categorizing transactions...', icon: '🏷️' },
+    { id: 'normalizing', label: 'Normalizing merchant names...', icon: '✨' },
+    { id: 'detecting', label: 'Detecting anomalies...', icon: '🔍' },
+    { id: 'insights', label: 'Generating financial insights...', icon: '📊' },
+    { id: 'saving', label: 'Saving results...', icon: '💾' },
+  ]
+
   const processFiles = async () => {
     if (uploadedFiles.length === 0) return
 
     setProcessing(true)
+    setProcessingStep(0)
 
     // PostHog: Capture processing started event
     posthog.capture('pdf_processing_started', {
@@ -312,9 +325,22 @@ export default function UploadPage() {
         prev.map(file => ({ ...file, status: 'processing' }))
       )
 
+      // Simulate progress steps (the API doesn't report granular progress, so we estimate)
+      const stepInterval = setInterval(() => {
+        setProcessingStep(prev => {
+          if (prev < PROCESSING_STEPS.length - 1) {
+            return prev + 1
+          }
+          return prev
+        })
+      }, 8000) // Move to next step every ~8 seconds (total ~56 seconds for all steps)
+
       // Process each file using the PDF processing API
       for (const file of uploadedFiles) {
         try {
+          // Reset step for each file
+          setProcessingStep(0)
+
           const response = await fetch('/api/process-pdf', {
             method: 'POST',
             headers: {
@@ -377,10 +403,10 @@ export default function UploadPage() {
 
         } catch (error) {
           console.error(`Error processing file ${file.id}:`, error)
-          
-          setUploadedFiles(prev => 
-            prev.map(f => f.id === file.id ? { 
-              ...f, 
+
+          setUploadedFiles(prev =>
+            prev.map(f => f.id === file.id ? {
+              ...f,
               status: 'failed',
               error: error.message
             } : f)
@@ -388,10 +414,14 @@ export default function UploadPage() {
         }
       }
 
+      // Clear the step progress interval
+      clearInterval(stepInterval)
+
     } catch (error) {
       console.error('Error processing files:', error)
     } finally {
       setProcessing(false)
+      setProcessingStep(null)
     }
   }
 
@@ -660,12 +690,58 @@ export default function UploadPage() {
             <CardContent>
               <div className="space-y-4">
                 {processing && (
-                  <div className="space-y-2 p-4 bg-blue-50/50 rounded-lg">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-blue-700 font-medium">Processing files...</span>
-                      <span className="text-blue-600">{completedFiles.length} / {uploadedFiles.length} completed</span>
+                  <div className="space-y-4 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                    {/* Current Step Indicator */}
+                    {processingStep !== null && PROCESSING_STEPS[processingStep] && (
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center animate-pulse">
+                          <span className="text-lg">{PROCESSING_STEPS[processingStep].icon}</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-blue-800 font-semibold text-lg">
+                            {PROCESSING_STEPS[processingStep].label}
+                          </p>
+                          <p className="text-blue-600 text-sm">
+                            Step {processingStep + 1} of {PROCESSING_STEPS.length}
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step Progress Pills */}
+                    <div className="flex flex-wrap gap-2">
+                      {PROCESSING_STEPS.map((step, index) => (
+                        <div
+                          key={step.id}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                            index < processingStep
+                              ? 'bg-green-100 text-green-700'
+                              : index === processingStep
+                              ? 'bg-blue-600 text-white animate-pulse'
+                              : 'bg-gray-100 text-gray-400'
+                          }`}
+                        >
+                          {index < processingStep ? '✓' : step.icon} {step.id}
+                        </div>
+                      ))}
                     </div>
-                    <Progress value={(completedFiles.length / uploadedFiles.length) * 100} className="h-2" />
+
+                    {/* Overall Progress */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-blue-700 font-medium">Overall Progress</span>
+                        <span className="text-blue-600">{completedFiles.length} / {uploadedFiles.length} files completed</span>
+                      </div>
+                      <Progress value={(completedFiles.length / uploadedFiles.length) * 100} className="h-2" />
+                    </div>
+
+                    {/* Estimated Time */}
+                    <p className="text-center text-sm text-blue-600/80 italic">
+                      AI processing typically takes 1-2 minutes per file
+                    </p>
                   </div>
                 )}
 

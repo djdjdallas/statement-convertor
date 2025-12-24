@@ -155,7 +155,7 @@ export async function POST(request) {
       }
 
       // Update file record with completion status and metadata
-      await supabase
+      const { error: updateError } = await supabase
         .from('files')
         .update({
           processing_status: 'completed',
@@ -165,6 +165,11 @@ export async function POST(request) {
           extraction_method: extractedData.metadata?.extractionMethod || 'Traditional'
         })
         .eq('id', fileId)
+
+      if (updateError) {
+        console.error('Failed to update file status to completed:', updateError)
+        throw new Error('Failed to update file status')
+      }
 
       // Log successful processing
       await supabase.from('usage_tracking').insert({
