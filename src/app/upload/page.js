@@ -361,7 +361,8 @@ export default function UploadPage() {
               ...file,
               status: 'completed',
               transactionCount: result.data.transactionCount,
-              bankType: result.data.bankType
+              bankType: result.data.bankType,
+              previewTransactions: result.data.preview || []
             }
 
             setUploadedFiles(prev =>

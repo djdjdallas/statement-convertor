@@ -18,11 +18,15 @@ import {
   Building,
   ExternalLink,
   Loader2,
-  Eye
+  Eye,
+  ChevronDown
 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import posthog from 'posthog-js'
 import Link from 'next/link'
+
+// Number of transactions to show in preview
+const PREVIEW_LIMIT = 5
 
 export default function ExportSuccessModal({
   isOpen,
@@ -34,6 +38,44 @@ export default function ExportSuccessModal({
 }) {
   const [exporting, setExporting] = useState({ xlsx: false, csv: false })
   const [exportComplete, setExportComplete] = useState({ xlsx: false, csv: false })
+
+  // Get preview transactions from file prop
+  const previewTransactions = file?.previewTransactions || []
+  const displayedTransactions = previewTransactions.slice(0, PREVIEW_LIMIT)
+  const remainingCount = (file?.transactionCount || 0) - displayedTransactions.length
+
+  // Format currency amount with color
+  const formatAmount = (amount) => {
+    const numAmount = parseFloat(amount)
+    const isPositive = numAmount >= 0
+    const formatted = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(Math.abs(numAmount))
+
+    return {
+      value: isPositive ? `+${formatted}` : `-${formatted}`,
+      className: isPositive ? 'text-green-600 font-medium' : 'text-red-600 font-medium'
+    }
+  }
+
+  // Format date for display
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-'
+    try {
+      const date = new Date(dateStr)
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    } catch {
+      return dateStr
+    }
+  }
+
+  // Truncate long descriptions
+  const truncateDescription = (desc, maxLength = 35) => {
+    if (!desc) return '-'
+    return desc.length > maxLength ? desc.substring(0, maxLength) + '...' : desc
+  }
 
   // Track modal view when it opens
   useEffect(() => {
@@ -150,29 +192,81 @@ export default function ExportSuccessModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader className="text-center pb-2">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="text-center pb-2 flex-shrink-0">
+          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+            <CheckCircle className="h-7 w-7 text-green-600" />
           </div>
-          <DialogTitle className="text-2xl font-bold text-center">
-            Statement Processed Successfully!
+          <DialogTitle className="text-xl font-bold text-center">
+            Extracted {file.transactionCount} transactions from {file.name}
           </DialogTitle>
-          <DialogDescription className="text-center text-base mt-2">
-            <span className="font-medium text-gray-900">{file.name}</span>
-            <br />
-            <span className="text-green-600 font-semibold">
-              {file.transactionCount} transactions
-            </span> extracted
-            {file.bankType && file.bankType !== 'generic' && (
-              <Badge variant="outline" className="ml-2 text-xs">
+          {file.bankType && file.bankType !== 'generic' && (
+            <div className="flex justify-center mt-1">
+              <Badge variant="outline" className="text-xs">
                 {file.bankType}
               </Badge>
-            )}
-          </DialogDescription>
+            </div>
+          )}
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 flex-1 overflow-hidden flex flex-col">
+          {/* Transaction Preview Table */}
+          {displayedTransactions.length > 0 && (
+            <div className="border rounded-lg overflow-hidden flex-shrink-0">
+              <div className="bg-gray-50 px-3 py-2 border-b">
+                <p className="text-sm font-medium text-gray-700">Preview of extracted transactions</p>
+              </div>
+              <div className="max-h-[200px] overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr className="text-left text-gray-600">
+                      <th className="px-3 py-2 font-medium">Date</th>
+                      <th className="px-3 py-2 font-medium">Description</th>
+                      <th className="px-3 py-2 font-medium text-right">Amount</th>
+                      <th className="px-3 py-2 font-medium">Category</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {displayedTransactions.map((tx, index) => {
+                      const amount = formatAmount(tx.amount)
+                      return (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-3 py-2 text-gray-600 whitespace-nowrap">
+                            {formatDate(tx.date)}
+                          </td>
+                          <td className="px-3 py-2 text-gray-900" title={tx.description}>
+                            {truncateDescription(tx.normalizedMerchant || tx.description)}
+                          </td>
+                          <td className={`px-3 py-2 text-right whitespace-nowrap ${amount.className}`}>
+                            {amount.value}
+                          </td>
+                          <td className="px-3 py-2">
+                            {tx.category ? (
+                              <Badge variant="secondary" className="text-xs font-normal">
+                                {tx.category}
+                              </Badge>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {remainingCount > 0 && (
+                <Link href={`/preview/${file.id}`} onClick={handleViewDetails}>
+                  <div className="px-3 py-2 bg-gray-50 border-t text-center hover:bg-gray-100 transition-colors cursor-pointer">
+                    <span className="text-sm text-blue-600 font-medium flex items-center justify-center gap-1">
+                      <ChevronDown className="h-4 w-4" />
+                      {remainingCount} more transactions...
+                    </span>
+                  </div>
+                </Link>
+              )}
+            </div>
+          )}
           {/* Primary Export Options */}
           <div className="space-y-3">
             <p className="text-sm font-medium text-gray-700 text-center">
