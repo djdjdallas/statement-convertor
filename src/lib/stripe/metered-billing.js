@@ -170,6 +170,7 @@ export async function recordApiConversion({
 export async function createApiCheckoutSession({
   userId,
   userEmail,
+  customerId,
   planTier,
   successUrl,
   cancelUrl
@@ -188,7 +189,7 @@ export async function createApiCheckoutSession({
   const config = API_PLAN_CONFIGS[planTier];
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig = {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
@@ -197,7 +198,6 @@ export async function createApiCheckoutSession({
           quantity: 1
         }
       ],
-      customer_email: userEmail,
       client_reference_id: userId,
       success_url: successUrl,
       cancel_url: cancelUrl,
@@ -212,7 +212,16 @@ export async function createApiCheckoutSession({
         user_id: userId,
         plan_tier: planTier
       }
-    });
+    };
+
+    // Use existing customer if available, otherwise fall back to email
+    if (customerId) {
+      sessionConfig.customer = customerId;
+    } else {
+      sessionConfig.customer_email = userEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return session;
 

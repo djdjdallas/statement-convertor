@@ -35,6 +35,7 @@ export const STRIPE_PRICES = {
 export async function createCheckoutSession({
   userId,
   userEmail,
+  customerId,
   priceId,
   successUrl,
   cancelUrl,
@@ -45,7 +46,7 @@ export async function createCheckoutSession({
     if (!stripe) {
       throw new Error('Stripe is not configured')
     }
-    
+
     const sessionConfig = {
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -55,7 +56,6 @@ export async function createCheckoutSession({
           quantity: 1,
         },
       ],
-      customer_email: userEmail,
       client_reference_id: userId,
       success_url: successUrl,
       cancel_url: cancelUrl,
@@ -67,6 +67,13 @@ export async function createCheckoutSession({
           userId: userId
         }
       }
+    }
+
+    // Use existing customer if available, otherwise fall back to email
+    if (customerId) {
+      sessionConfig.customer = customerId
+    } else {
+      sessionConfig.customer_email = userEmail
     }
     
     // Add trial period if specified

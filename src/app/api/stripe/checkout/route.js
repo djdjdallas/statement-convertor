@@ -88,6 +88,7 @@ export async function POST(request) {
     const { session, error: sessionError } = await createCheckoutSession({
       userId: user.id,
       userEmail: user.email,
+      customerId: customer.id,
       priceId,
       successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
       cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
