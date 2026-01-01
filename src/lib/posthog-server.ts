@@ -108,3 +108,43 @@ export function trackError(userId: string | null, data: {
     context: data.context
   })
 }
+
+// Track Xero connection events
+export function trackXeroConnection(userId: string, data: {
+  action: 'auth_started' | 'auth_completed' | 'auth_failed' | 'disconnected' | 'token_refreshed' | 'token_refresh_failed'
+  tenantId?: string
+  tenantName?: string
+  error?: string
+  errorCode?: string
+}) {
+  trackServerEvent(userId, 'xero_connection', {
+    action: data.action,
+    tenant_id: data.tenantId,
+    tenant_name: data.tenantName,
+    error: data.error,
+    error_code: data.errorCode,
+    success: !data.error
+  })
+}
+
+// Track Xero export events
+export function trackXeroExport(userId: string, data: {
+  action: 'started' | 'completed' | 'failed'
+  fileId?: string
+  tenantId?: string
+  transactionCount?: number
+  error?: string
+  errorCode?: string
+  duration?: number
+}) {
+  trackServerEvent(userId, 'xero_export', {
+    action: data.action,
+    file_id: data.fileId,
+    tenant_id: data.tenantId,
+    transaction_count: data.transactionCount,
+    error: data.error,
+    error_code: data.errorCode,
+    duration_ms: data.duration,
+    success: data.action === 'completed'
+  })
+}

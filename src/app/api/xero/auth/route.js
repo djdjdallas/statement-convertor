@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { XeroService } from '@/lib/xero/xero-service';
 import { createClient } from '@/lib/supabase/server';
+import { trackXeroConnection } from '@/lib/posthog-server';
 
 export async function GET(request) {
   try {
@@ -35,12 +36,25 @@ export async function GET(request) {
 
     if (error) {
       console.error('Failed to store OAuth state:', error);
+      trackXeroConnection(user.id, {
+        action: 'auth_failed',
+        error: 'Failed to store OAuth state',
+        errorCode: 'OAUTH_STATE_ERROR'
+      });
       return NextResponse.json({ error: 'Failed to initialize authentication' }, { status: 500 });
     }
+
+    // Track auth started
+    trackXeroConnection(user.id, { action: 'auth_started' });
 
     return NextResponse.json({ authUrl });
   } catch (error) {
     console.error('Xero auth error:', error);
+    trackXeroConnection('unknown', {
+      action: 'auth_failed',
+      error: error.message,
+      errorCode: 'AUTH_INIT_ERROR'
+    });
     return NextResponse.json({ error: 'Auth initialization failed' }, { status: 500 });
   }
 }

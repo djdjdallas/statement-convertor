@@ -3,7 +3,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { XeroService } from '@/lib/xero/xero-service'
 import { hasXeroAccess } from '@/lib/subscription-tiers'
-import { trackSync, trackError } from '@/lib/posthog-server'
+import { trackSync, trackError, trackXeroExport, trackXeroConnection } from '@/lib/posthog-server'
 
 export async function POST(req) {
   try {
@@ -29,12 +29,25 @@ export async function POST(req) {
     }
 
     const { fileId, tenantId, bankAccountId } = await req.json()
+    const exportStartTime = Date.now()
 
     if (!fileId || !tenantId || !bankAccountId) {
-      return NextResponse.json({ 
-        error: 'Missing required parameters: fileId, tenantId, and bankAccountId are required' 
+      trackXeroExport(session.user.id, {
+        action: 'failed',
+        error: 'Missing required parameters',
+        errorCode: 'MISSING_PARAMS'
+      })
+      return NextResponse.json({
+        error: 'Missing required parameters: fileId, tenantId, and bankAccountId are required'
       }, { status: 400 })
     }
+
+    // Track export started
+    trackXeroExport(session.user.id, {
+      action: 'started',
+      fileId,
+      tenantId
+    })
 
     // Fetch the file and its transactions
     const { data: file, error: fileError } = await supabase
@@ -131,7 +144,17 @@ export async function POST(req) {
       })
       .eq('id', fileId)
 
-    // Track successful Xero sync in PostHog
+    // Track successful Xero export in PostHog
+    const exportDuration = Date.now() - exportStartTime
+    trackXeroExport(session.user.id, {
+      action: 'completed',
+      fileId,
+      tenantId,
+      transactionCount: file.transactions.length,
+      duration: exportDuration
+    })
+
+    // Also track sync for backward compatibility
     trackSync(session.user.id, {
       platform: 'xero',
       transactionCount: file.transactions.length,
@@ -148,39 +171,74 @@ export async function POST(req) {
   } catch (error) {
     console.error('Xero export error:', error)
 
-    // Track Xero sync error in PostHog
-    trackError(null, {
-      type: 'xero_sync_failed',
-      message: error.message,
-      endpoint: '/api/xero/export'
-    })
-    
-    // Check for refresh token expired error
+    // Determine error code based on error type
+    let errorCode = 'EXPORT_ERROR'
     if (error.message?.includes('Refresh token has expired') || error.code === 'XERO_TOKEN_EXPIRED') {
-      return NextResponse.json({ 
+      errorCode = 'TOKEN_EXPIRED'
+    } else if (error.response?.statusCode === 401) {
+      errorCode = 'AUTH_FAILED'
+    } else if (error.response?.statusCode === 403) {
+      errorCode = 'ACCESS_DENIED'
+    } else if (error.response?.statusCode === 429) {
+      errorCode = 'RATE_LIMITED'
+    }
+
+    // Track Xero export failure in PostHog
+    trackXeroExport(null, {
+      action: 'failed',
+      error: error.message,
+      errorCode
+    })
+
+    // Track token refresh failures separately for connection monitoring
+    if (errorCode === 'TOKEN_EXPIRED' || errorCode === 'AUTH_FAILED') {
+      trackXeroConnection('unknown', {
+        action: 'token_refresh_failed',
+        error: error.message,
+        errorCode
+      })
+    }
+
+    // Also track as general error for backward compatibility
+    trackError(null, {
+      type: 'xero_export_failed',
+      message: error.message,
+      endpoint: '/api/xero/export',
+      context: { errorCode }
+    })
+
+    // Check for refresh token expired error
+    if (errorCode === 'TOKEN_EXPIRED') {
+      return NextResponse.json({
         error: 'Xero session expired. Please reconnect your Xero account.',
         code: 'XERO_TOKEN_EXPIRED',
         requiresReconnect: true
       }, { status: 401 })
     }
-    
+
     // Handle specific Xero errors
-    if (error.response?.statusCode === 401) {
-      return NextResponse.json({ 
+    if (errorCode === 'AUTH_FAILED') {
+      return NextResponse.json({
         error: 'Xero authentication failed. Please reconnect your Xero account.',
         code: 'XERO_AUTH_FAILED',
         requiresReconnect: true
       }, { status: 401 })
     }
-    
-    if (error.response?.statusCode === 403) {
-      return NextResponse.json({ 
-        error: 'Access denied. Please check your Xero permissions.' 
+
+    if (errorCode === 'ACCESS_DENIED') {
+      return NextResponse.json({
+        error: 'Access denied. Please check your Xero permissions.'
       }, { status: 403 })
     }
 
-    return NextResponse.json({ 
-      error: error.message || 'Failed to export to Xero' 
+    if (errorCode === 'RATE_LIMITED') {
+      return NextResponse.json({
+        error: 'Xero API rate limit reached. Please try again in a few minutes.'
+      }, { status: 429 })
+    }
+
+    return NextResponse.json({
+      error: error.message || 'Failed to export to Xero'
     }, { status: 500 })
   }
 }

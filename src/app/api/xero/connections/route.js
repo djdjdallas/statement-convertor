@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { trackXeroConnection } from '@/lib/posthog-server';
 
 export async function GET(request) {
   try {
@@ -51,6 +52,12 @@ export async function DELETE(request) {
 
       if (error) {
         console.error('Failed to delete connection:', error);
+        trackXeroConnection(user.id, {
+          action: 'disconnected',
+          tenantId,
+          error: 'Failed to delete connection',
+          errorCode: 'DELETE_ERROR'
+        });
         return NextResponse.json({ error: 'Failed to delete connection' }, { status: 500 });
       }
     } else {
@@ -63,13 +70,30 @@ export async function DELETE(request) {
 
       if (error) {
         console.error('Failed to disconnect:', error);
+        trackXeroConnection(user.id, {
+          action: 'disconnected',
+          tenantId,
+          error: 'Failed to disconnect',
+          errorCode: 'DISCONNECT_ERROR'
+        });
         return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
       }
     }
 
+    // Track successful disconnect
+    trackXeroConnection(user.id, {
+      action: 'disconnected',
+      tenantId
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Disconnect error:', error);
+    trackXeroConnection('unknown', {
+      action: 'disconnected',
+      error: error.message,
+      errorCode: 'DISCONNECT_ERROR'
+    });
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

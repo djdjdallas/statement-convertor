@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { XeroService } from '@/lib/xero/xero-service';
 import { encrypt } from '@/lib/encryption';
 import { createClient } from '@/lib/supabase/server';
+import { trackXeroConnection } from '@/lib/posthog-server';
 
 export async function GET(request) {
   try {
@@ -10,6 +11,11 @@ export async function GET(request) {
     const state = url.searchParams.get('state');
 
     if (!code || !state) {
+      trackXeroConnection('unknown', {
+        action: 'auth_failed',
+        error: 'Missing OAuth parameters',
+        errorCode: 'MISSING_PARAMS'
+      });
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?xero_error=missing_params`);
     }
 
@@ -26,6 +32,11 @@ export async function GET(request) {
 
     if (stateError || !stateRecord) {
       console.error('Invalid OAuth state:', stateError);
+      trackXeroConnection('unknown', {
+        action: 'auth_failed',
+        error: 'Invalid or expired OAuth state',
+        errorCode: 'INVALID_STATE'
+      });
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?xero_error=invalid_state`);
     }
 
@@ -81,6 +92,20 @@ export async function GET(request) {
 
       if (result.error) {
         console.error('Failed to store Xero connection:', result.error);
+        trackXeroConnection(stateRecord.user_id, {
+          action: 'auth_failed',
+          tenantId: tenant.tenantId,
+          tenantName: tenant.tenantName,
+          error: 'Failed to store connection',
+          errorCode: 'DB_ERROR'
+        });
+      } else {
+        // Track successful connection for each tenant
+        trackXeroConnection(stateRecord.user_id, {
+          action: 'auth_completed',
+          tenantId: tenant.tenantId,
+          tenantName: tenant.tenantName
+        });
       }
     }
 
@@ -90,6 +115,11 @@ export async function GET(request) {
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?xero_success=connected`);
   } catch (error) {
     console.error('Xero callback error:', error);
+    trackXeroConnection('unknown', {
+      action: 'auth_failed',
+      error: error.message,
+      errorCode: 'CALLBACK_ERROR'
+    });
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?xero_error=callback_failed`);
   }
 }
